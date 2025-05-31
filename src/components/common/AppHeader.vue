@@ -43,7 +43,7 @@
           <ShoppingCart ref="shoppingCartRef" />
 
           <!-- Theme Toggle -->
-          <n-button 
+          <n-button
             @click="toggleTheme"
             quaternary
             circle
@@ -57,7 +57,7 @@
           </n-button>
 
           <!-- Mobile Menu Toggle -->
-          <n-button 
+          <n-button
             @click="toggleMobileMenu"
             quaternary
             circle
@@ -75,7 +75,7 @@
     </div>
 
     <!-- Mobile Menu -->
-    <div 
+    <div
       v-show="isMobileMenuOpen"
       class="md:hidden bg-light-bg-secondary dark:bg-dark-bg-secondary border-t border-light-border-secondary dark:border-dark-border-secondary"
     >
@@ -122,10 +122,7 @@ import {
   MenuOutline,
   CloseOutline,
   HomeOutline,
-  GridOutline,
-  ListOutline,
-  InformationCircleOutline,
-  CallOutline
+  GridOutline
 } from '@vicons/ionicons5'
 import { useTheme, useNaiveTheme } from '@/composables/useTheme'
 import { SearchBar, ShoppingCart } from '@/components/examples'
