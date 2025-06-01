@@ -9,7 +9,7 @@ export const userRoutes: RouteRecordRaw[] = [
       {
         path: '',
         name: 'Home',
-        component: () => import('@/views/Home.vue'),
+        component: () => import('@/views/user/Home.vue'),
         meta: {
           title: 'Home - Sport Shop'
         }

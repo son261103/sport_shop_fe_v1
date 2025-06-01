@@ -8,8 +8,9 @@
       <!-- Breadcrumb -->
       <AppBreadcrumb :current-path="currentPath" />
 
-      <!-- Page Content -->
-      <slot />
+      <div class="mt-4">
+        <router-view />
+      </div>
     </main>
 
     <!-- Footer -->
@@ -18,19 +19,19 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import { AppHeader, AppFooter, AppBreadcrumb } from '@/components/common'
+import { ref } from "vue";
+import { AppHeader, AppFooter, AppBreadcrumb } from "@/components/user/common";
 
 interface Props {
-  currentPath?: string
-  showBreadcrumb?: boolean
+  currentPath?: string;
+  showBreadcrumb?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  currentPath: '/',
-  showBreadcrumb: true
-})
+  currentPath: "/",
+  showBreadcrumb: true,
+});
 
 // In a real app, this would come from Vue Router
-const currentPath = ref(props.currentPath)
+const currentPath = ref(props.currentPath);
 </script>
