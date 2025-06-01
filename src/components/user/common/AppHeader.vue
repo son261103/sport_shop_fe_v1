@@ -64,12 +64,12 @@
                   Tài khoản của tôi
                 </div>
               </div>
-              <div class="py-1.5">
+              <div class="py-1.5 font-medium">
                 <a href="#" class="dropdown-item">
                   <div class="flex items-center">
                     <n-icon
                       size="16"
-                      class="mr-1 text-light-accent-sport dark:text-dark-accent-sport"
+                      class="mr-2.5 text-light-accent-sport dark:text-dark-accent-sport"
                     >
                       <PersonOutline />
                     </n-icon>
@@ -364,6 +364,4 @@ const hideUserMenu = () => {
     isUserMenuOpen.value = false;
   }, 200);
 };
-
-
 </script>
