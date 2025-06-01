@@ -17,7 +17,7 @@
       v-show="isExpanded"
       @mouseenter="cancelCollapseTimer"
       @mouseleave="startCollapseTimer"
-      class="search-container dropdown-menu w-64 flex items-center bg-light-bg-secondary dark:bg-dark-bg-secondary rounded-lg overflow-hidden"
+      class="search-container w-64 flex items-center"
       :class="{ 'show': isExpanded, 'expanded': isExpanded }"
     >
       <!-- Search Icon -->
@@ -262,51 +262,3 @@ defineExpose({
 })
 </script>
 
-<style scoped>
-/* Search specific styles */
-.search-container {
-  min-width: 16rem;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.search-container input {
-  background: transparent;
-  border: none;
-  outline: none;
-  transition: all 0.2s ease-in-out;
-}
-
-.search-container input:focus {
-  outline: none;
-  box-shadow: none;
-}
-
-/* Override dropdown positioning for search */
-.search-container.dropdown-menu {
-  position: absolute;
-  opacity: 1;
-  visibility: visible;
-  transform: none;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* Smooth expand/collapse animation */
-.search-container:not(.expanded) {
-  transform: scale(0.95);
-  opacity: 0.8;
-}
-
-.search-container.expanded {
-  transform: scale(1);
-  opacity: 1;
-}
-
-/* Suggestions dropdown animation */
-.dropdown-menu {
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.dropdown-item {
-  transition: all 0.15s ease-in-out;
-}
-</style>

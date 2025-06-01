@@ -24,7 +24,7 @@
     >
       <!-- Cart Header -->
       <div class="dropdown-header flex justify-between items-center">
-        <h3 class="font-medium text-light-text-primary dark:text-dark-text-primary">Giỏ hàng</h3>
+        <h5 class="font-medium text-light-text-primary dark:text-dark-text-primary">Giỏ hàng</h5>
         <button 
           @click="closeCart"
           class="text-light-text-secondary dark:text-dark-text-secondary hover:text-light-accent-sport dark:hover:text-dark-accent-sport transition-colors p-1 rounded-md hover:bg-light-bg-primary dark:hover:bg-dark-bg-primary"
