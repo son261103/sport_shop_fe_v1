@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { onMounted } from 'vue'
 import { ThemeProvider } from './providers'
-import { DefaultLayout } from './layouts'
 
 import { useThemeStore } from './stores/theme'
 
@@ -15,8 +14,6 @@ onMounted(() => {
 
 <template>
   <ThemeProvider>
-    <DefaultLayout>
-      <router-view />
-    </DefaultLayout>
+    <router-view />
   </ThemeProvider>
 </template>

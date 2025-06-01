@@ -1,23 +1,12 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import type { RouteRecordRaw } from 'vue-router'
+import { userRoutes } from './userRouter'
+import { adminRoutes } from './adminRouter'
 
+// Combine all routes
 const routes: RouteRecordRaw[] = [
-  {
-    path: '/',
-    name: 'Home',
-    component: () => import('@/views/Home.vue'),
-    meta: {
-      title: 'Home - Sport Shop'
-    }
-  },
-  {
-    path: '/components',
-    name: 'ComponentShowcase',
-    component: () => import('@/views/ComponentShowcase.vue'),
-    meta: {
-      title: 'Component Showcase - Sport Shop'
-    }
-  }
+  ...userRoutes,
+  ...adminRoutes
 ]
 
 const router = createRouter({
