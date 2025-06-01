@@ -2,7 +2,8 @@
   <div class="relative">
     <!-- Cart Button with Badge -->
     <button 
-      @click="toggleCart"
+      @mouseenter="showCart"
+      @mouseleave="startHideTimer"
       class="header-icon p-1.5 text-light-text-secondary dark:text-dark-text-secondary transition-colors relative"
       :class="{ 'text-light-accent-sport dark:text-dark-accent-sport active-icon': isOpen }"
     >
@@ -16,6 +17,8 @@
     <!-- Cart Dropdown -->
     <div 
       v-show="isOpen"
+      @mouseenter="cancelHideTimer"
+      @mouseleave="startHideTimer"
       class="cart-dropdown dropdown-menu w-80"
       :class="{ 'show': isOpen }"
     >
@@ -120,17 +123,12 @@
       </div>
     </div>
 
-    <!-- Backdrop when cart is open -->
-    <div
-      v-if="isOpen"
-      @click="closeCart"
-      class="fixed inset-0 z-40"
-    ></div>
+
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onBeforeUnmount } from 'vue'
 import { NIcon, NBadge, NButton } from 'naive-ui'
 import { CartOutline, CloseOutline, TrashOutline, AddOutline, RemoveOutline } from '@vicons/ionicons5'
 
@@ -164,6 +162,7 @@ const cartItems = ref<CartItem[]>([
 ])
 
 const isOpen = ref(false)
+const hideTimer = ref<number | null>(null)
 
 // Computed properties
 const cartItemCount = computed(() => {
@@ -175,12 +174,30 @@ const cartTotal = computed(() => {
 })
 
 // Methods
-const toggleCart = () => {
-  isOpen.value = !isOpen.value
+const showCart = () => {
+  cancelHideTimer()
+  isOpen.value = true
+}
+
+const hideCart = () => {
+  isOpen.value = false
 }
 
 const closeCart = () => {
   isOpen.value = false
+}
+
+const startHideTimer = () => {
+  hideTimer.value = setTimeout(() => {
+    hideCart()
+  }, 300)
+}
+
+const cancelHideTimer = () => {
+  if (hideTimer.value) {
+    clearTimeout(hideTimer.value)
+    hideTimer.value = null
+  }
 }
 
 const updateItemQuantity = (index: number, quantity: number) => {
@@ -213,17 +230,19 @@ const formatPrice = (price: number) => {
   return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price)
 }
 
-// Handle clicks outside to close cart
-const handleClickOutside = (event: MouseEvent) => {
-  const target = event.target as HTMLElement
-  if (isOpen.value && !target.closest('.cart-dropdown') && !target.closest('button')) {
-    closeCart()
+
+
+// Cleanup timer on unmount
+onBeforeUnmount(() => {
+  if (hideTimer.value) {
+    clearTimeout(hideTimer.value)
   }
-}
+})
 
 // Expose methods to parent component
 defineExpose({
   openCart: () => {
+    cancelHideTimer()
     isOpen.value = true
   },
   closeCart,
@@ -239,35 +258,9 @@ defineExpose({
     }
     
     // Optionally open cart when adding items
+    cancelHideTimer()
     isOpen.value = true
   }
 })
 </script>
 
-<style scoped>
-/* Cart specific styles */
-.cart-dropdown {
-  min-width: 20rem;
-  max-width: 24rem;
-}
-
-/* Product image styling */
-.cart-dropdown img {
-  transition: transform 0.2s ease;
-}
-
-.cart-dropdown img:hover {
-  transform: scale(1.05);
-}
-
-/* Quantity controls styling */
-.cart-dropdown button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-/* Smooth transitions for cart items */
-.cart-dropdown .border-b:last-child {
-  border-bottom: none;
-}
-</style>

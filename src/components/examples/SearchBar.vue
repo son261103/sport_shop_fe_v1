@@ -2,7 +2,8 @@
   <div class="relative">
     <!-- Search Icon Only Button -->
     <button 
-      @click="expandSearch"
+      @mouseenter="expandSearch"
+      @mouseleave="startCollapseTimer"
       class="header-icon p-1.5 text-light-text-secondary dark:text-dark-text-secondary transition-colors relative"
       :class="{ 'text-light-accent-sport dark:text-dark-accent-sport active-icon': isExpanded }"
     >
@@ -14,8 +15,10 @@
     <!-- Expanded Search Input -->
     <div 
       v-show="isExpanded"
+      @mouseenter="cancelCollapseTimer"
+      @mouseleave="startCollapseTimer"
       class="search-container dropdown-menu w-64 flex items-center bg-light-bg-secondary dark:bg-dark-bg-secondary rounded-lg overflow-hidden"
-      :class="{ 'show': isExpanded }"
+      :class="{ 'show': isExpanded, 'expanded': isExpanded }"
     >
       <!-- Search Icon -->
       <div class="flex-shrink-0 pl-3">
@@ -67,6 +70,8 @@
     <!-- Suggestions Dropdown -->
     <div
       v-if="showSuggestions && filteredSuggestions.length > 0 && isExpanded"
+      @mouseenter="cancelCollapseTimer"
+      @mouseleave="startCollapseTimer"
       class="dropdown-menu w-64 max-h-60 overflow-y-auto show"
       style="top: calc(100% + 42px);"
     >
@@ -91,17 +96,12 @@
       </ul>
     </div>
 
-    <!-- Backdrop when expanded -->
-    <div
-      v-if="isExpanded"
-      @click="collapseSearch"
-      class="fixed inset-0 z-40"
-    ></div>
+
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue'
+import { ref, computed, onBeforeUnmount, watch } from 'vue'
 import { NIcon } from 'naive-ui'
 import { SearchOutline, CloseOutline } from '@vicons/ionicons5'
 
@@ -129,6 +129,7 @@ const showSuggestions = ref(false)
 const highlightedIndex = ref(-1)
 const isExpanded = ref(false)
 const searchInputRef = ref<HTMLInputElement | null>(null)
+const collapseTimer = ref<number | null>(null)
 
 // Computed
 const filteredSuggestions = computed(() => {
@@ -205,6 +206,7 @@ const performSearch = () => {
 }
 
 const expandSearch = () => {
+  cancelCollapseTimer()
   isExpanded.value = true
   // Focus the input after expanding
   setTimeout(() => {
@@ -219,13 +221,20 @@ const collapseSearch = () => {
   showSuggestions.value = false
 }
 
-// Handle clicks outside to collapse search
-const handleClickOutside = (event: MouseEvent) => {
-  const target = event.target as HTMLElement
-  if (isExpanded.value && !target.closest('.search-container') && !target.closest('button')) {
+const startCollapseTimer = () => {
+  collapseTimer.value = setTimeout(() => {
     collapseSearch()
+  }, 300)
+}
+
+const cancelCollapseTimer = () => {
+  if (collapseTimer.value) {
+    clearTimeout(collapseTimer.value)
+    collapseTimer.value = null
   }
 }
+
+
 
 // Watch for search query changes
 watch(searchQuery, (newValue) => {
@@ -235,12 +244,10 @@ watch(searchQuery, (newValue) => {
 })
 
 // Lifecycle hooks
-onMounted(() => {
-  document.addEventListener('click', handleClickOutside)
-})
-
 onBeforeUnmount(() => {
-  document.removeEventListener('click', handleClickOutside)
+  if (collapseTimer.value) {
+    clearTimeout(collapseTimer.value)
+  }
 })
 
 // Expose methods to parent component
@@ -259,12 +266,14 @@ defineExpose({
 /* Search specific styles */
 .search-container {
   min-width: 16rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .search-container input {
   background: transparent;
   border: none;
   outline: none;
+  transition: all 0.2s ease-in-out;
 }
 
 .search-container input:focus {
@@ -278,5 +287,26 @@ defineExpose({
   opacity: 1;
   visibility: visible;
   transform: none;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Smooth expand/collapse animation */
+.search-container:not(.expanded) {
+  transform: scale(0.95);
+  opacity: 0.8;
+}
+
+.search-container.expanded {
+  transform: scale(1);
+  opacity: 1;
+}
+
+/* Suggestions dropdown animation */
+.dropdown-menu {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.dropdown-item {
+  transition: all 0.15s ease-in-out;
 }
 </style>
