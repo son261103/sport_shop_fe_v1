@@ -1,6 +1,6 @@
 <template>
   <div 
-    class="group relative overflow-hidden rounded-xl bg-light-bg-secondary dark:bg-dark-bg-secondary border border-light-border dark:border-dark-border hover:border-sport-primary dark:hover:border-sport-accent transition-all duration-300 cursor-pointer"
+    class="group relative overflow-hidden rounded-xl bg-light-bg-secondary dark:bg-dark-bg-secondary border border-light-border-primary dark:border-dark-border-primary hover:border-sport-primary dark:hover:border-sport-accent transition-all duration-300 cursor-pointer"
     @click="handleClick"
   >
     <!-- Background Image -->

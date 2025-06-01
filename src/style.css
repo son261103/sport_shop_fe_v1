@@ -104,8 +104,7 @@
 
   /* 🔗 Links */
   a {
-    @apply text-light-accent-sport dark:text-dark-accent-sport
-           hover:underline transition-colors duration-200;
+    @apply text-light-accent-sport dark:text-dark-accent-sport;
   }
 
   /* 📝 Form Elements */
@@ -237,12 +236,77 @@
     @apply px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200
            text-light-text-secondary dark:text-dark-text-secondary
            hover:text-light-accent-sport dark:hover:text-dark-accent-sport
-           hover:bg-light-bg-secondary dark:hover:bg-dark-bg-secondary;
+           relative;
+  }
+
+  .nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent-sport), var(--accent-sport-secondary, var(--accent-sport)));
+    transition: width 0.3s ease-in-out;
+    border-radius: 2px;
+  }
+
+  .nav-link:hover::after {
+    width: 100%;
   }
 
   .nav-link.active {
-    @apply text-light-accent-sport dark:text-dark-accent-sport
-           bg-primary-50 dark:bg-primary-900;
+    @apply text-light-accent-sport dark:text-dark-accent-sport;
+  }
+
+  .nav-link.active::after {
+    width: 100%;
+    background: linear-gradient(90deg, var(--accent-sport), var(--accent-sport-secondary, var(--accent-sport)));
+  }
+
+  /* 🎯 Header Icon Components */
+  .header-icon {
+    @apply relative overflow-visible flex items-center justify-center
+           w-11 h-11 rounded-lg transition-all duration-200
+           hover:bg-light-bg-secondary dark:hover:bg-dark-bg-secondary
+           focus:outline-none focus:ring-2 focus:ring-light-accent-sport dark:focus:ring-dark-accent-sport
+           focus:ring-opacity-50;
+  }
+
+  .header-icon.active-icon {
+    @apply bg-light-bg-secondary dark:bg-dark-bg-secondary;
+  }
+
+  /* 🎯 Dropdown Components */
+  .dropdown-menu {
+    @apply absolute right-0 top-full mt-1 bg-light-bg-primary dark:bg-dark-bg-primary
+           border border-light-border-primary dark:border-dark-border-primary rounded-lg shadow-lg
+           z-50 overflow-hidden transition-all duration-200 ease-in-out
+           opacity-0 invisible transform translate-y-2 scale-95;
+  }
+
+  .dropdown-menu.show {
+    @apply opacity-100 visible transform translate-y-0 scale-100;
+  }
+
+  .dropdown-header {
+    @apply p-3 border-b border-light-border-primary dark:border-dark-border-primary
+           bg-light-bg-secondary dark:bg-dark-bg-secondary;
+  }
+
+  .dropdown-item {
+    @apply block px-3 py-2 text-light-text-secondary dark:text-dark-text-secondary
+           hover:text-light-accent-sport dark:hover:text-dark-accent-sport
+           hover:bg-light-bg-secondary dark:hover:bg-dark-bg-secondary
+           transition-colors duration-150;
+  }
+
+  .dropdown-item.danger {
+    @apply hover:text-light-accent-danger dark:hover:text-dark-accent-danger;
+  }
+
+  .dropdown-divider {
+    @apply border-t border-light-border-primary dark:border-dark-border-primary my-1;
   }
 
   /* 🔍 Search Components */

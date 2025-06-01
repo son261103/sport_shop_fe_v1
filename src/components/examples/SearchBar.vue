@@ -1,185 +1,282 @@
 <template>
-  <div class="relative w-full max-w-md">
-    <!-- Search Input -->
-    <div class="relative">
+  <div class="relative">
+    <!-- Search Icon Only Button -->
+    <button 
+      @click="expandSearch"
+      class="header-icon p-1.5 text-light-text-secondary dark:text-dark-text-secondary transition-colors relative"
+      :class="{ 'text-light-accent-sport dark:text-dark-accent-sport active-icon': isExpanded }"
+    >
+      <n-icon size="22">
+        <SearchOutline />
+      </n-icon>
+    </button>
+
+    <!-- Expanded Search Input -->
+    <div 
+      v-show="isExpanded"
+      class="search-container dropdown-menu w-64 flex items-center bg-light-bg-secondary dark:bg-dark-bg-secondary rounded-lg overflow-hidden"
+      :class="{ 'show': isExpanded }"
+    >
+      <!-- Search Icon -->
+      <div class="flex-shrink-0 pl-3">
+        <n-icon size="16" class="text-light-text-muted dark:text-dark-text-muted">
+          <SearchOutline />
+        </n-icon>
+      </div>
+
+      <!-- Category Filter (Optional) -->
+      <div v-if="showCategoryFilter" class="flex-shrink-0 pl-1">
+        <select 
+          v-model="selectedCategory" 
+          class="text-xs bg-transparent border-0 text-light-text-secondary dark:text-dark-text-secondary focus:ring-0 py-1 pl-1 pr-6"
+        >
+          <option value="all">Tất cả</option>
+          <option value="clothing">Quần áo</option>
+          <option value="shoes">Giày</option>
+          <option value="accessories">Phụ kiện</option>
+        </select>
+      </div>
+
+      <!-- Search Input -->
       <input
+        ref="searchInputRef"
         v-model="searchQuery"
         type="text"
         :placeholder="placeholder"
-        class="w-full pl-10 pr-12 py-3 bg-light-bg-secondary dark:bg-dark-bg-secondary border border-light-border dark:border-dark-border rounded-lg focus:outline-none focus:ring-2 focus:ring-sport-primary dark:focus:ring-sport-accent focus:border-transparent text-light-text-primary dark:text-dark-text-primary placeholder-light-text-secondary dark:placeholder-dark-text-secondary transition-all duration-200"
-        @input="handleInput"
-        @focus="showSuggestions = true"
+        class="flex-grow bg-transparent border-0 py-2.5 px-2 text-sm text-light-text-primary dark:text-dark-text-primary focus:ring-0 focus:outline-none"
+        @focus="handleFocus"
         @blur="handleBlur"
-        @keydown="handleKeydown"
+        @keydown.down.prevent="navigateSuggestion(1)"
+        @keydown.up.prevent="navigateSuggestion(-1)"
+        @keydown.enter="handleEnter"
+        @keydown.esc="collapseSearch"
       />
-      
-      <!-- Search Icon -->
-      <div class="absolute left-3 top-1/2 transform -translate-y-1/2">
-        <svg class="w-5 h-5 text-light-text-secondary dark:text-dark-text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-        </svg>
-      </div>
 
       <!-- Clear Button -->
       <button
         v-if="searchQuery"
         @click="clearSearch"
-        class="absolute right-3 top-1/2 transform -translate-y-1/2 text-light-text-secondary dark:text-dark-text-secondary hover:text-sport-primary dark:hover:text-sport-accent transition-colors"
+        class="flex-shrink-0 p-1 mr-2 text-light-text-muted dark:text-dark-text-muted hover:text-light-accent-sport dark:hover:text-dark-accent-sport transition-colors"
       >
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-        </svg>
+        <n-icon size="16">
+          <CloseOutline />
+        </n-icon>
       </button>
     </div>
 
-    <!-- Search Suggestions -->
+    <!-- Suggestions Dropdown -->
     <div
-      v-if="showSuggestions && filteredSuggestions.length > 0"
-      class="absolute top-full left-0 right-0 mt-1 bg-light-bg-primary dark:bg-dark-bg-primary border border-light-border dark:border-dark-border rounded-lg shadow-lg z-50 max-h-60 overflow-y-auto"
+      v-if="showSuggestions && filteredSuggestions.length > 0 && isExpanded"
+      class="dropdown-menu w-64 max-h-60 overflow-y-auto show"
+      style="top: calc(100% + 42px);"
     >
-      <div
-        v-for="(suggestion, index) in filteredSuggestions"
-        :key="suggestion.id"
-        :class="[
-          'px-4 py-3 cursor-pointer transition-colors',
-          index === selectedIndex 
-            ? 'bg-sport-primary/10 dark:bg-sport-accent/10' 
-            : 'hover:bg-light-bg-secondary dark:hover:bg-dark-bg-secondary'
-        ]"
-        @click="selectSuggestion(suggestion)"
-      >
-        <div class="flex items-center space-x-3">
-          <div class="flex-shrink-0">
-            <svg class="w-4 h-4 text-light-text-secondary dark:text-dark-text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-            </svg>
+      <ul class="py-1">
+        <li
+          v-for="(suggestion, index) in filteredSuggestions"
+          :key="index"
+          @click="selectSuggestion(suggestion)"
+          @mouseenter="highlightedIndex = index"
+          class="dropdown-item cursor-pointer text-sm"
+          :class="{
+            'bg-light-bg-secondary dark:bg-dark-bg-secondary text-light-text-primary dark:text-dark-text-primary': highlightedIndex === index
+          }"
+        >
+          <div class="flex items-center">
+            <n-icon size="16" class="mr-2 text-light-accent-sport dark:text-dark-accent-sport">
+              <SearchOutline />
+            </n-icon>
+            <span>{{ suggestion }}</span>
           </div>
-          <div class="flex-1">
-            <div class="text-sm font-medium text-light-text-primary dark:text-dark-text-primary">
-              {{ suggestion.title }}
-            </div>
-            <div v-if="suggestion.category" class="text-xs text-light-text-secondary dark:text-dark-text-secondary">
-              in {{ suggestion.category }}
-            </div>
-          </div>
-          <div v-if="suggestion.type" class="flex-shrink-0">
-            <span class="text-xs px-2 py-1 bg-sport-primary/20 dark:bg-sport-accent/20 text-sport-primary dark:text-sport-accent rounded-full">
-              {{ suggestion.type }}
-            </span>
-          </div>
-        </div>
-      </div>
+        </li>
+      </ul>
     </div>
 
-    <!-- No Results -->
+    <!-- Backdrop when expanded -->
     <div
-      v-if="showSuggestions && searchQuery && filteredSuggestions.length === 0"
-      class="absolute top-full left-0 right-0 mt-1 bg-light-bg-primary dark:bg-dark-bg-primary border border-light-border dark:border-dark-border rounded-lg shadow-lg z-50 p-4 text-center"
-    >
-      <div class="text-light-text-secondary dark:text-dark-text-secondary">
-        No results found for "{{ searchQuery }}"
-      </div>
-    </div>
+      v-if="isExpanded"
+      @click="collapseSearch"
+      class="fixed inset-0 z-40"
+    ></div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, nextTick } from 'vue'
-
-interface SearchSuggestion {
-  id: string
-  title: string
-  category?: string
-  type?: string
-}
+import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue'
+import { NIcon } from 'naive-ui'
+import { SearchOutline, CloseOutline } from '@vicons/ionicons5'
 
 interface Props {
   placeholder?: string
-  suggestions?: SearchSuggestion[]
-}
-
-interface Emits {
-  (e: 'search', query: string): void
-  (e: 'select', suggestion: SearchSuggestion): void
+  size?: 'small' | 'medium' | 'large'
+  showCategoryFilter?: boolean
+  suggestions?: string[]
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  placeholder: 'Search products, categories...',
-  suggestions: () => [
-    { id: '1', title: 'Nike Air Max', category: 'Shoes', type: 'Product' },
-    { id: '2', title: 'Running Shoes', category: 'Footwear', type: 'Category' },
-    { id: '3', title: 'Adidas', category: 'Brand', type: 'Brand' },
-    { id: '4', title: 'Basketball', category: 'Sports', type: 'Category' },
-    { id: '5', title: 'Workout Gear', category: 'Equipment', type: 'Category' },
-  ]
+  placeholder: 'Tìm kiếm...',
+  size: 'medium',
+  showCategoryFilter: false,
+  suggestions: () => []
 })
 
-const emit = defineEmits<Emits>()
+const emit = defineEmits(['search', 'clear', 'focus', 'blur'])
 
+// State
 const searchQuery = ref('')
+const selectedCategory = ref('all')
+const isFocused = ref(false)
 const showSuggestions = ref(false)
-const selectedIndex = ref(-1)
+const highlightedIndex = ref(-1)
+const isExpanded = ref(false)
+const searchInputRef = ref<HTMLInputElement | null>(null)
 
+// Computed
 const filteredSuggestions = computed(() => {
-  if (!searchQuery.value) return props.suggestions
+  if (!searchQuery.value) return []
   
-  return props.suggestions.filter(suggestion =>
-    suggestion.title.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-    suggestion.category?.toLowerCase().includes(searchQuery.value.toLowerCase())
+  return props.suggestions.filter(suggestion => 
+    suggestion.toLowerCase().includes(searchQuery.value.toLowerCase())
   )
 })
 
-const handleInput = () => {
-  selectedIndex.value = -1
-  emit('search', searchQuery.value)
+// Methods
+const handleFocus = () => {
+  isFocused.value = true
+  showSuggestions.value = true
+  emit('focus')
 }
 
 const handleBlur = () => {
-  // Delay hiding suggestions to allow click events
+  isFocused.value = false
+  // Don't hide suggestions immediately to allow clicking on them
   setTimeout(() => {
-    showSuggestions.value = false
-  }, 200)
-}
-
-const handleKeydown = (event: KeyboardEvent) => {
-  if (!showSuggestions.value) return
-
-  switch (event.key) {
-    case 'ArrowDown':
-      event.preventDefault()
-      selectedIndex.value = Math.min(selectedIndex.value + 1, filteredSuggestions.value.length - 1)
-      break
-    case 'ArrowUp':
-      event.preventDefault()
-      selectedIndex.value = Math.max(selectedIndex.value - 1, -1)
-      break
-    case 'Enter':
-      event.preventDefault()
-      if (selectedIndex.value >= 0) {
-        selectSuggestion(filteredSuggestions.value[selectedIndex.value])
-      } else {
-        emit('search', searchQuery.value)
-        showSuggestions.value = false
-      }
-      break
-    case 'Escape':
+    if (!isFocused.value) {
       showSuggestions.value = false
-      selectedIndex.value = -1
-      break
-  }
-}
-
-const selectSuggestion = (suggestion: SearchSuggestion) => {
-  searchQuery.value = suggestion.title
-  showSuggestions.value = false
-  selectedIndex.value = -1
-  emit('select', suggestion)
+    }
+  }, 200)
+  emit('blur')
 }
 
 const clearSearch = () => {
   searchQuery.value = ''
-  showSuggestions.value = false
-  selectedIndex.value = -1
-  emit('search', '')
+  emit('clear')
+  // Focus the input after clearing
+  if (searchInputRef.value) {
+    searchInputRef.value.focus()
+  }
 }
+
+const navigateSuggestion = (direction: number) => {
+  if (!filteredSuggestions.value.length) return
+  
+  const newIndex = highlightedIndex.value + direction
+  
+  if (newIndex >= filteredSuggestions.value.length) {
+    highlightedIndex.value = 0
+  } else if (newIndex < 0) {
+    highlightedIndex.value = filteredSuggestions.value.length - 1
+  } else {
+    highlightedIndex.value = newIndex
+  }
+}
+
+const handleEnter = () => {
+  if (highlightedIndex.value >= 0 && filteredSuggestions.value.length > 0) {
+    selectSuggestion(filteredSuggestions.value[highlightedIndex.value])
+  } else {
+    performSearch()
+  }
+}
+
+const selectSuggestion = (suggestion: string) => {
+  searchQuery.value = suggestion
+  showSuggestions.value = false
+  performSearch()
+}
+
+const performSearch = () => {
+  if (searchQuery.value.trim()) {
+    emit('search', {
+      query: searchQuery.value,
+      category: selectedCategory.value
+    })
+    collapseSearch()
+  }
+}
+
+const expandSearch = () => {
+  isExpanded.value = true
+  // Focus the input after expanding
+  setTimeout(() => {
+    if (searchInputRef.value) {
+      searchInputRef.value.focus()
+    }
+  }, 100)
+}
+
+const collapseSearch = () => {
+  isExpanded.value = false
+  showSuggestions.value = false
+}
+
+// Handle clicks outside to collapse search
+const handleClickOutside = (event: MouseEvent) => {
+  const target = event.target as HTMLElement
+  if (isExpanded.value && !target.closest('.search-container') && !target.closest('button')) {
+    collapseSearch()
+  }
+}
+
+// Watch for search query changes
+watch(searchQuery, (newValue) => {
+  if (newValue) {
+    showSuggestions.value = true
+  }
+})
+
+// Lifecycle hooks
+onMounted(() => {
+  document.addEventListener('click', handleClickOutside)
+})
+
+onBeforeUnmount(() => {
+  document.removeEventListener('click', handleClickOutside)
+})
+
+// Expose methods to parent component
+defineExpose({
+  clearSearch,
+  performSearch,
+  expandSearch,
+  collapseSearch,
+  focus: () => {
+    expandSearch()
+  }
+})
 </script>
+
+<style scoped>
+/* Search specific styles */
+.search-container {
+  min-width: 16rem;
+}
+
+.search-container input {
+  background: transparent;
+  border: none;
+  outline: none;
+}
+
+.search-container input:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+/* Override dropdown positioning for search */
+.search-container.dropdown-menu {
+  position: absolute;
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+}
+</style>
