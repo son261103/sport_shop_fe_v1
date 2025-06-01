@@ -1,10 +1,12 @@
 <template>
-  <header class="bg-light-bg-primary dark:bg-dark-bg-primary text-light-text-primary dark:text-dark-text-primary border-b border-light-border-primary dark:border-dark-border-primary shadow-sm">
+  <header
+    class="bg-light-bg-primary dark:bg-dark-bg-primary text-light-text-primary dark:text-dark-text-primary border-b border-light-border-primary dark:border-dark-border-primary"
+  >
     <div class="container-custom">
       <div class="flex items-center justify-between h-14">
         <!-- Logo & Brand -->
         <div class="flex items-center space-x-4">
-          <h1 class="text-xl font-bold text-gradient-sport-animated">
+          <h1 class="text-3xl font-bold text-gradient-sport-animated">
             <router-link to="/" class="flex items-center">
               SportShop
             </router-link>
@@ -18,7 +20,10 @@
             :key="item.path"
             :to="item.path"
             class="nav-link py-1.5 px-2 font-medium text-light-text-secondary dark:text-dark-text-secondary relative"
-            :class="{ 'text-light-accent-sport dark:text-dark-accent-sport active': $route.path === item.path }"
+            :class="{
+              'text-light-accent-sport dark:text-dark-accent-sport active':
+                $route.path === item.path,
+            }"
           >
             {{ item.label }}
           </router-link>
@@ -33,14 +38,17 @@
           <ShoppingCart ref="shoppingCartRef" />
 
           <!-- User Menu -->
-          <div 
-            class="relative"
+          <div
+            class="relative user-menu-container"
             @mouseenter="showUserMenu"
             @mouseleave="hideUserMenu"
           >
-            <button 
+            <button
               class="header-icon text-light-text-secondary dark:text-dark-text-secondary transition-colors relative"
-              :class="{ 'text-light-accent-sport dark:text-dark-accent-sport active-icon': isUserMenuOpen }"
+              :class="{
+                'text-light-accent-sport dark:text-dark-accent-sport active-icon':
+                  isUserMenuOpen,
+              }"
             >
               <n-icon size="22">
                 <PersonOutline />
@@ -48,17 +56,21 @@
             </button>
 
             <!-- User Dropdown -->
-            <div 
-              class="dropdown-menu w-52"
-              :class="{ 'show': isUserMenuOpen }"
-            >
+            <div class="dropdown-menu w-52" :class="{ show: isUserMenuOpen }">
               <div class="dropdown-header">
-                <div class="font-medium text-light-text-primary dark:text-dark-text-primary text-base">Tài khoản của tôi</div>
+                <div
+                  class="font-medium text-light-text-primary dark:text-dark-text-primary text-base"
+                >
+                  Tài khoản của tôi
+                </div>
               </div>
               <div class="py-1.5">
                 <a href="#" class="dropdown-item">
                   <div class="flex items-center">
-                    <n-icon size="16" class="mr-2.5 text-light-accent-sport dark:text-dark-accent-sport">
+                    <n-icon
+                      size="16"
+                      class="mr-1 text-light-accent-sport dark:text-dark-accent-sport"
+                    >
                       <PersonOutline />
                     </n-icon>
                     <span>Hồ sơ</span>
@@ -66,7 +78,10 @@
                 </a>
                 <a href="#" class="dropdown-item">
                   <div class="flex items-center">
-                    <n-icon size="16" class="mr-2.5 text-light-accent-sport dark:text-dark-accent-sport">
+                    <n-icon
+                      size="16"
+                      class="mr-2.5 text-light-accent-sport dark:text-dark-accent-sport"
+                    >
                       <HeartOutline />
                     </n-icon>
                     <span>Yêu thích</span>
@@ -74,7 +89,10 @@
                 </a>
                 <a href="#" class="dropdown-item">
                   <div class="flex items-center">
-                    <n-icon size="16" class="mr-2.5 text-light-accent-sport dark:text-dark-accent-sport">
+                    <n-icon
+                      size="16"
+                      class="mr-2.5 text-light-accent-sport dark:text-dark-accent-sport"
+                    >
                       <BagOutline />
                     </n-icon>
                     <span>Đơn hàng</span>
@@ -82,7 +100,10 @@
                 </a>
                 <a href="#" class="dropdown-item">
                   <div class="flex items-center">
-                    <n-icon size="16" class="mr-2.5 text-light-accent-sport dark:text-dark-accent-sport">
+                    <n-icon
+                      size="16"
+                      class="mr-2.5 text-light-accent-sport dark:text-dark-accent-sport"
+                    >
                       <SettingsOutline />
                     </n-icon>
                     <span>Cài đặt</span>
@@ -90,27 +111,36 @@
                 </a>
                 <a href="#" class="dropdown-item">
                   <div class="flex items-center">
-                    <n-icon size="16" class="mr-2.5 text-light-accent-sport dark:text-dark-accent-sport">
+                    <n-icon
+                      size="16"
+                      class="mr-2.5 text-light-accent-sport dark:text-dark-accent-sport"
+                    >
                       <NotificationsOutline />
                     </n-icon>
                     <span>Thông báo</span>
                   </div>
                 </a>
                 <div class="dropdown-divider"></div>
-                <button 
+                <button
                   @click="toggleTheme"
                   class="dropdown-item w-full text-left"
                 >
                   <div class="flex items-center">
-                    <n-icon size="16" class="mr-2.5 text-light-accent-sport dark:text-dark-accent-sport">
+                    <n-icon
+                      size="16"
+                      class="mr-2.5 text-light-accent-sport dark:text-dark-accent-sport"
+                    >
                       <component :is="isDark ? SunnyOutline : MoonOutline" />
                     </n-icon>
-                    <span>{{ isDark ? 'Chế độ sáng' : 'Chế độ tối' }}</span>
+                    <span>{{ isDark ? "Chế độ sáng" : "Chế độ tối" }}</span>
                   </div>
                 </button>
                 <a href="#" class="dropdown-item danger">
                   <div class="flex items-center">
-                    <n-icon size="16" class="mr-2.5 text-light-accent-danger dark:text-dark-accent-danger">
+                    <n-icon
+                      size="16"
+                      class="mr-2.5 text-light-accent-danger dark:text-dark-accent-danger"
+                    >
                       <LogOutOutline />
                     </n-icon>
                     <span>Đăng xuất</span>
@@ -124,7 +154,10 @@
           <button
             @click="toggleMobileMenu"
             class="header-icon md:hidden p-1.5 text-light-text-secondary dark:text-dark-text-secondary transition-colors relative"
-            :class="{ 'text-light-accent-sport dark:text-dark-accent-sport active-icon': isMobileMenuOpen }"
+            :class="{
+              'text-light-accent-sport dark:text-dark-accent-sport active-icon':
+                isMobileMenuOpen,
+            }"
           >
             <n-icon size="22">
               <component :is="isMobileMenuOpen ? CloseOutline : MenuOutline" />
@@ -147,44 +180,87 @@
             :key="`mobile-${item.path}`"
             :to="item.path"
             class="block py-2 px-3 rounded-md font-medium text-light-text-secondary dark:text-dark-text-secondary hover:text-light-accent-sport dark:hover:text-dark-accent-sport transition-colors relative"
-            :class="{ 'text-light-accent-sport dark:text-dark-accent-sport active': $route.path === item.path }"
+            :class="{
+              'text-light-accent-sport dark:text-dark-accent-sport active':
+                $route.path === item.path,
+            }"
             @click="isMobileMenuOpen = false"
           >
-            <n-icon v-if="item.icon" size="16" class="mr-2.5 text-light-accent-sport dark:text-dark-accent-sport">
+            <n-icon
+              v-if="item.icon"
+              size="16"
+              class="mr-2.5 text-light-accent-sport dark:text-dark-accent-sport"
+            >
               <component :is="item.icon" />
             </n-icon>
             {{ item.label }}
           </router-link>
 
           <!-- Mobile Account Links -->
-          <div class="mt-4 pt-3 border-t border-light-border-primary dark:border-dark-border-primary">
-            <div class="text-xs uppercase text-light-text-muted dark:text-dark-text-muted font-semibold tracking-wider mb-2 px-3">Tài khoản</div>
-            <a href="#" class="block py-2 px-3 rounded-md font-medium text-light-text-secondary dark:text-dark-text-secondary hover:text-light-accent-sport dark:hover:text-dark-accent-sport transition-colors">
-              <n-icon size="16" class="mr-2.5 text-light-accent-sport dark:text-dark-accent-sport">
+          <div
+            class="mt-4 pt-3 border-t border-light-border-primary dark:border-dark-border-primary"
+          >
+            <div
+              class="text-xs uppercase text-light-text-muted dark:text-dark-text-muted font-semibold tracking-wider mb-2 px-3"
+            >
+              Tài khoản
+            </div>
+            <a
+              href="#"
+              class="block py-2 px-3 rounded-md font-medium text-light-text-secondary dark:text-dark-text-secondary hover:text-light-accent-sport dark:hover:text-dark-accent-sport transition-colors"
+            >
+              <n-icon
+                size="16"
+                class="mr-2.5 text-light-accent-sport dark:text-dark-accent-sport"
+              >
                 <PersonOutline />
               </n-icon>
               Hồ sơ
             </a>
-            <a href="#" class="block py-2 px-3 rounded-md font-medium text-light-text-secondary dark:text-dark-text-secondary hover:text-light-accent-sport dark:hover:text-dark-accent-sport transition-colors">
-              <n-icon size="16" class="mr-2.5 text-light-accent-sport dark:text-dark-accent-sport">
+            <a
+              href="#"
+              class="block py-2 px-3 rounded-md font-medium text-light-text-secondary dark:text-dark-text-secondary hover:text-light-accent-sport dark:hover:text-dark-accent-sport transition-colors"
+            >
+              <n-icon
+                size="16"
+                class="mr-2.5 text-light-accent-sport dark:text-dark-accent-sport"
+              >
                 <HeartOutline />
               </n-icon>
               Yêu thích
             </a>
-            <a href="#" class="block py-2 px-3 rounded-md font-medium text-light-text-secondary dark:text-dark-text-secondary hover:text-light-accent-sport dark:hover:text-dark-accent-sport transition-colors">
-              <n-icon size="16" class="mr-2.5 text-light-accent-sport dark:text-dark-accent-sport">
+            <a
+              href="#"
+              class="block py-2 px-3 rounded-md font-medium text-light-text-secondary dark:text-dark-text-secondary hover:text-light-accent-sport dark:hover:text-dark-accent-sport transition-colors"
+            >
+              <n-icon
+                size="16"
+                class="mr-2.5 text-light-accent-sport dark:text-dark-accent-sport"
+              >
                 <BagOutline />
               </n-icon>
               Đơn hàng
             </a>
-            <a href="#" class="block py-2 px-3 rounded-md font-medium text-light-text-secondary dark:text-dark-text-secondary hover:text-light-accent-sport dark:hover:text-dark-accent-sport transition-colors">
-              <n-icon size="16" class="mr-2.5 text-light-accent-sport dark:text-dark-accent-sport">
+            <a
+              href="#"
+              class="block py-2 px-3 rounded-md font-medium text-light-text-secondary dark:text-dark-text-secondary hover:text-light-accent-sport dark:hover:text-dark-accent-sport transition-colors"
+            >
+              <n-icon
+                size="16"
+                class="mr-2.5 text-light-accent-sport dark:text-dark-accent-sport"
+              >
                 <SettingsOutline />
               </n-icon>
               Cài đặt
             </a>
-            <a href="#" class="block py-2 px-3 rounded-md font-medium text-light-text-secondary dark:text-dark-text-secondary hover:text-light-accent-sport dark:hover:text-dark-accent-sport transition-colors">
-              <n-icon size="16" class="mr-2.5 text-light-accent-sport dark:text-dark-accent-sport">
+            <a
+              href="#"
+              class="block py-2 px-3 rounded-md font-medium text-light-text-secondary dark:text-dark-text-secondary hover:text-light-accent-sport dark:hover:text-dark-accent-sport transition-colors"
+            >
+              <n-icon
+                size="16"
+                class="mr-2.5 text-light-accent-sport dark:text-dark-accent-sport"
+              >
                 <NotificationsOutline />
               </n-icon>
               Thông báo
@@ -192,18 +268,27 @@
           </div>
 
           <!-- Theme Toggle in Mobile Menu -->
-          <button 
+          <button
             @click="toggleTheme"
             class="w-full mt-2 flex items-center py-2 px-3 rounded-md font-medium text-light-text-secondary dark:text-dark-text-secondary hover:text-light-accent-sport dark:hover:text-dark-accent-sport transition-colors"
           >
-            <n-icon size="16" class="mr-2.5 text-light-accent-sport dark:text-dark-accent-sport">
+            <n-icon
+              size="16"
+              class="mr-2.5 text-light-accent-sport dark:text-dark-accent-sport"
+            >
               <component :is="isDark ? SunnyOutline : MoonOutline" />
             </n-icon>
-            <span>{{ isDark ? 'Chế độ sáng' : 'Chế độ tối' }}</span>
+            <span>{{ isDark ? "Chế độ sáng" : "Chế độ tối" }}</span>
           </button>
-          
-          <a href="#" class="block py-2 px-3 rounded-md font-medium text-light-text-secondary dark:text-dark-text-secondary hover:text-light-accent-sport dark:hover:text-dark-accent-sport transition-colors">
-            <n-icon size="16" class="mr-2.5 text-light-accent-danger dark:text-dark-accent-danger">
+
+          <a
+            href="#"
+            class="block py-2 px-3 rounded-md font-medium text-light-text-secondary dark:text-dark-text-secondary hover:text-light-accent-sport dark:hover:text-dark-accent-sport transition-colors"
+          >
+            <n-icon
+              size="16"
+              class="mr-2.5 text-light-accent-danger dark:text-dark-accent-danger"
+            >
               <LogOutOutline />
             </n-icon>
             Đăng xuất
@@ -215,8 +300,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import { NIcon } from 'naive-ui'
+import { ref } from "vue";
+import { NIcon } from "naive-ui";
 import {
   SunnyOutline,
   MoonOutline,
@@ -227,51 +312,56 @@ import {
   BagOutline,
   SettingsOutline,
   NotificationsOutline,
-  LogOutOutline
-} from '@vicons/ionicons5'
-import { useTheme, useNaiveTheme } from '@/composables/useTheme'
-import { SearchBar, ShoppingCart } from '@/components/examples'
+  LogOutOutline,
+} from "@vicons/ionicons5";
+import { useTheme, useNaiveTheme } from "@/composables/useTheme";
+import { SearchBar, ShoppingCart } from "@/components/examples";
 
 interface NavigationItem {
-  label: string
-  path: string
-  icon?: any
+  label: string;
+  path: string;
+  icon?: any;
 }
 
-const { toggleTheme } = useTheme()
-const { isDark } = useNaiveTheme()
+const { toggleTheme } = useTheme();
+const { isDark } = useNaiveTheme();
 
 // Refs
-const searchBarRef = ref()
-const shoppingCartRef = ref()
-const isMobileMenuOpen = ref(false)
-const isUserMenuOpen = ref(false)
+const searchBarRef = ref();
+const shoppingCartRef = ref();
+const isMobileMenuOpen = ref(false);
+const isUserMenuOpen = ref(false);
+let hideMenuTimeout: NodeJS.Timeout | null = null;
 
 // Navigation items
 const navigationItems: NavigationItem[] = [
-  { label: 'Trang chủ', path: '/' },
-  { label: 'Sản phẩm', path: '/products' },
-  { label: 'Danh mục', path: '/categories' },
-  { label: 'Khuyến mãi', path: '/sale' },
-  { label: 'Liên hệ', path: '/contact' }
-]
+  { label: "Trang chủ", path: "/" },
+  { label: "Sản phẩm", path: "/products" },
+  { label: "Danh mục", path: "/categories" },
+  { label: "Khuyến mãi", path: "/sale" },
+  { label: "Liên hệ", path: "/contact" },
+];
 
 // Methods
 const toggleMobileMenu = () => {
-  isMobileMenuOpen.value = !isMobileMenuOpen.value
+  isMobileMenuOpen.value = !isMobileMenuOpen.value;
   if (isMobileMenuOpen.value) {
-    isUserMenuOpen.value = false
+    isUserMenuOpen.value = false;
   }
-}
+};
 
 const showUserMenu = () => {
-  isUserMenuOpen.value = true
-  isMobileMenuOpen.value = false
-}
+  if (hideMenuTimeout) {
+    clearTimeout(hideMenuTimeout);
+    hideMenuTimeout = null;
+  }
+  isUserMenuOpen.value = true;
+  isMobileMenuOpen.value = false;
+};
 
 const hideUserMenu = () => {
-  isUserMenuOpen.value = false
-}
+  hideMenuTimeout = setTimeout(() => {
+    isUserMenuOpen.value = false;
+  }, 150);
+};
 </script>
-
-
