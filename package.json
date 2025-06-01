@@ -11,12 +11,14 @@
   "dependencies": {
     "@tailwindcss/vite": "^4.1.8",
     "@vicons/ionicons5": "^0.13.0",
+    "aos": "^2.3.4",
     "naive-ui": "^2.41.0",
     "pinia": "^3.0.2",
     "vue": "^3.5.13",
     "vue-router": "^4.5.1"
   },
   "devDependencies": {
+    "@types/aos": "^3.0.7",
     "@types/node": "^22.15.29",
     "@vitejs/plugin-vue": "^5.2.3",
     "@vue/tsconfig": "^0.7.0",

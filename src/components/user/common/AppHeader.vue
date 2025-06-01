@@ -1,6 +1,6 @@
 <template>
   <header
-    class="bg-light-bg-primary dark:bg-dark-bg-primary text-light-text-primary dark:text-dark-text-primary border-b border-light-border-primary dark:border-dark-border-primary"
+    class="relative z-10 bg-gradient-to-b from-light-bg-primary/80 via-light-bg-primary/60 to-transparent dark:from-dark-bg-primary/80 dark:via-dark-bg-primary/60 dark:to-transparent text-light-text-primary dark:text-dark-text-primary backdrop-blur-sm"
   >
     <div class="container-custom">
       <div class="flex items-center justify-between h-14">
@@ -19,7 +19,7 @@
             v-for="item in navigationItems"
             :key="item.path"
             :to="item.path"
-            class="nav-link py-1.5 px-2 font-medium text-light-text-secondary dark:text-dark-text-secondary relative"
+            class="nav-link py-1.5 px-2 text-base font-semibold text-light-text-secondary dark:text-dark-text-secondary relative"
             :class="{
               'text-light-accent-sport dark:text-dark-accent-sport active':
                 $route.path === item.path,
@@ -331,7 +331,7 @@ const searchBarRef = ref();
 const shoppingCartRef = ref();
 const isMobileMenuOpen = ref(false);
 const isUserMenuOpen = ref(false);
-let hideMenuTimeout: NodeJS.Timeout | null = null;
+let hideMenuTimeout: number | null = null;
 
 // Navigation items
 const navigationItems: NavigationItem[] = [
@@ -362,6 +362,8 @@ const showUserMenu = () => {
 const hideUserMenu = () => {
   hideMenuTimeout = setTimeout(() => {
     isUserMenuOpen.value = false;
-  }, 150);
+  }, 200);
 };
+
+
 </script>

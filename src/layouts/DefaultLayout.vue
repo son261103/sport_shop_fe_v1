@@ -4,7 +4,7 @@
     <AppHeader />
 
     <!-- Main Content -->
-    <main class="container-custom section-padding">
+    <main>
       <!-- Breadcrumb -->
       <AppBreadcrumb :current-path="currentPath" />
 
