@@ -72,13 +72,14 @@
             <h1
               class="text-5xl font-bold text-gradient-sport-animated tracking-tight"
             >
-              Chào mừng trở lại
+              Đăng nhập
             </h1>
             <h2 class="text-6xl font-black text-gradient-sport">Sport Shop</h2>
             <p
               class="text-xl text-light-text-secondary dark:text-dark-text-secondary leading-relaxed"
             >
-              Tiếp tục hành trình khám phá thế giới thể thao cùng chúng tôi
+              Chào mừng trở lại! Tiếp tục hành trình khám phá thế giới thể thao
+              cùng chúng tôi
             </p>
           </div>
 
@@ -174,52 +175,6 @@
         class="w-full lg:w-1/2 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8"
       >
         <div class="max-w-md w-full space-y-8 animate-fade-in">
-          <!-- Enhanced Header -->
-          <div class="text-center">
-            <div class="flex justify-center mb-6">
-              <div
-                class="w-20 h-20 bg-gradient-sport rounded-3xl flex items-center justify-center shadow-sport transform hover:scale-110 transition-all duration-500 hover:rotate-6 group"
-              >
-                <svg
-                  class="w-10 h-10 text-white group-hover:scale-110 transition-transform duration-300"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path
-                    fill-rule="evenodd"
-                    d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
-                    clip-rule="evenodd"
-                  />
-                </svg>
-                <!-- Floating particles around icon -->
-                <div
-                  class="absolute -top-1 -right-1 w-3 h-3 bg-yellow-400 rounded-full opacity-70 animate-ping"
-                ></div>
-                <div
-                  class="absolute -bottom-1 -left-1 w-2 h-2 bg-blue-400 rounded-full opacity-60 animate-pulse"
-                  style="animation-delay: 1s"
-                ></div>
-              </div>
-            </div>
-            <h2
-              class="text-4xl font-bold text-gradient-sport-animated mb-3 tracking-tight"
-            >
-              Đăng nhập
-            </h2>
-            <p
-              class="text-light-text-secondary dark:text-dark-text-secondary text-lg font-light"
-            >
-              Chào mừng bạn quay trở lại
-              <span class="text-gradient-sport font-medium">Sport Shop</span>
-            </p>
-            <!-- Decorative line -->
-            <div class="flex justify-center mt-4">
-              <div
-                class="w-16 h-1 bg-gradient-sport rounded-full opacity-60"
-              ></div>
-            </div>
-          </div>
-
           <!-- Enhanced Login Form -->
           <div
             class="card p-8 backdrop-blur-xl bg-white/80 dark:bg-gray-800/80 border border-white/20 dark:border-gray-700/20 shadow-2xl hover:shadow-3xl transition-all duration-700 transform hover:scale-[1.02]"

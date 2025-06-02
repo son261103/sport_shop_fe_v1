@@ -67,17 +67,14 @@
 
           <!-- Welcome Message -->
           <div class="space-y-6">
-            <h1
-              class="text-5xl font-bold text-gradient-sport-animated tracking-tight"
-            >
-              Chào mừng đến với
+            <h1 class="text-5xl font-bold text-gradient-sport-animated tracking-tight">
+              Đăng ký
             </h1>
-            <h2 class="text-6xl font-black text-gradient-sport">Sport Shop</h2>
-            <p
-              class="text-xl text-light-text-secondary dark:text-dark-text-secondary leading-relaxed"
-            >
-              Khám phá thế giới thể thao với những sản phẩm chất lượng cao và
-              dịch vụ tuyệt vời
+            <h2 class="text-6xl font-black text-gradient-sport">
+              Sport Shop
+            </h2>
+            <p class="text-xl text-light-text-secondary dark:text-dark-text-secondary leading-relaxed">
+              Tạo tài khoản mới để trải nghiệm thế giới thể thao với những sản phẩm chất lượng cao
             </p>
           </div>
 
@@ -176,50 +173,7 @@
       <div
         class="w-full lg:w-1/2 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8"
       >
-        <div class="max-w-md w-full space-y-8 animate-fade-in">
-          <!-- Enhanced Header -->
-          <div class="text-center">
-            <div class="flex justify-center mb-6">
-              <div
-                class="w-20 h-20 bg-gradient-sport rounded-3xl flex items-center justify-center shadow-sport transform hover:scale-110 transition-all duration-500 hover:rotate-6 group"
-              >
-                <svg
-                  class="w-10 h-10 text-white group-hover:scale-110 transition-transform duration-300"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path
-                    d="M8 9a3 3 0 100-6 3 3 0 000 6zM8 11a6 6 0 016 6H2a6 6 0 016-6zM16 7a1 1 0 10-2 0v1a1 1 0 102 0V7zM12 7a1 1 0 112 0v1a1 1 0 11-2 0V7zM16 3a1 1 0 10-2 0v1a1 1 0 102 0V3zM12 3a1 1 0 112 0v1a1 1 0 11-2 0V3z"
-                  />
-                </svg>
-                <!-- Floating particles around icon -->
-                <div
-                  class="absolute -top-1 -right-1 w-3 h-3 bg-yellow-400 rounded-full opacity-70 animate-ping"
-                ></div>
-                <div
-                  class="absolute -bottom-1 -left-1 w-2 h-2 bg-blue-400 rounded-full opacity-60 animate-pulse"
-                  style="animation-delay: 1s"
-                ></div>
-              </div>
-            </div>
-            <h2
-              class="text-4xl font-bold text-gradient-sport-animated mb-3 tracking-tight"
-            >
-              Đăng ký
-            </h2>
-            <p
-              class="text-light-text-secondary dark:text-dark-text-secondary text-lg font-light"
-            >
-              Tạo tài khoản mới để trải nghiệm
-              <span class="text-gradient-sport font-medium">Sport Shop</span>
-            </p>
-            <!-- Decorative line -->
-            <div class="flex justify-center mt-4">
-              <div
-                class="w-16 h-1 bg-gradient-sport rounded-full opacity-60"
-              ></div>
-            </div>
-          </div>
+        <div class="max-w-md w-full animate-fade-in">
 
           <!-- Enhanced Register Form -->
           <div
