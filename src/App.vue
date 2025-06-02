@@ -1,19 +1,48 @@
 <script setup lang="ts">
-import { onMounted } from 'vue'
-import { ThemeProvider } from './providers'
+import { onMounted } from "vue";
+import { useRouter } from "vue-router";
+import { ThemeProvider } from "./providers";
+import { useThemeStore } from "./stores/theme";
+import { useLoading } from "./composables/useLoading";
+import Loading from "./components/ui/Loading.vue";
 
-import { useThemeStore } from './stores/theme'
+const themeStore = useThemeStore();
+const router = useRouter();
+const { isLoading, loadingText, showLoading, hideLoading } = useLoading();
 
-const themeStore = useThemeStore()
+// Setup router loading
+router.beforeEach((to, from, next) => {
+  if (to.path !== from.path) {
+    showLoading("Đang chuyển trang...");
+  }
+  next();
+});
+
+router.afterEach(() => {
+  // Hide loading after a short delay to ensure smooth transition
+  setTimeout(() => {
+    hideLoading();
+  }, 300);
+});
 
 onMounted(() => {
-  themeStore.initTheme()
-  themeStore.setupSystemThemeListener()
-})
+  themeStore.initTheme();
+  themeStore.setupSystemThemeListener();
+});
 </script>
 
 <template>
   <ThemeProvider>
+    <!-- Global Loading Overlay -->
+    <Loading
+      v-if="isLoading"
+      :text="loadingText"
+      size="lg"
+      color="sport"
+      :fullscreen="true"
+    />
+
+    <!-- Main App Content -->
     <router-view />
   </ThemeProvider>
 </template>
