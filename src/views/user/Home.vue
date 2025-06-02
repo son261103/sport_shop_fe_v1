@@ -8,6 +8,9 @@
 
     <!-- Why Choose Us Section -->
     <WhyChooseUs />
+
+    <!-- News Section -->
+    <NewsSection />
   </div>
 </template>
 
@@ -18,6 +21,7 @@ import {
   HeroSection,
   FeaturedCategories,
   WhyChooseUs,
+  NewsSection,
 } from "@/components/user/home";
 
 // Initialize AOS when component is mounted

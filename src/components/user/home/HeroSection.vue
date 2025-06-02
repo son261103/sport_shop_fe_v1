@@ -203,30 +203,6 @@
             class="absolute inset-0 bg-gradient-to-r from-light-accent-sport/20 to-light-accent-sport/40 dark:from-dark-accent-sport/20 dark:to-dark-accent-sport/40 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"
           ></div>
         </button>
-        <button
-          class="group btn-secondary text-lg px-8 py-4 transform hover:scale-105 transition-all duration-300 relative overflow-hidden"
-        >
-          <span class="relative z-10 flex items-center gap-2">
-            <svg
-              class="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
-              ></path>
-            </svg>
-            Xem danh mục
-          </span>
-          <!-- Hover effect -->
-          <div
-            class="absolute inset-0 bg-light-accent-sport/10 dark:bg-dark-accent-sport/10 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"
-          ></div>
-        </button>
       </div>
 
       <!-- Enhanced Stats -->
