@@ -94,15 +94,16 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { useTheme } from '@/composables/useTheme'
+import { useTheme, useNaiveTheme } from '@/composables/useTheme'
 
 defineEmits<{
   'toggle-sidebar': []
 }>()
 
-const { isDark, toggleTheme } = useTheme()
+const { toggleTheme } = useTheme()
+const { isDark } = useNaiveTheme()
 const isProfileMenuOpen = ref(false)
-let hideTimeout: NodeJS.Timeout | null = null
+let hideTimeout: number | null = null
 
 const showProfileMenu = () => {
   if (hideTimeout) {
