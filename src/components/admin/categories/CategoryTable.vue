@@ -275,6 +275,17 @@ const handleBulkDelete = async () => {
     content: `Bạn có chắc chắn muốn xóa ${selectedIds.value.length} danh mục đã chọn? Hành động này không thể hoàn tác.`,
     positiveText: "Xóa",
     negativeText: "Hủy",
+    class: "custom-dialog",
+    style: {
+      "--n-color": "var(--bg-secondary)",
+      "--n-text-color": "var(--text-primary)",
+      "--n-title-text-color": "var(--text-primary)",
+      "--n-content-text-color": "var(--text-secondary)",
+      "--n-action-color": "var(--bg-primary)",
+      "--n-border-color": "var(--border-primary)",
+      "--n-border-radius": "16px",
+      "--n-box-shadow": "0 8px 32px rgba(0, 0, 0, 0.1)",
+    },
     onPositiveClick: async () => {
       isDeleting.value = true;
 
@@ -304,3 +315,50 @@ const formatDate = (dateString: string) => {
   });
 };
 </script>
+
+<style scoped>
+/* Custom Dialog Styles for Dark Mode Support */
+:deep(.custom-dialog) {
+  background: var(--bg-secondary) !important;
+  color: var(--text-primary) !important;
+  border: 1px solid var(--border-primary) !important;
+  border-radius: 16px !important;
+  backdrop-filter: blur(10px) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1) !important;
+}
+
+:deep(.custom-dialog .n-dialog__title) {
+  color: var(--text-primary) !important;
+  font-weight: 600 !important;
+}
+
+:deep(.custom-dialog .n-dialog__content) {
+  color: var(--text-secondary) !important;
+}
+
+:deep(.custom-dialog .n-dialog__action) {
+  background: var(--bg-primary) !important;
+  border-top: 1px solid var(--border-primary) !important;
+}
+
+:deep(.custom-dialog .n-button--primary-type) {
+  background: var(--accent-danger) !important;
+  border-color: var(--accent-danger) !important;
+  color: white !important;
+}
+
+:deep(.custom-dialog .n-button--primary-type:hover) {
+  background: var(--accent-danger) !important;
+  opacity: 0.9 !important;
+}
+
+:deep(.custom-dialog .n-button--default-type) {
+  background: var(--bg-secondary) !important;
+  border-color: var(--border-primary) !important;
+  color: var(--text-primary) !important;
+}
+
+:deep(.custom-dialog .n-button--default-type:hover) {
+  background: var(--border-primary) !important;
+}
+</style>
