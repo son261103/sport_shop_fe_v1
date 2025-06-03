@@ -8,14 +8,7 @@ import type {
   User,
 } from "@/types/auth";
 
-// Auth API endpoints
-const AUTH_ENDPOINTS = {
-  REGISTER: "/register",
-  LOGIN: "/login",
-  LOGOUT: "/logout",
-  ME: "/me",
-  REFRESH: "/refresh",
-} as const;
+// Auth API endpoints are now defined in api.ts
 
 export class AuthService {
   /**
@@ -23,10 +16,7 @@ export class AuthService {
    */
   static async register(data: RegisterRequest): Promise<AuthResponse> {
     try {
-      const response = await api.post<AuthResponse>(
-        AUTH_ENDPOINTS.REGISTER,
-        data
-      );
+      const response = await api.auth.register(data);
 
       // Store token if registration successful
       if (response.status && response.data.token) {
@@ -46,7 +36,7 @@ export class AuthService {
    */
   static async login(data: LoginRequest): Promise<AuthResponse> {
     try {
-      const response = await api.post<AuthResponse>(AUTH_ENDPOINTS.LOGIN, data);
+      const response = await api.auth.login(data);
 
       // Store token and user data if login successful
       if (response.status && response.data.token) {
@@ -71,9 +61,7 @@ export class AuthService {
    */
   static async logout(): Promise<{ status: boolean; message: string }> {
     try {
-      const response = await api.post<{ status: boolean; message: string }>(
-        AUTH_ENDPOINTS.LOGOUT
-      );
+      const response = await api.auth.logout();
 
       // Clear stored data regardless of API response
       this.clearAuthData();
@@ -92,8 +80,8 @@ export class AuthService {
    */
   static async getCurrentUser(): Promise<User> {
     try {
-      const response = await api.get<{ user: User }>(AUTH_ENDPOINTS.ME);
-      return response.user;
+      const response = await api.auth.me();
+      return response;
     } catch (error: any) {
       console.error("Get current user error:", error);
       throw error;

@@ -12,17 +12,17 @@ export const categoryService = {
   getCategories: (
     params?: CategoryListParams
   ): Promise<CategoryListResponse> => {
-    return api.get("/admin/categories", { params });
+    return api.categories.getAll(params);
   },
 
   // Get a specific category by ID
   getCategory: (id: number): Promise<CategoryResponse> => {
-    return api.get(`/admin/categories/${id}`);
+    return api.categories.getById(id);
   },
 
   // Create a new category
   createCategory: (data: CategoryFormData): Promise<CategoryResponse> => {
-    return api.post("/admin/categories", data);
+    return api.categories.create(data);
   },
 
   // Update an existing category
@@ -30,14 +30,19 @@ export const categoryService = {
     id: number,
     data: CategoryFormData
   ): Promise<CategoryResponse> => {
-    return api.put(`/admin/categories/${id}`, data);
+    return api.categories.update(id, data);
+  },
+
+  // Delete a category
+  deleteCategory: (id: number): Promise<{ status: boolean; message: string }> => {
+    return api.categories.delete(id);
   },
 
   // Bulk delete categories
   bulkDeleteCategories: (
     data: BulkDeleteRequest
   ): Promise<{ status: boolean; message: string }> => {
-    return api.post("/admin/categories/bulk-delete", data);
+    return api.categories.bulkDelete(data);
   },
 };
 

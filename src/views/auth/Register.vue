@@ -36,10 +36,27 @@
       ></div>
     </div>
 
-    <!-- Grid Pattern -->
+    <!-- Sports Pattern Background -->
     <div
-      class="absolute inset-0 bg-grid-pattern opacity-3 dark:opacity-8"
+      class="absolute inset-0 bg-sports-pattern opacity-4 dark:opacity-10"
     ></div>
+    
+    <!-- Additional Sports Elements -->
+    <div class="absolute inset-0 overflow-hidden pointer-events-none">
+      <!-- Soccer Ball Pattern -->
+      <div class="absolute top-10 left-10 w-8 h-8 bg-sports-ball opacity-20 rounded-full animate-spin-slow"></div>
+      <div class="absolute top-32 right-20 w-6 h-6 bg-sports-ball opacity-15 rounded-full animate-spin-slow" style="animation-delay: 1s"></div>
+      <div class="absolute bottom-20 left-32 w-10 h-10 bg-sports-ball opacity-10 rounded-full animate-spin-slow" style="animation-delay: 2s"></div>
+      <div class="absolute bottom-40 right-40 w-4 h-4 bg-sports-ball opacity-25 rounded-full animate-spin-slow" style="animation-delay: 3s"></div>
+      
+      <!-- Basketball Lines -->
+      <div class="absolute top-1/4 left-1/4 w-16 h-16 border-2 border-orange-400/20 rounded-full animate-pulse" style="animation-delay: 0.5s"></div>
+      <div class="absolute bottom-1/3 right-1/3 w-12 h-12 border-2 border-orange-400/15 rounded-full animate-pulse" style="animation-delay: 2.5s"></div>
+      
+      <!-- Tennis Net Pattern -->
+      <div class="absolute top-0 right-0 w-32 h-32 bg-tennis-net opacity-10 transform rotate-45"></div>
+      <div class="absolute bottom-0 left-0 w-24 h-24 bg-tennis-net opacity-8 transform -rotate-45"></div>
+    </div>
 
     <!-- Main Container with Two Columns -->
     <div class="relative z-10 min-h-screen flex">
@@ -47,7 +64,7 @@
       <div
         class="hidden lg:flex lg:w-1/2 flex-col justify-center items-center p-12 text-center"
       >
-        <div class="max-w-lg space-y-8 animate-fade-in">
+        <div class="max-w-lg space-y-4 animate-fade-in">
           <!-- Logo and Brand -->
           <div class="flex justify-center mb-8">
             <div
@@ -67,14 +84,17 @@
 
           <!-- Welcome Message -->
           <div class="space-y-6">
-            <h1 class="text-5xl font-bold text-gradient-sport-animated tracking-tight">
+            <h1
+              class="text-5xl font-bold text-gradient-sport-animated tracking-tight"
+            >
               Đăng ký
             </h1>
-            <h2 class="text-6xl font-black text-gradient-sport">
-              Sport Shop
-            </h2>
-            <p class="text-xl text-light-text-secondary dark:text-dark-text-secondary leading-relaxed">
-              Tạo tài khoản mới để trải nghiệm thế giới thể thao với những sản phẩm chất lượng cao
+            <h2 class="text-6xl font-black text-gradient-sport">Sport Shop</h2>
+            <p
+              class="text-xl text-light-text-secondary dark:text-dark-text-secondary leading-relaxed"
+            >
+              Tạo tài khoản mới để trải nghiệm thế giới thể thao với những sản
+              phẩm chất lượng cao
             </p>
           </div>
 
@@ -174,12 +194,11 @@
         class="w-full lg:w-1/2 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8"
       >
         <div class="max-w-md w-full animate-fade-in">
-
           <!-- Enhanced Register Form -->
           <div
             class="card p-8 backdrop-blur-xl bg-white/80 dark:bg-gray-800/80 border border-white/20 dark:border-gray-700/20 shadow-2xl hover:shadow-3xl transition-all duration-700 transform hover:scale-[1.02]"
           >
-            <form @submit.prevent="handleRegister" class="space-y-6">
+            <form @submit.prevent="handleRegister" class="space-y-2">
               <!-- Enhanced Name Field -->
               <div class="group">
                 <label
@@ -268,7 +287,7 @@
               </div>
 
               <!-- Enhanced Email Field -->
-              <div class="group">
+              <div class="group mt-3">
                 <label
                   for="email"
                   class="form-label text-light-text-primary dark:text-dark-text-primary font-medium mb-3 block"
@@ -362,7 +381,7 @@
               </div>
 
               <!-- Enhanced Password Field -->
-              <div class="group">
+              <div class="group mt-3">
                 <label
                   for="password"
                   class="form-label text-light-text-primary dark:text-dark-text-primary font-medium mb-3 block"
@@ -507,7 +526,7 @@
               </div>
 
               <!-- Enhanced Confirm Password Field -->
-              <div class="group">
+              <div class="group mt-3">
                 <label
                   for="password_confirmation"
                   class="form-label text-light-text-primary dark:text-dark-text-primary font-medium mb-3 block"
@@ -641,7 +660,7 @@
 
               <!-- Enhanced Terms and Conditions -->
               <div
-                class="flex items-start space-x-3 p-4 bg-gradient-to-r from-light-accent-sport/5 to-transparent dark:from-dark-accent-sport/5 rounded-lg border border-light-border-primary/30 dark:border-dark-border-primary/30"
+                class="flex items-start space-x-3 p-3 bg-gradient-to-r from-light-accent-sport/5 to-transparent dark:from-dark-accent-sport/5 rounded-lg border border-light-border-primary/30 dark:border-dark-border-primary/30 mt-2"
               >
                 <input
                   id="terms"
@@ -710,7 +729,7 @@
               </div>
 
               <!-- Enhanced Submit Button -->
-              <div class="pt-2">
+              <div class="pt-1">
                 <button
                   type="submit"
                   class="group relative w-full flex justify-center items-center py-4 px-6 text-base font-semibold rounded-xl text-white bg-gradient-to-r from-light-accent-sport to-light-accent-sport/80 dark:from-dark-accent-sport dark:to-dark-accent-sport/80 hover:from-light-accent-sport/90 hover:to-light-accent-sport/70 dark:hover:from-dark-accent-sport/90 dark:hover:to-dark-accent-sport/70 focus:outline-none focus:ring-4 focus:ring-light-accent-sport/30 dark:focus:ring-dark-accent-sport/30 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 transform hover:scale-[1.02] hover:shadow-xl active:scale-[0.98] overflow-hidden"
@@ -751,16 +770,16 @@
             </form>
 
             <!-- Enhanced Divider -->
-            <div class="mt-8">
-              <div class="relative">
+            <div class="mt-1">
+              <div class="relative py-1">
                 <div class="absolute inset-0 flex items-center">
                   <div
-                    class="w-full border-t-2 border-gradient-to-r from-transparent via-light-border-primary to-transparent dark:via-dark-border-primary"
+                    class="w-full border-t border-gradient-to-r from-transparent via-light-border-primary to-transparent dark:via-dark-border-primary opacity-50"
                   ></div>
                 </div>
                 <div class="relative flex justify-center text-sm">
                   <span
-                    class="px-4 py-1 bg-light-bg-secondary/80 dark:bg-dark-bg-secondary/80 text-light-text-muted dark:text-dark-text-muted backdrop-blur-sm rounded-full border border-light-border-primary/30 dark:border-dark-border-primary/30"
+                    class="px-3 py-0.5 bg-light-bg-primary/80 dark:bg-dark-bg-primary/80 backdrop-blur-sm text-light-text-secondary dark:text-dark-text-secondary rounded-full border border-light-border-primary/30 dark:border-dark-border-primary/30"
                   >
                     Hoặc
                   </span>
@@ -769,7 +788,7 @@
             </div>
 
             <!-- Enhanced Login Link -->
-            <div class="mt-8 text-center">
+            <div class="mt-0.5 text-center">
               <div
                 class="p-4 bg-gradient-to-r from-light-accent-sport/5 to-transparent dark:from-dark-accent-sport/5 rounded-lg border border-light-border-primary/20 dark:border-dark-border-primary/20"
               >
@@ -1046,15 +1065,80 @@ onMounted(() => {
 
 <style scoped>
 /* Custom styles for register page */
-.bg-grid-pattern {
-  background-image: linear-gradient(rgba(0, 200, 151, 0.1) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0, 200, 151, 0.1) 1px, transparent 1px);
-  background-size: 20px 20px;
+/* Sports Pattern Background */
+.bg-sports-pattern {
+  background-image: 
+    /* Hexagon pattern for soccer ball effect */
+    radial-gradient(circle at 25% 25%, rgba(0, 200, 151, 0.08) 2px, transparent 2px),
+    radial-gradient(circle at 75% 75%, rgba(255, 165, 0, 0.06) 2px, transparent 2px),
+    /* Grid lines for sports field */
+    linear-gradient(rgba(0, 200, 151, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 200, 151, 0.05) 1px, transparent 1px),
+    /* Diagonal lines for dynamic effect */
+    linear-gradient(45deg, rgba(0, 200, 151, 0.03) 1px, transparent 1px),
+    linear-gradient(-45deg, rgba(255, 165, 0, 0.03) 1px, transparent 1px);
+  background-size: 40px 40px, 60px 60px, 30px 30px, 30px 30px, 50px 50px, 50px 50px;
+  background-position: 0 0, 20px 20px, 0 0, 0 0, 0 0, 25px 25px;
 }
 
-.dark .bg-grid-pattern {
-  background-image: linear-gradient(rgba(0, 229, 161, 0.1) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0, 229, 161, 0.1) 1px, transparent 1px);
+.dark .bg-sports-pattern {
+  background-image: 
+    radial-gradient(circle at 25% 25%, rgba(0, 229, 161, 0.1) 2px, transparent 2px),
+    radial-gradient(circle at 75% 75%, rgba(255, 193, 7, 0.08) 2px, transparent 2px),
+    linear-gradient(rgba(0, 229, 161, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 229, 161, 0.06) 1px, transparent 1px),
+    linear-gradient(45deg, rgba(0, 229, 161, 0.04) 1px, transparent 1px),
+    linear-gradient(-45deg, rgba(255, 193, 7, 0.04) 1px, transparent 1px);
+}
+
+/* Sports Ball Pattern */
+.bg-sports-ball {
+  background: radial-gradient(circle at 30% 30%, rgba(0, 200, 151, 0.8), rgba(0, 200, 151, 0.4));
+  position: relative;
+}
+
+.bg-sports-ball::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 60%;
+  height: 60%;
+  background: radial-gradient(circle, transparent 40%, rgba(255, 255, 255, 0.3) 45%, transparent 50%);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.dark .bg-sports-ball {
+  background: radial-gradient(circle at 30% 30%, rgba(0, 229, 161, 0.8), rgba(0, 229, 161, 0.4));
+}
+
+/* Tennis Net Pattern */
+.bg-tennis-net {
+  background-image: 
+    linear-gradient(0deg, rgba(0, 200, 151, 0.3) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 200, 151, 0.3) 1px, transparent 1px);
+  background-size: 8px 8px;
+}
+
+.dark .bg-tennis-net {
+  background-image: 
+    linear-gradient(0deg, rgba(0, 229, 161, 0.4) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 229, 161, 0.4) 1px, transparent 1px);
+}
+
+/* Slow spin animation for sports elements */
+@keyframes spin-slow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin-slow {
+  animation: spin-slow 20s linear infinite;
 }
 
 /* Enhanced Form animations */

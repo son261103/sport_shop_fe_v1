@@ -54,7 +54,7 @@
               v-model="formData.name"
               type="text"
               required
-              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-dark-bg-primary text-light-text-primary dark:text-dark-text-primary"
+              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-light-accent-sport focus:border-light-accent-sport dark:focus:ring-dark-accent-sport dark:focus:border-dark-accent-sport bg-white dark:bg-dark-bg-primary text-light-text-primary dark:text-dark-text-primary transition-colors"
               placeholder="Nhập tên danh mục"
             />
           </div>
@@ -82,7 +82,7 @@
             <button
               type="submit"
               :disabled="isLoading"
-              class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-md transition-colors"
+              class="px-4 py-2 text-sm font-medium text-white bg-gradient-sport hover:bg-gradient-sport-hover disabled:opacity-50 disabled:cursor-not-allowed rounded-md transition-all duration-200 shadow-sm hover:shadow-md"
             >
               <span v-if="isLoading" class="flex items-center">
                 <svg
@@ -120,10 +120,10 @@
 
 <script setup lang="ts">
 import { ref, watch, computed } from "vue";
-import type { Category, CategoryFormData } from "../../../types/admin/category";
-import type { ValidationError } from "../../../types/api";
-import { categoryService } from "../../../services/admin/categoryService";
-import { handleApiError } from "../../../services/api";
+import { useCategory } from "@/composables/useCategory";
+import { useNotification } from "@/composables/useNotification";
+import type { Category, CategoryFormData } from "@/types/admin/category";
+import type { ValidationError } from "@/types/api";
 
 interface Props {
   isOpen: boolean;
@@ -137,6 +137,10 @@ interface Emits {
 
 const props = defineProps<Props>();
 const emit = defineEmits<Emits>();
+
+// Use category composable
+const { createCategory, updateCategory } = useCategory();
+const { showValidationErrors, showError, showSuccess } = useNotification();
 
 const formData = ref<CategoryFormData>({
   name: "",
@@ -188,20 +192,23 @@ const handleSubmit = async () => {
     let response;
 
     if (isEdit.value && props.category) {
-      response = await categoryService.updateCategory(
-        props.category.id,
-        formData.value
-      );
+      response = await updateCategory(props.category.id, formData.value);
+      showSuccess("Cập nhật danh mục thành công!");
     } else {
-      response = await categoryService.createCategory(formData.value);
+      response = await createCategory(formData.value);
+      showSuccess("Tạo danh mục thành công!");
     }
 
     emit("success", response.data);
     closeModal();
   } catch (error: any) {
-    const validationErrors = handleApiError(error);
-    if (Array.isArray(validationErrors)) {
-      errors.value = validationErrors;
+    // Handle validation errors
+    if (error.type === "validation" && error.errors) {
+      errors.value = error.errors;
+      showValidationErrors(error.errors);
+    } else {
+      console.error("Category form error:", error);
+      showError(error.message || "Có lỗi xảy ra khi xử lý danh mục");
     }
   } finally {
     isLoading.value = false;

@@ -5,6 +5,19 @@ import type {
   InternalAxiosRequestConfig,
 } from "axios";
 import type { ValidationError } from "../types/api";
+import type {
+  CategoryFormData,
+  CategoryListResponse,
+  CategoryResponse,
+  CategoryListParams,
+  BulkDeleteRequest,
+} from "../types/admin/category";
+import type {
+  AuthResponse,
+  LoginRequest,
+  RegisterRequest,
+  User,
+} from "../types/auth";
 import { useLoading } from "../composables/useLoading";
 
 // Base API configuration
@@ -126,10 +139,78 @@ export const api = {
   },
 
   // DELETE request
-  delete: <T>(url: string): Promise<T> => {
+  delete: <T>(url: string, config?: any): Promise<T> => {
     return apiClient
-      .delete(url)
+      .delete(url, config)
       .then((response: AxiosResponse) => response.data);
+  },
+
+  // Auth operations
+  auth: {
+    // Register a new user
+    register: (data: RegisterRequest): Promise<AuthResponse> => {
+      return api.post<AuthResponse>("/register", data);
+    },
+
+    // Login user
+    login: (data: LoginRequest): Promise<AuthResponse> => {
+      return api.post<AuthResponse>("/login", data);
+    },
+
+    // Logout user
+    logout: (): Promise<{ status: boolean; message: string }> => {
+      return api.post<{ status: boolean; message: string }>("/logout");
+    },
+
+    // Get current user
+    me: (): Promise<User> => {
+      return api.get<User>("/me");
+    },
+
+    // Refresh token
+    refresh: (): Promise<AuthResponse> => {
+      return api.post<AuthResponse>("/refresh");
+    },
+  },
+
+  // Category CRUD operations
+  categories: {
+    // Get all categories with pagination and filters
+    getAll: (params?: CategoryListParams): Promise<CategoryListResponse> => {
+      return api.get<CategoryListResponse>("/admin/categories", { params });
+    },
+
+    // Get a specific category by ID
+    getById: (id: number): Promise<CategoryResponse> => {
+      return api.get<CategoryResponse>(`/admin/categories/${id}`);
+    },
+
+    // Create a new category
+    create: (data: CategoryFormData): Promise<CategoryResponse> => {
+      return api.post<CategoryResponse>("/admin/categories", data);
+    },
+
+    // Update an existing category
+    update: (id: number, data: CategoryFormData): Promise<CategoryResponse> => {
+      return api.put<CategoryResponse>(`/admin/categories/${id}`, data);
+    },
+
+    // Delete a category
+    delete: (id: number): Promise<{ status: boolean; message: string }> => {
+      return api.delete<{ status: boolean; message: string }>(
+        `/admin/categories/${id}`
+      );
+    },
+
+    // Bulk delete categories
+    bulkDelete: (
+      data: BulkDeleteRequest
+    ): Promise<{ status: boolean; message: string }> => {
+      return api.delete<{ status: boolean; message: string }>(
+        "/admin/categories/bulk-delete",
+        { data }
+      );
+    },
   },
 };
 

@@ -1,8 +1,16 @@
-// 🔧 Hooks Export for Sport Shop
+// 🔧 Composables Export for Sport Shop
 
-// Authentication Hook
-// Note: useAuth is now available from @/hooks/useAuth
+// Auth Composable
+export { useAuth } from "./useAuth";
 
-// Re-export existing composables for consistency
-export { useTheme } from "@/composables/useTheme";
-export { useLoading } from "@/composables/useLoading";
+// Category Composable
+export { useCategory } from "./useCategory";
+
+// Loading Composable
+export { useLoading } from "./useLoading";
+
+// Notification Composable
+export { useNotification } from "./useNotification";
+
+// Theme Composables
+export { useTheme, useThemeClasses } from "./useTheme";

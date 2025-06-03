@@ -1,7 +1,7 @@
 <template>
-  <div class="p-6">
+  <div class="p-2">
     <!-- Page Header -->
-    <div class="mb-6">
+    <div class="mb-4">
       <h1
         class="text-2xl font-bold text-light-text-primary dark:text-dark-text-primary mb-2"
       >
@@ -47,7 +47,7 @@
         <div class="flex gap-2">
           <select
             v-model="sortBy"
-            @change="loadCategories"
+            @change="() => loadCategories()"
             class="border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 bg-white dark:bg-dark-bg-primary text-light-text-primary dark:text-dark-text-primary focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="">Sắp xếp theo</option>
@@ -58,7 +58,7 @@
 
           <select
             v-model="sortOrder"
-            @change="loadCategories"
+            @change="() => loadCategories()"
             class="border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 bg-white dark:bg-dark-bg-primary text-light-text-primary dark:text-dark-text-primary focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="asc">Tăng dần</option>
@@ -96,71 +96,33 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
-import type {
-  Category,
-  CategoryListResponse,
-  CategoryListParams,
-} from "../../types/admin/category";
-import { categoryService } from "../../services/admin/categoryService";
-import { handleApiError } from "../../services/api";
-import CategoryTable from "../../components/admin/categories/CategoryTable.vue";
-import CategoryPagination from "../../components/admin/categories/CategoryPagination.vue";
-import CategoryModal from "../../components/admin/categories/CategoryModal.vue";
+import { ref, onMounted, watch } from "vue";
+import { useCategory } from "@/composables/useCategory";
+import type { Category } from "@/types/admin/category";
+import CategoryTable from "@/components/admin/categories/CategoryTable.vue";
+import CategoryPagination from "@/components/admin/categories/CategoryPagination.vue";
+import CategoryModal from "@/components/admin/categories/CategoryModal.vue";
 
-// State
-const categories = ref<Category[]>([]);
-const paginationData = ref<CategoryListResponse["data"] | null>(null);
-const isLoading = ref(false);
+// Use category composable
+const {
+  categories,
+  paginationData,
+  isLoading,
+  error,
+  searchQuery,
+  sortBy,
+  sortOrder,
+  loadCategories,
+  handlePageChange,
+  handlePerPageChange,
+  debouncedSearch,
+  handleSortChange,
+  clearError,
+} = useCategory();
+
+// Modal state
 const isModalOpen = ref(false);
 const selectedCategory = ref<Category | null>(null);
-
-// Search and filters
-const searchQuery = ref("");
-const sortBy = ref("");
-const sortOrder = ref<"asc" | "desc">("asc");
-const currentPage = ref(1);
-const perPage = ref(10);
-
-// Debounced search
-let searchTimeout: number;
-const debouncedSearch = () => {
-  clearTimeout(searchTimeout);
-  searchTimeout = setTimeout(() => {
-    currentPage.value = 1;
-    loadCategories();
-  }, 500);
-};
-
-// Load categories
-const loadCategories = async () => {
-  isLoading.value = true;
-
-  try {
-    const params: CategoryListParams = {
-      page: currentPage.value,
-      per_page: perPage.value,
-    };
-
-    if (searchQuery.value.trim()) {
-      params.search = searchQuery.value.trim();
-    }
-
-    if (sortBy.value) {
-      params.sort_by = sortBy.value;
-      params.sort_order = sortOrder.value;
-    }
-
-    const response = await categoryService.getCategories(params);
-    categories.value = response.data.data;
-    paginationData.value = response.data;
-  } catch (error: any) {
-    handleApiError(error);
-    alert("Có lỗi xảy ra khi tải danh sách danh mục");
-  } finally {
-    isLoading.value = false;
-  }
-};
 
 // Modal handlers
 const openAddModal = () => {
@@ -180,19 +142,21 @@ const closeModal = () => {
 
 const handleCategorySuccess = () => {
   loadCategories();
+  closeModal();
 };
 
-// Pagination handlers
-const handlePageChange = (page: number) => {
-  currentPage.value = page;
-  loadCategories();
-};
+// Watch for sort changes
+watch([sortBy, sortOrder], () => {
+  handleSortChange();
+});
 
-const handlePerPageChange = (newPerPage: number) => {
-  perPage.value = newPerPage;
-  currentPage.value = 1;
-  loadCategories();
-};
+// Show error alerts
+watch(error, (newError) => {
+  if (newError) {
+    alert(newError);
+    clearError();
+  }
+});
 
 // Initialize
 onMounted(() => {

@@ -33,8 +33,8 @@
             :class="[
               'px-3 py-1 text-sm border rounded transition-colors',
               link.active
-                ? 'bg-blue-600 text-white border-blue-600'
-                : 'border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 text-light-text-primary dark:text-dark-text-primary',
+                ? 'bg-gradient-sport text-white border-light-accent-sport shadow-sm'
+                : 'border-gray-300 dark:border-gray-600 hover:bg-light-bg-secondary dark:hover:bg-dark-bg-primary text-light-text-primary dark:text-dark-text-primary hover:border-light-accent-sport dark:hover:border-dark-accent-sport',
             ]"
           >
             {{ link.label }}
@@ -66,7 +66,7 @@
       <select
         :value="pagination.per_page"
         @change="changePerPage($event)"
-        class="border border-gray-300 dark:border-gray-600 rounded px-2 py-1 bg-white dark:bg-dark-bg-primary text-light-text-primary dark:text-dark-text-primary focus:outline-none focus:ring-2 focus:ring-blue-500"
+        class="border border-gray-300 dark:border-gray-600 rounded px-2 py-1 bg-white dark:bg-dark-bg-primary text-light-text-primary dark:text-dark-text-primary focus:outline-none focus:ring-2 focus:ring-light-accent-sport dark:focus:ring-dark-accent-sport transition-colors"
       >
         <option value="10">10</option>
         <option value="25">25</option>
