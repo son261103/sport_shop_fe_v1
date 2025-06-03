@@ -219,6 +219,7 @@
 
 <script setup lang="ts">
 import { ref, computed } from "vue";
+import { useDialog } from "naive-ui";
 import { useCategory } from "@/composables/useCategory";
 import { useNotification } from "@/composables/useNotification";
 import type { Category } from "@/types/admin/category";
@@ -240,6 +241,7 @@ const emit = defineEmits<Emits>();
 // Use category composable for bulk operations
 const { bulkDeleteCategories } = useCategory();
 const { showSuccess, showError } = useNotification();
+const dialog = useDialog();
 
 // Selection state
 const selectedIds = ref<number[]>([]);
@@ -268,26 +270,28 @@ const toggleSelectAll = () => {
 const handleBulkDelete = async () => {
   if (selectedIds.value.length === 0) return;
 
-  const confirmed = confirm(
-    `Bạn có chắc chắn muốn xóa ${selectedIds.value.length} danh mục đã chọn?`
-  );
+  dialog.warning({
+    title: "Xác nhận xóa",
+    content: `Bạn có chắc chắn muốn xóa ${selectedIds.value.length} danh mục đã chọn? Hành động này không thể hoàn tác.`,
+    positiveText: "Xóa",
+    negativeText: "Hủy",
+    onPositiveClick: async () => {
+      isDeleting.value = true;
 
-  if (!confirmed) return;
-
-  isDeleting.value = true;
-
-  try {
-    const deleteCount = selectedIds.value.length;
-    await bulkDeleteCategories(selectedIds.value);
-    selectedIds.value = [];
-    emit("refresh");
-    showSuccess(`Xóa thành công ${deleteCount} danh mục đã chọn`);
-  } catch (error: any) {
-    console.error("Bulk delete error:", error);
-    showError(error.message || "Có lỗi xảy ra khi xóa danh mục");
-  } finally {
-    isDeleting.value = false;
-  }
+      try {
+        const deleteCount = selectedIds.value.length;
+        await bulkDeleteCategories(selectedIds.value);
+        selectedIds.value = [];
+        emit("refresh");
+        showSuccess(`Xóa thành công ${deleteCount} danh mục đã chọn`);
+      } catch (error: any) {
+        console.error("Bulk delete error:", error);
+        showError(error.message || "Có lỗi xảy ra khi xóa danh mục");
+      } finally {
+        isDeleting.value = false;
+      }
+    },
+  });
 };
 
 const formatDate = (dateString: string) => {
