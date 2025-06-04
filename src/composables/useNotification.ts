@@ -1,7 +1,8 @@
-import { useNotification as useNaiveNotification } from "naive-ui";
+import { useNotification as useNaiveNotification, useDialog } from "naive-ui";
 
 export const useNotification = () => {
   const notification = useNaiveNotification();
+  const dialog = useDialog();
 
   const showSuccess = (message: string, title?: string) => {
     notification.success({
@@ -43,11 +44,37 @@ export const useNotification = () => {
     });
   };
 
+  const showConfirm = (
+    title: string,
+    content: string,
+    positiveText: string = "Xác nhận",
+    negativeText: string = "Hủy"
+  ): Promise<boolean> => {
+    return new Promise((resolve) => {
+      dialog.warning({
+        title,
+        content,
+        positiveText,
+        negativeText,
+        onPositiveClick: () => {
+          resolve(true);
+        },
+        onNegativeClick: () => {
+          resolve(false);
+        },
+        onClose: () => {
+          resolve(false);
+        },
+      });
+    });
+  };
+
   return {
     showSuccess,
     showError,
     showWarning,
     showInfo,
     showValidationErrors,
+    showConfirm,
   };
 };

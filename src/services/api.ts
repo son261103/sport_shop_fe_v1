@@ -13,6 +13,13 @@ import type {
   BulkDeleteRequest,
 } from "../types/admin/category";
 import type {
+  BrandFormData,
+  BrandListResponse,
+  BrandResponse,
+  BrandListParams,
+  BulkDeleteRequest as BrandBulkDeleteRequest,
+} from "../types/admin/brand";
+import type {
   AuthResponse,
   LoginRequest,
   RegisterRequest,
@@ -208,6 +215,46 @@ export const api = {
     ): Promise<{ status: boolean; message: string }> => {
       return api.delete<{ status: boolean; message: string }>(
         "/admin/categories/bulk-delete",
+        { data }
+      );
+    },
+  },
+
+  // Brand CRUD operations
+  brands: {
+    // Get all brands with pagination and filters
+    getAll: (params?: BrandListParams): Promise<BrandListResponse> => {
+      return api.get<BrandListResponse>("/admin/brands", { params });
+    },
+
+    // Get a specific brand by ID
+    getById: (id: number): Promise<BrandResponse> => {
+      return api.get<BrandResponse>(`/admin/brands/${id}`);
+    },
+
+    // Create a new brand
+    create: (data: BrandFormData): Promise<BrandResponse> => {
+      return api.post<BrandResponse>("/admin/brands", data);
+    },
+
+    // Update an existing brand
+    update: (id: number, data: BrandFormData): Promise<BrandResponse> => {
+      return api.put<BrandResponse>(`/admin/brands/${id}`, data);
+    },
+
+    // Delete a brand
+    delete: (id: number): Promise<{ status: boolean; message: string }> => {
+      return api.delete<{ status: boolean; message: string }>(
+        `/admin/brands/${id}`
+      );
+    },
+
+    // Bulk delete brands
+    bulkDelete: (
+      data: BrandBulkDeleteRequest
+    ): Promise<{ status: boolean; message: string }> => {
+      return api.delete<{ status: boolean; message: string }>(
+        "/admin/brands/bulk-delete",
         { data }
       );
     },
