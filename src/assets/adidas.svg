@@ -1,0 +1,16 @@
+<svg width="300" height="200" viewBox="0 0 300 200" xmlns="http://www.w3.org/2000/svg">
+
+  
+  <!-- Adidas Three Stripes -->
+  <g transform="translate(150, 100)">
+    <!-- First stripe -->
+    <polygon points="-60,-30 -30,-30 -15,30 -45,30" fill="#000000"/>
+    <!-- Second stripe -->
+    <polygon points="-20,-30 10,-30 25,30 -5,30" fill="#000000"/>
+    <!-- Third stripe -->
+    <polygon points="20,-30 50,-30 65,30 35,30" fill="#000000"/>
+  </g>
+  
+  <!-- ADIDAS text -->
+  <text x="150" y="160" font-family="Arial, sans-serif" font-size="24" font-weight="bold" text-anchor="middle" fill="#000000">adidas</text>
+</svg>

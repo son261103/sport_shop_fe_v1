@@ -15,6 +15,11 @@ export const userRoutes: RouteRecordRaw[] = [
         }
       },
       {
+        path: 'products',
+        name: 'Products',
+        component: () => import('@/views/user/Products.vue'),
+      },
+      {
         path: 'components',
         name: 'ComponentShowcase',
         component: () => import('@/views/ComponentShowcase.vue'),

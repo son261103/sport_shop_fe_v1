@@ -11,6 +11,10 @@
 
     <!-- News Section -->
     <NewsSection />
+
+     <!-- LogoRun -->
+    <LogoRun />
+
   </div>
 </template>
 
@@ -22,6 +26,7 @@ import {
   FeaturedCategories,
   WhyChooseUs,
   NewsSection,
+  LogoRun,
 } from "@/components/user/home";
 
 // Initialize AOS when component is mounted
