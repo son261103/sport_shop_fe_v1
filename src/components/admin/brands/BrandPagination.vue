@@ -21,11 +21,10 @@
             >Hiển thị:</span
           >
           <select
-            :value="pagination.per_page"
+            :value="pagination.per_page || 10"
             @change="handlePerPageChange"
             class="border border-gray-300 dark:border-gray-600 rounded-md px-2 py-1 text-sm bg-white dark:bg-dark-bg-primary text-light-text-primary dark:text-dark-text-primary focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
-            <option value="5">5</option>
             <option value="10">10</option>
             <option value="25">25</option>
             <option value="50">50</option>

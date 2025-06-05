@@ -51,6 +51,16 @@ export const adminRoutes: RouteRecordRaw[] = [
         },
       },
       {
+        path: "products/:id",
+        name: "AdminProductDetail",
+        component: () => import("@/views/admin/AdminProductDetail.vue"),
+        meta: {
+          title: "Product Detail - Admin Dashboard",
+          requiresAuth: true,
+          requiresAdmin: true,
+        },
+      },
+      {
         path: "orders",
         name: "AdminOrders",
         component: () => import("@/views/admin/AdminOrders.vue"),

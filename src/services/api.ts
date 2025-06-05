@@ -20,6 +20,13 @@ import type {
   BulkDeleteRequest as BrandBulkDeleteRequest,
 } from "../types/admin/brand";
 import type {
+  ProductFormData,
+  ProductListResponse,
+  ProductResponse,
+  ProductListParams,
+  BulkDeleteRequest as ProductBulkDeleteRequest,
+} from "../types/admin/product";
+import type {
   AuthResponse,
   LoginRequest,
   RegisterRequest,
@@ -257,6 +264,94 @@ export const api = {
         "/admin/brands/bulk-delete",
         { data }
       );
+    },
+  },
+
+  // Product CRUD operations
+  products: {
+    // Get all products with pagination and filters
+    getAll: (params?: ProductListParams): Promise<ProductListResponse> => {
+      return api.get<ProductListResponse>("/admin/products", { params });
+    },
+
+    // Get a specific product by ID
+    getById: (id: number): Promise<ProductResponse> => {
+      return api.get<ProductResponse>(`/admin/products/${id}`);
+    },
+
+    // Create a new product
+    create: (data: ProductFormData): Promise<ProductResponse> => {
+      const formData = new FormData();
+      formData.append("name", data.name);
+      formData.append("price", data.price.toString());
+      if (data.discount_price)
+        formData.append("discount_price", data.discount_price.toString());
+      if (data.description) formData.append("description", data.description);
+      if (data.stock_quantity !== undefined)
+        formData.append("stock_quantity", data.stock_quantity.toString());
+      if (data.is_active !== undefined)
+        formData.append("is_active", data.is_active.toString());
+      if (data.category_id)
+        formData.append("category_id", data.category_id.toString());
+      if (data.brand_id) formData.append("brand_id", data.brand_id.toString());
+      if (data.image) formData.append("image", data.image);
+
+      return apiClient
+        .post<ProductResponse>("/admin/products", formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        })
+        .then((response: AxiosResponse) => response.data);
+    },
+
+    // Update an existing product
+    update: (id: number, data: ProductFormData): Promise<ProductResponse> => {
+      const formData = new FormData();
+      formData.append("name", data.name);
+      formData.append("price", data.price.toString());
+      if (data.discount_price)
+        formData.append("discount_price", data.discount_price.toString());
+      if (data.description) formData.append("description", data.description);
+      if (data.stock_quantity !== undefined)
+        formData.append("stock_quantity", data.stock_quantity.toString());
+      if (data.is_active !== undefined)
+        formData.append("is_active", data.is_active.toString());
+      if (data.category_id)
+        formData.append("category_id", data.category_id.toString());
+      if (data.brand_id) formData.append("brand_id", data.brand_id.toString());
+      if (data.image) formData.append("image", data.image);
+      formData.append("_method", "PUT");
+
+      return apiClient
+        .post<ProductResponse>(`/admin/products/${id}`, formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        })
+        .then((response: AxiosResponse) => response.data);
+    },
+
+    // Delete a product
+    delete: (id: number): Promise<{ status: boolean; message: string }> => {
+      return api.delete<{ status: boolean; message: string }>(
+        `/admin/products/${id}`
+      );
+    },
+
+    // Bulk delete products
+    bulkDelete: (
+      data: ProductBulkDeleteRequest
+    ): Promise<{ status: boolean; message: string }> => {
+      return api.delete<{ status: boolean; message: string }>(
+        "/admin/products/bulk-delete",
+        { data }
+      );
+    },
+
+    // Toggle product active status
+    toggleStatus: (id: number): Promise<ProductResponse> => {
+      return api.put<ProductResponse>(`/admin/products/${id}/toggle-status`);
     },
   },
 };

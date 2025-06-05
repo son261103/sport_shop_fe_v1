@@ -9,7 +9,7 @@
         class="text-sm text-light-text-secondary dark:text-dark-text-secondary"
       >
         Hiển thị {{ pagination.from }} - {{ pagination.to }} trong tổng số
-        {{ pagination.total }} danh mục
+        {{ pagination.total }} sản phẩm
       </div>
 
       <!-- Pagination Controls -->
@@ -107,11 +107,11 @@
 
 <script setup lang="ts">
 import { computed } from "vue";
-import type { CategoryListResponse } from "../../../types/admin/category";
+import type { ProductListResponse } from "@/types/admin/product";
 
 // Props
 interface Props {
-  pagination: CategoryListResponse["data"];
+  pagination: ProductListResponse["data"];
 }
 
 const props = defineProps<Props>();
