@@ -516,7 +516,7 @@ import type { Product } from "@/types/admin/product";
 
 // Props
 interface Props {
-  products: Product[];
+  products?: Product[];
   isLoading: boolean;
   selectedIds: number[];
   sortBy: string;
@@ -526,6 +526,7 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
+  products: () => [],
   isDeleting: false,
 });
 
@@ -544,17 +545,19 @@ interface Emits {
 const emit = defineEmits<Emits>();
 
 // Computed
-const hasProducts = computed(() => props.products.length > 0);
+const hasProducts = computed(() => (props.products || []).length > 0);
 const isAllSelected = computed(() => {
+  const productList = props.products || [];
   return (
-    props.products.length > 0 &&
-    props.products.every((product) => props.selectedIds.includes(product.id))
+    productList.length > 0 &&
+    productList.every((product) => props.selectedIds.includes(product.id))
   );
 });
 const isIndeterminate = computed(() => {
+  const productList = props.products || [];
   return (
     props.selectedIds.length > 0 &&
-    props.selectedIds.length < props.products.length
+    props.selectedIds.length < productList.length
   );
 });
 
@@ -601,7 +604,16 @@ const formatPrice = (price: string | number) => {
 };
 
 const formatDate = (dateString: string) => {
-  return new Date(dateString).toLocaleDateString("vi-VN", {
+  if (!dateString) {
+    return "Chưa có thông tin";
+  }
+
+  const date = new Date(dateString);
+  if (isNaN(date.getTime())) {
+    return "Ngày không hợp lệ";
+  }
+
+  return date.toLocaleDateString("vi-VN", {
     year: "numeric",
     month: "2-digit",
     day: "2-digit",

@@ -1,4 +1,5 @@
 import axios, { AxiosError } from "axios";
+import qs from "qs";
 import type {
   AxiosInstance,
   AxiosResponse,
@@ -44,6 +45,20 @@ const apiClient: AxiosInstance = axios.create({
   headers: {
     "Content-Type": "application/json",
     Accept: "application/json",
+  },
+  paramsSerializer: {
+    serialize: (params) => {
+      console.log("Original params:", params);
+      // Check if params is wrapped in a 'params' object
+      const actualParams = params.params || params;
+      const serialized = qs.stringify(actualParams, {
+        arrayFormat: "brackets",
+        skipNulls: true,
+        encode: false,
+      });
+      console.log("Serialized params:", serialized);
+      return serialized;
+    },
   },
 });
 

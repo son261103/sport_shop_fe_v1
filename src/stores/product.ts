@@ -4,16 +4,16 @@ import { productService } from "@/services/admin/productService";
 import { handleApiError } from "@/services/api";
 import type {
   Product,
-  ProductListResponse,
   ProductListParams,
   ProductFormData,
+  ProductPaginationData,
   BulkDeleteRequest,
 } from "@/types/admin/product";
 
 export const useProductStore = defineStore("product", () => {
   // State
   const products = ref<Product[]>([]);
-  const paginationData = ref<ProductListResponse["data"] | null>(null);
+  const paginationData = ref<ProductPaginationData | null>(null);
   const selectedProduct = ref<Product | null>(null);
   const isLoading = ref(false);
   const error = ref<string | null>(null);
@@ -23,7 +23,7 @@ export const useProductStore = defineStore("product", () => {
   const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
   // Getters
-  const hasProducts = computed(() => products.value.length > 0);
+  const hasProducts = computed(() => products.value?.length > 0);
   const totalProducts = computed(() => paginationData.value?.total || 0);
   const currentPage = computed(() => paginationData.value?.current_page || 1);
   const lastPage = computed(() => paginationData.value?.last_page || 1);
@@ -68,13 +68,46 @@ export const useProductStore = defineStore("product", () => {
 
     try {
       const response = await productService.getProducts(params);
-      products.value = response.data.data;
-      paginationData.value = response.data;
+
+      // Handle the API response structure
+      if (response.data && Array.isArray(response.data)) {
+        // New API structure with separate data and pagination
+        products.value = response.data;
+        if (response.pagination) {
+          paginationData.value = {
+            current_page: response.pagination.current_page,
+            data: response.data,
+            first_page_url: '',
+            from: (response.pagination.current_page - 1) * response.pagination.per_page + 1,
+            last_page: response.pagination.last_page,
+            last_page_url: '',
+            links: [],
+            next_page_url: null,
+            path: '',
+            per_page: response.pagination.per_page,
+            prev_page_url: null,
+            to: Math.min(response.pagination.current_page * response.pagination.per_page, response.pagination.total),
+            total: response.pagination.total,
+            sort_by: response.sort?.by || 'created_at',
+            sort_order: response.sort?.order || 'desc'
+          };
+        } else {
+          paginationData.value = null;
+        }
+      } else {
+        // Fallback for unexpected response structure
+        products.value = [];
+        paginationData.value = null;
+      }
+
       updateLastFetchTime();
       return response;
     } catch (err: any) {
       const errorMessage = "Có lỗi xảy ra khi tải danh sách sản phẩm";
       setError(errorMessage);
+      // Reset products to empty array on error to prevent undefined prop warnings
+      products.value = [];
+      paginationData.value = null;
       handleApiError(err);
       console.error("Fetch products error:", err);
       throw err;

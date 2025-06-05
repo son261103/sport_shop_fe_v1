@@ -31,13 +31,12 @@ interface Props {
   showBreadcrumb?: boolean;
 }
 
-const props = withDefaults(defineProps<Props>(), {
+withDefaults(defineProps<Props>(), {
   currentPath: "/admin",
   showBreadcrumb: true,
 });
 
 const isSidebarCollapsed = ref(false);
-const currentPath = ref(props.currentPath);
 
 const toggleSidebar = () => {
   isSidebarCollapsed.value = !isSidebarCollapsed.value;

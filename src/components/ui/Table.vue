@@ -223,7 +223,7 @@ const getCellClasses = (column: Column) => {
   return baseClasses.join(' ')
 }
 
-const getRowClasses = (row: any, index: number) => {
+const getRowClasses = (_row: any, index: number) => {
   const baseClasses = []
 
   if (props.striped && index % 2 === 1) {

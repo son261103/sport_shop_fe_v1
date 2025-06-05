@@ -316,7 +316,16 @@ const handleBulkDelete = async () => {
 };
 
 const formatDate = (dateString: string) => {
-  return new Date(dateString).toLocaleDateString("vi-VN", {
+  if (!dateString) {
+    return "Chưa có thông tin";
+  }
+
+  const date = new Date(dateString);
+  if (isNaN(date.getTime())) {
+    return "Ngày không hợp lệ";
+  }
+
+  return date.toLocaleDateString("vi-VN", {
     year: "numeric",
     month: "2-digit",
     day: "2-digit",

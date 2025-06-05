@@ -40,11 +40,11 @@ export function useProduct() {
   const selectedProduct = computed(() => productStore.selectedProduct);
 
   // Local computed
-  const hasProducts = computed(() => products.value.length > 0);
+  const hasProducts = computed(() => products.value?.length > 0);
   const hasSelection = computed(() => selectedIds.value.length > 0);
   const isAllSelected = computed(() => {
     return (
-      products.value.length > 0 &&
+      products.value?.length > 0 &&
       products.value.every((product) => selectedIds.value.includes(product.id))
     );
   });

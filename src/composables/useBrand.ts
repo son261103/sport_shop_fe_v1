@@ -36,14 +36,16 @@ export function useBrand() {
   const hasSelection = computed(() => selectedIds.value.length > 0);
   const isAllSelected = computed(() => {
     return (
-      brands.value.length > 0 &&
-      brands.value.every((brand) => selectedIds.value.includes(brand.id))
+      (brands.value || []).length > 0 &&
+      (brands.value || []).every((brand) =>
+        selectedIds.value.includes(brand.id)
+      )
     );
   });
   const isIndeterminate = computed(() => {
     return (
       selectedIds.value.length > 0 &&
-      selectedIds.value.length < brands.value.length
+      selectedIds.value.length < (brands.value || []).length
     );
   });
 

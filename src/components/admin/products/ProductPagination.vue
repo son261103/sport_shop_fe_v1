@@ -107,11 +107,11 @@
 
 <script setup lang="ts">
 import { computed } from "vue";
-import type { ProductListResponse } from "@/types/admin/product";
+import type { ProductPaginationData } from "@/types/admin/product";
 
 // Props
 interface Props {
-  pagination: ProductListResponse["data"];
+  pagination: ProductPaginationData;
 }
 
 const props = defineProps<Props>();

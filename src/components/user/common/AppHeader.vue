@@ -1,6 +1,6 @@
 <template>
   <header
-    class="relative z-10 bg-gradient-to-b from-light-bg-primary/80 via-light-bg-primary/60 to-transparent dark:from-dark-bg-primary/80 dark:via-dark-bg-primary/60 dark:to-transparent text-light-text-primary dark:text-dark-text-primary backdrop-blur-sm"
+    class="relative z-50 bg-gradient-to-b from-light-bg-primary/80 via-light-bg-primary/60 to-transparent dark:from-dark-bg-primary/80 dark:via-dark-bg-primary/60 dark:to-transparent text-light-text-primary dark:text-dark-text-primary backdrop-blur-sm"
   >
     <div class="container-custom">
       <div class="flex items-center justify-between h-14">

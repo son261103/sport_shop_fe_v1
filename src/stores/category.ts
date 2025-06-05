@@ -4,16 +4,16 @@ import { categoryService } from "@/services/admin/categoryService";
 import { handleApiError } from "@/services/api";
 import type {
   Category,
-  CategoryListResponse,
   CategoryListParams,
   CategoryFormData,
+  CategoryPaginationData,
   BulkDeleteRequest,
 } from "@/types/admin/category";
 
 export const useCategoryStore = defineStore("category", () => {
   // State
   const categories = ref<Category[]>([]);
-  const paginationData = ref<CategoryListResponse["data"] | null>(null);
+  const paginationData = ref<CategoryPaginationData | null>(null);
   const selectedCategory = ref<Category | null>(null);
   const isLoading = ref(false);
   const error = ref<string | null>(null);
@@ -23,7 +23,7 @@ export const useCategoryStore = defineStore("category", () => {
   const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
   // Getters
-  const hasCategories = computed(() => categories.value.length > 0);
+  const hasCategories = computed(() => categories.value?.length > 0);
   const totalCategories = computed(() => paginationData.value?.total || 0);
   const currentPage = computed(() => paginationData.value?.current_page || 1);
   const lastPage = computed(() => paginationData.value?.last_page || 1);
@@ -64,9 +64,20 @@ export const useCategoryStore = defineStore("category", () => {
 
     try {
       const response = await categoryService.getCategories(params);
-      categories.value = response.data.data;
-      paginationData.value = response.data;
+
+      // Handle the CategoryListResponse structure
+      if (Array.isArray(response.data)) {
+        // Simple array response (fallback)
+        categories.value = response.data;
+        paginationData.value = null;
+      } else {
+        // Standard paginated response structure
+        categories.value = response.data.data;
+        paginationData.value = response.data;
+      }
+
       updateLastFetchTime();
+      return response;
     } catch (err: any) {
       handleApiError(err);
       setError("Có lỗi xảy ra khi tải danh sách danh mục");
