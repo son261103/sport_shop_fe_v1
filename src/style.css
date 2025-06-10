@@ -421,7 +421,7 @@
   .dropdown-menu {
     @apply absolute right-0 top-full mt-1 bg-light-bg-primary dark:bg-dark-bg-primary
            border border-light-border-primary dark:border-dark-border-primary rounded-2xl shadow-2xl
-           z-50 overflow-hidden
+           z-[100] overflow-hidden
            opacity-0 invisible transform translate-y-2 scale-95;
     backdrop-filter: blur(20px);
     border: 1px solid rgba(255, 255, 255, 0.1);

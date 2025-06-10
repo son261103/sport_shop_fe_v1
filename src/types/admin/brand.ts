@@ -10,28 +10,32 @@ export interface BrandFormData {
   name: string;
 }
 
+export interface BrandPaginationData {
+  current_page: number;
+  data: Brand[];
+  first_page_url: string;
+  from: number;
+  last_page: number;
+  last_page_url: string;
+  links: {
+    url: string | null;
+    label: string;
+    active: boolean;
+  }[];
+  next_page_url: string | null;
+  path: string;
+  per_page: number;
+  prev_page_url: string | null;
+  to: number;
+  total: number;
+  sort_by: string;
+  sort_order: string;
+}
+
 export interface BrandListResponse {
   status: boolean;
   message: string;
-  data: {
-    current_page: number;
-    data: Brand[];
-    first_page_url: string;
-    from: number;
-    last_page: number;
-    last_page_url: string;
-    links: {
-      url: string | null;
-      label: string;
-      active: boolean;
-    }[];
-    next_page_url: string | null;
-    path: string;
-    per_page: number;
-    prev_page_url: string | null;
-    to: number;
-    total: number;
-  };
+  data: BrandPaginationData;
 }
 
 export interface BrandResponse {

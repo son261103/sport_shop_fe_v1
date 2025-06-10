@@ -48,7 +48,7 @@
           <select
             v-model="sortBy"
             @change="() => loadCategories()"
-            class="border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 bg-white dark:bg-dark-bg-primary text-light-text-primary dark:text-dark-text-primary focus:outline-none focus:ring-2 focus:ring-blue-500"
+            class="form-input min-w-[140px]"
           >
             <option value="">Sắp xếp theo</option>
             <option value="name">Tên</option>
@@ -59,7 +59,7 @@
           <select
             v-model="sortOrder"
             @change="() => loadCategories()"
-            class="border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 bg-white dark:bg-dark-bg-primary text-light-text-primary dark:text-dark-text-primary focus:outline-none focus:ring-2 focus:ring-blue-500"
+            class="form-input min-w-[120px]"
           >
             <option value="asc">Tăng dần</option>
             <option value="desc">Giảm dần</option>

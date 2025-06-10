@@ -171,9 +171,7 @@ import {
   SettingsOutline,
   StatsChartOutline,
   NotificationsOutline,
-  CheckmarkCircleOutline,
-  TimeOutline,
-  CloseCircleOutline
+
 } from '@vicons/ionicons5'
 import { Card, Button, Badge, Table } from '@/components/ui'
 import StatCard from './StatCard.vue'
@@ -257,36 +255,36 @@ const stats = [
     title: 'Total Revenue',
     value: '$45,231',
     change: '+20.1%',
-    trend: 'up',
+    trend: 'up' as const,
     icon: StatsChartOutline,
-    color: 'sport'
+    color: 'sport' as const
   },
   {
     id: 2,
     title: 'Orders',
     value: '2,345',
     change: '+15.3%',
-    trend: 'up',
+    trend: 'up' as const,
     icon: CartOutline,
-    color: 'info'
+    color: 'info' as const
   },
   {
     id: 3,
     title: 'Customers',
     value: '1,234',
     change: '+8.2%',
-    trend: 'up',
+    trend: 'up' as const,
     icon: PersonOutline,
-    color: 'warning'
+    color: 'warning' as const
   },
   {
     id: 4,
     title: 'Products',
     value: '567',
     change: '+2.5%',
-    trend: 'up',
+    trend: 'up' as const,
     icon: SettingsOutline,
-    color: 'success'
+    color: 'success' as const
   }
 ]
 

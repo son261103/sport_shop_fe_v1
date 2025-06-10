@@ -112,13 +112,7 @@ const tinTuc = [
 <style scoped>
 .line-clamp-2 {
   display: -webkit-box;
-  display: -moz-box;
-  display: box;
-  -webkit-line-clamp: 2;
-  line-clamp: 2;
   -webkit-box-orient: vertical;
-  -moz-box-orient: vertical;
-  box-orient: vertical;
   overflow: hidden;
 }
 </style>

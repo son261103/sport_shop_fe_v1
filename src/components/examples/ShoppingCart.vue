@@ -147,7 +147,7 @@ const cartItems = ref<CartItem[]>([
     id: 1,
     name: 'Giày thể thao Nike Air Max',
     price: 2500000,
-    image: 'https://via.placeholder.com/150',
+    image: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTUwIiBoZWlnaHQ9IjE1MCIgdmlld0JveD0iMCAwIDE1MCAxNTAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxNTAiIGhlaWdodD0iMTUwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik03NSA2MEw5MCA3NUg4MFY5MEg3MFY3NUg2MEw3NSA2MFoiIGZpbGw9IiM5Q0EzQUYiLz4KPC9zdmc+',
     quantity: 1,
     variant: 'Màu: Đen, Kích thước: 42'
   },
@@ -155,7 +155,7 @@ const cartItems = ref<CartItem[]>([
     id: 2,
     name: 'Áo thun Adidas Originals',
     price: 850000,
-    image: 'https://via.placeholder.com/150',
+    image: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTUwIiBoZWlnaHQ9IjE1MCIgdmlld0JveD0iMCAwIDE1MCAxNTAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxNTAiIGhlaWdodD0iMTUwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik03NSA2MEw5MCA3NUg4MFY5MEg3MFY3NUg2MEw3NSA2MFoiIGZpbGw9IiM5Q0EzQUYiLz4KPC9zdmc+',
     quantity: 2,
     variant: 'Màu: Trắng, Kích thước: L'
   }

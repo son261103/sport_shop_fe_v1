@@ -64,7 +64,7 @@ const emit = defineEmits<{
   close: []
 }>()
 
-const { getBgClass, getTextClass, getBorderClass } = useThemeClasses()
+const { getTextClass } = useThemeClasses()
 
 const titleClasses = computed(() => [
   getTextClass('primary'),

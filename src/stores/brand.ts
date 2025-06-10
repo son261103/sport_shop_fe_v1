@@ -4,7 +4,7 @@ import { brandService } from "@/services/admin/brandService";
 import { handleApiError } from "@/services/api";
 import type {
   Brand,
-  BrandListResponse,
+  BrandPaginationData,
   BrandListParams,
   BrandFormData,
   BulkDeleteRequest,
@@ -13,7 +13,7 @@ import type {
 export const useBrandStore = defineStore("brand", () => {
   // State
   const brands = ref<Brand[]>([]);
-  const paginationData = ref<BrandListResponse["data"] | null>(null);
+  const paginationData = ref<BrandPaginationData | null>(null);
   const selectedBrand = ref<Brand | null>(null);
   const isLoading = ref(false);
   const error = ref<string | null>(null);
@@ -23,7 +23,7 @@ export const useBrandStore = defineStore("brand", () => {
   const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
   // Getters
-  const hasBrands = computed(() => brands.value.length > 0);
+  const hasBrands = computed(() => brands.value?.length > 0);
   const totalBrands = computed(() => paginationData.value?.total || 0);
   const currentPage = computed(() => paginationData.value?.current_page || 1);
   const lastPage = computed(() => paginationData.value?.last_page || 1);
@@ -68,8 +68,18 @@ export const useBrandStore = defineStore("brand", () => {
 
     try {
       const response = await brandService.getBrands(params);
-      brands.value = response.data.data;
-      paginationData.value = response.data;
+
+      // Handle the API response structure
+      if (response.data) {
+        // Standard paginated response structure
+        brands.value = response.data.data;
+        paginationData.value = response.data;
+      } else {
+        // Fallback for unexpected response structure
+        brands.value = [];
+        paginationData.value = null;
+      }
+
       updateLastFetchTime();
       return response;
     } catch (err: any) {

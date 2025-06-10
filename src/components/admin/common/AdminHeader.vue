@@ -39,11 +39,11 @@
           <div
             class="w-8 h-8 bg-gradient-sport rounded-full flex items-center justify-center"
           >
-            <span class="text-white font-medium text-sm">A</span>
+            <span class="text-white font-medium text-sm">{{ userInitial }}</span>
           </div>
           <span
             class="text-light-text-primary dark:text-dark-text-primary font-medium"
-            >Admin</span
+            >{{ userName || 'Admin' }}</span
           >
         </button>
 
@@ -53,7 +53,12 @@
             <div
               class="font-medium text-light-text-primary dark:text-dark-text-primary text-base"
             >
-              Tài khoản quản trị
+              {{ userName || 'Tài khoản quản trị' }}
+            </div>
+            <div
+              class="text-sm text-light-text-secondary dark:text-dark-text-secondary mt-1"
+            >
+              {{ userEmail }}
             </div>
           </div>
           <div class="py-1.5">
@@ -180,10 +185,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import { useRouter } from "vue-router";
 import { useTheme, useNaiveTheme } from "@/composables/useTheme";
 import { useAuth } from "@/composables/useAuth";
+import { useAuthStore } from "@/stores/auth";
 
 defineEmits<{
   "toggle-sidebar": [];
@@ -193,8 +199,17 @@ const router = useRouter();
 const { toggleTheme } = useTheme();
 const { isDark } = useNaiveTheme();
 const { logout } = useAuth();
+const authStore = useAuthStore();
 const isProfileMenuOpen = ref(false);
 let hideTimeout: number | null = null;
+
+// Computed properties for user info
+const userName = computed(() => authStore.userName);
+const userEmail = computed(() => authStore.userEmail);
+const userInitial = computed(() => {
+  const name = authStore.userName;
+  return name ? name.charAt(0).toUpperCase() : 'A';
+});
 
 const showProfileMenu = () => {
   if (hideTimeout) {

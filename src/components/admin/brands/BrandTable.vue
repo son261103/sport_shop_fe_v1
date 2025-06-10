@@ -54,11 +54,11 @@
         <div v-else></div>
         <button
           @click="$emit('add')"
-          class="p-2 text-white bg-gradient-sport hover:bg-gradient-sport-hover rounded-md transition-all duration-200 shadow-sm hover:shadow-md"
+          class="flex items-center px-4 py-2 text-white bg-gradient-sport hover:bg-gradient-sport-hover rounded-lg transition-all duration-200 shadow-md hover:shadow-lg"
           title="Thêm thương hiệu"
         >
           <svg
-            class="w-5 h-5"
+            class="w-4 h-4 mr-2"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -70,6 +70,7 @@
               d="M12 4v16m8-8H4"
             ></path>
           </svg>
+          Thêm thương hiệu
         </button>
       </div>
     </div>
@@ -297,7 +298,16 @@ const isDeleting = ref(false);
 
 // Methods
 const formatDate = (dateString: string) => {
-  return new Date(dateString).toLocaleDateString("vi-VN", {
+  if (!dateString) {
+    return "Chưa có thông tin";
+  }
+
+  const date = new Date(dateString);
+  if (isNaN(date.getTime())) {
+    return "Ngày không hợp lệ";
+  }
+
+  return date.toLocaleDateString("vi-VN", {
     year: "numeric",
     month: "2-digit",
     day: "2-digit",

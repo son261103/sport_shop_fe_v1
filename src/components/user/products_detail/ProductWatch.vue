@@ -16,7 +16,7 @@
       <div class="flex justify-center px-8">
         <div class="w-full">
           <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2">
-            <div v-for="(product, index) in relatedProducts.slice(0, 5)" 
+            <div v-for="(product, index) in props.relatedProducts.slice(0, 5)" 
                  :key="product.id"
                  data-aos="fade-up" 
                  :data-aos-delay="100 + index * 100"
@@ -176,17 +176,7 @@ const toggleWishlist = (productId: string) => {
   console.log('Wishlist updated:', wishlist.value);
 };
 
-const quickView = (product: Product) => {
-  // Here you would typically open a modal with product details
-  console.log('Quick view for product:', product);
-  alert(`Xem nhanh: ${product.name}`);
-};
 
-const compareProduct = (product: Product) => {
-  // Here you would typically add to comparison list
-  console.log('Adding to comparison:', product);
-  alert(`Đã thêm "${product.name}" vào danh sách so sánh`);
-};
 
 const addToCart = (product: Product) => {
   if (!product.inStock) {
@@ -225,13 +215,7 @@ const handleImageError = (event: Event) => {
 
 .line-clamp-2 {
   display: -webkit-box;
-  display: -moz-box;
-  display: box;
-  -webkit-line-clamp: 2;
-  line-clamp: 2;
   -webkit-box-orient: vertical;
-  -moz-box-orient: vertical;
-  box-orient: vertical;
   overflow: hidden;
 }
 
