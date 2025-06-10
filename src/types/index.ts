@@ -19,7 +19,7 @@ export type {
 export { ANIMATION_CLASSES } from "./ui";
 
 // Sport types
-export type { SportCategory, CategoryConfig, Product } from "./sport";
+export type { SportCategory, CategoryConfig, Product, CartItem } from "./sport";
 
 // Auth types
 export type {

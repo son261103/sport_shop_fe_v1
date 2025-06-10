@@ -13,11 +13,12 @@
       <!-- Featured Categories Section -->
       <FeaturedCategories />
 
-      <!-- Why Choose Us Section -->
-      <WhyChooseUs />
+    <!-- News Section -->
+    <NewsSection />
 
-      <!-- News Section -->
-      <NewsSection />
+     <!-- LogoRun -->
+    <LogoRun />
+
     </div>
   </div>
 </template>
@@ -28,8 +29,8 @@ import AOS from "aos";
 import {
   HeroSection,
   FeaturedCategories,
-  WhyChooseUs,
   NewsSection,
+  LogoRun,
 } from "@/components/user/home";
 import { Loading } from "@/components/ui";
 

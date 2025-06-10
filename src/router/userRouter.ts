@@ -16,9 +16,34 @@ export const userRoutes: RouteRecordRaw[] = [
         },
       },
       {
-        path: "components",
-        name: "ComponentShowcase",
-        component: () => import("@/views/ComponentShowcase.vue"),
+        path: 'products',
+        name: 'Products',
+        component: () => import('@/views/user/Products.vue'),
+        meta: {
+          title: "Sản phẩm - Sport Shop",
+        },
+      },
+      {
+        path: 'products/:id',
+        name: 'ProductsDetail',
+        component: () => import('@/views/user/ProductsDetail.vue'),
+        meta: {
+          title: "Chi tiết sản phẩm - Sport Shop",
+        },
+      },
+      {
+        path: 'cart',
+        name: 'Cart',
+        component: () => import('@/views/user/Cart.vue'),
+        meta: {
+          title: "Giỏ hàng - Sport Shop",
+        },
+      },
+
+      {
+        path: 'components',
+        name: 'ComponentShowcase',
+        component: () => import('@/views/ComponentShowcase.vue'),
         meta: {
           title: "Component Showcase - Sport Shop",
         },
@@ -66,7 +91,7 @@ export const userRoutes: RouteRecordRaw[] = [
       title: "Đăng nhập - Sport Shop",
       requiresGuest: true,
     },
-    beforeEnter: (_to, _from, next) => {
+    beforeEnter: (_, __, next) => {
       const authStore = useAuthStore();
       if (authStore.isAuthenticated) {
         const redirectPath = authStore.getRedirectPath();
@@ -84,7 +109,7 @@ export const userRoutes: RouteRecordRaw[] = [
       title: "Đăng ký - Sport Shop",
       requiresGuest: true,
     },
-    beforeEnter: (_to, _from, next) => {
+    beforeEnter: (_, __, next) => {
       const authStore = useAuthStore();
       if (authStore.isAuthenticated) {
         const redirectPath = authStore.getRedirectPath();

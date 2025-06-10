@@ -1,6 +1,6 @@
 <template>
-  <section class="relative py-24 px-4 bg-gradient-to-b from-transparent via-light-bg-primary/30 to-light-bg-secondary/80 dark:from-transparent dark:via-dark-bg-primary/30 dark:to-dark-bg-secondary/80 overflow-hidden">
-    <!-- Background effects giống WhyChooseUs -->
+  <section class="relative py-24 px-4 overflow-hidden" style="background-color: #e9ecef;">
+    <!-- Background effects -->
     <div class="absolute inset-0 overflow-hidden pointer-events-none">
       <div class="absolute top-32 left-16 w-24 h-24 bg-gradient-to-br from-blue-500/5 to-cyan-500/5 rounded-full blur-2xl animate-pulse"></div>
       <div class="absolute top-48 right-24 w-20 h-20 bg-gradient-to-br from-purple-500/5 to-violet-500/5 rounded-full blur-xl animate-bounce"></div>
@@ -8,7 +8,7 @@
     </div>
 
     <div class="container-custom relative z-10">
-      <!-- Title section với text style giống WhyChooseUs -->
+      <!-- Title section -->
       <div data-aos="fade-up" data-aos-duration="1000" class="text-center mb-16">
         <h2 class="text-3xl md:text-4xl font-bold text-light-text-primary dark:text-dark-text-primary mb-4">
           Tin tức thể thao
@@ -19,10 +19,10 @@
         </p>
       </div>
 
-      <!-- Grid content với max-width lớn hơn -->
+      <!-- Grid content -->
       <div class="max-w-[1920px] mx-auto px-6">
         <div class="grid grid-cols-12 gap-10">
-          <!-- Tin tức chính - layout rộng hơn -->
+          <!-- Tin tức chính -->
           <div data-aos="fade-up" data-aos-delay="100" class="col-span-12 lg:col-span-7">
             <div class="bg-white p-8 rounded-xl shadow-lg group hover:shadow-xl transition-all duration-300 cursor-pointer">
               <div class="overflow-hidden rounded-lg">
@@ -33,16 +33,17 @@
                 />
               </div>
               <h2 class="text-xl font-semibold mt-4 text-gray-800 group-hover:text-primary transition-colors duration-200">
-                Trung ương ban hành quy định mới về thi hành Điều lệ Đảng
+                Những xu hướng thể thao mới nhất năm 2024
               </h2>
               <div class="mt-3 text-gray-600 text-sm space-y-2">
-                <p>• Hà Nội nóng gần 40 độ C, mặt đường xuất hiện ảo ảnh</p>
-                <p>• Nam sinh được tuyển thẳng vào trường công</p>
+                <p>• Công nghệ AI trong huấn luyện thể thao</p>
+                <p>• Thiết bị thể thao thông minh ngày càng phổ biến</p>
+                <p>• Xu hướng tập luyện tại nhà sau đại dịch</p>
               </div>
             </div>
           </div>
 
-          <!-- Danh sách tin - layout rộng hơn -->
+          <!-- Danh sách tin -->
           <div data-aos="fade-up" data-aos-delay="200" class="col-span-12 lg:col-span-5">
             <div class="bg-white rounded-xl shadow-lg p-2">
               <div v-for="(news, index) in tinTuc" 
@@ -97,22 +98,9 @@ const tinTuc = [
     luotXem: 145
   },
   {
-    title: 'Điểm nhấn vòng 10 V.League 2023: HAGL thoát đáy bảng, Nam Định tiếp tục bay cao',
-    image: 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?ixlib=rb-4.0.3',
-    luotXem: 167
-  },
-  {
-    title: 'Thể thao Việt Nam hoàn thành xuất sắc chỉ tiêu tại SEA Games 32',
-    image: 'https://images.unsplash.com/photo-1517649763962-0c623066013b?ixlib=rb-4.0.3',
-    luotXem: 234
+    title: 'Xu hướng thể thao 2024: Công nghệ và sức khỏe',
+    image: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3',
+    luotXem: 178
   }
-]
+];
 </script>
-
-<style scoped>
-.line-clamp-2 {
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-</style>

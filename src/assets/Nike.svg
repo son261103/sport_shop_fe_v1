@@ -1,0 +1,11 @@
+<svg width="300" height="200" viewBox="0 0 300 200" xmlns="http://www.w3.org/2000/svg">
+
+   
+   <!-- Nike Swoosh -->
+   <g transform="translate(150, 100)">
+     <path d="M-80 20 Q-40 -20 0 -10 Q40 0 80 20 Q70 30 30 25 Q-10 20 -50 30 Q-70 35 -80 40 Z" fill="#000000"/>
+   </g>
+   
+   <!-- NIKE text -->
+   <text x="150" y="160" font-family="Arial, sans-serif" font-size="24" font-weight="bold" text-anchor="middle" fill="#000000">NIKE</text>
+ </svg>

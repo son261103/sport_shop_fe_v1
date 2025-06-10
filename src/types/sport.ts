@@ -27,8 +27,19 @@ export interface Product {
   originalPrice?: number
   category: SportCategory
   image: string
+  brand: string
   badges?: BadgeVariant[]
   inStock: boolean
-  rating?: number
+  rating: number
   reviews?: number
+}
+
+export interface CartItem extends Product {
+  quantity: number
+  selectedSize?: string
+  selectedColor?: string
+  stock?: number
+  discount?: number
+  addedAt?: string
+  productId?: string
 }

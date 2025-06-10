@@ -4,7 +4,7 @@
     @click="handleClick"
   >
     <!-- Product Image - Full width, no padding -->
-    <div class="relative h-48 w-full overflow-hidden">
+    <div class="relative h-36 w-full overflow-hidden">
       <img
         :src="product.image || '/placeholder.svg'"
         :alt="product.name"
@@ -44,17 +44,17 @@
     </div>
 
     <!-- Product Info -->
-    <div class="p-4">
+    <div class="p-3">
       <!-- Category Badge -->
-      <div class="mb-2">
-        <span :class="categoryBadgeClasses">{{ product.category }}</span>
+      <div class="mb-1">
+        <span :class="categoryBadgeClasses" class="text-xs">{{ product.category }}</span>
       </div>
 
       <!-- Product Name -->
-      <h3 :class="nameClasses">{{ product.name }}</h3>
+      <h3 :class="nameClasses" class="text-sm font-semibold line-clamp-2">{{ product.name }}</h3>
 
       <!-- Rating -->
-      <div class="flex items-center gap-1 mt-2">
+      <div class="flex items-center gap-1 mt-1">
         <div class="flex items-center">
           <n-icon class="w-4 h-4 fill-current text-yellow-400">
             <Star />
@@ -67,7 +67,7 @@
       </div>
 
       <!-- Price -->
-      <div class="mt-3">
+      <div class="mt-2">
         <div class="flex items-center justify-between gap-2">
           <div class="flex items-center gap-2 flex-1">
             <span
@@ -93,7 +93,7 @@
     </div>
 
     <!-- Footer -->
-    <div class="p-4 pt-0">
+    <div class="p-3 pt-0">
       <Button
         :variant="product.inStock ? 'primary' : 'secondary'"
         class="w-full font-medium"
@@ -213,6 +213,7 @@ const handleImageError = (event: Event) => {
 .line-clamp-2 {
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
