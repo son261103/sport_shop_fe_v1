@@ -1,16 +1,50 @@
 <template>
   <div class="p-6">
-    <div class="bg-white dark:bg-dark-bg-secondary rounded-lg shadow-sm p-6">
-      <h1 class="text-2xl font-bold text-light-text-primary dark:text-dark-text-primary mb-4">
-        Orders Management
+    <!-- Loading State -->
+    <div v-if="isLoading" class="flex items-center justify-center py-12">
+      <Loading size="lg" color="sport" text="Đang tải quản lý đơn hàng..." />
+    </div>
+
+    <!-- Page Content -->
+    <div
+      v-else
+      class="bg-white dark:bg-dark-bg-secondary rounded-lg shadow-sm p-6"
+    >
+      <h1
+        class="text-2xl font-bold text-light-text-primary dark:text-dark-text-primary mb-4"
+      >
+        Quản lý đơn hàng
       </h1>
       <p class="text-light-text-secondary dark:text-dark-text-secondary">
-        This is the orders management page. Content will be implemented soon.
+        Trang quản lý đơn hàng. Nội dung sẽ được triển khai sớm.
       </p>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-// Orders management logic will be implemented here
+import { ref, onMounted } from "vue";
+import { Loading } from "@/components/ui";
+
+// Loading state
+const isLoading = ref(true);
+
+// Load page data
+const loadPageData = async () => {
+  try {
+    isLoading.value = true;
+    // Simulate loading time
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    // TODO: Load orders data when implemented
+  } catch (error) {
+    console.error("Error loading orders data:", error);
+  } finally {
+    isLoading.value = false;
+  }
+};
+
+// Load data when component mounts
+onMounted(() => {
+  loadPageData();
+});
 </script>

@@ -491,6 +491,85 @@
     border-radius: 20px 20px 0 0;
   }
 
+  /* 🔍 Filter Sidebar */
+  .filter-sidebar {
+    @apply bg-light-bg-secondary dark:bg-dark-bg-secondary
+           border border-light-border-secondary dark:border-dark-border-secondary
+           rounded-2xl shadow-lg hover:shadow-xl;
+    backdrop-filter: blur(15px);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: linear-gradient(135deg, 
+      rgba(255, 255, 255, 0.1) 0%, 
+      rgba(255, 255, 255, 0.05) 100%);
+  }
+
+  .filter-sidebar:hover {
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+  }
+
+  .filter-sidebar-body {
+    @apply p-6;
+  }
+
+  .filter-sidebar h3 {
+    @apply text-gradient-sport-animated;
+    background-size: 200% 200%;
+  }
+
+  .filter-sidebar select {
+    @apply form-input;
+    background: linear-gradient(135deg, 
+      rgba(255, 255, 255, 0.9) 0%, 
+      rgba(255, 255, 255, 0.7) 100%);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(0, 200, 151, 0.2);
+  }
+
+  .filter-sidebar select:focus {
+    @apply ring-2 ring-light-accent-sport dark:ring-dark-accent-sport;
+    border-color: var(--accent-sport);
+    box-shadow: 0 0 0 3px rgba(0, 200, 151, 0.1);
+  }
+
+  .filter-sidebar input[type="radio"],
+  .filter-sidebar input[type="checkbox"] {
+    @apply w-4 h-4 text-light-accent-sport dark:text-dark-accent-sport
+           border-2 border-light-border-primary dark:border-dark-border-primary
+           focus:ring-light-accent-sport dark:focus:ring-dark-accent-sport
+           focus:ring-2 focus:ring-opacity-50;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .filter-sidebar input[type="radio"]:checked,
+  .filter-sidebar input[type="checkbox"]:checked {
+    @apply bg-light-accent-sport dark:bg-dark-accent-sport
+           border-light-accent-sport dark:border-dark-accent-sport;
+    box-shadow: 0 0 0 2px rgba(0, 200, 151, 0.2);
+  }
+
+  .filter-sidebar label {
+    @apply cursor-pointer transition-all duration-200;
+  }
+
+  .filter-sidebar label:hover {
+    @apply text-light-accent-sport dark:text-dark-accent-sport;
+    transform: translateX(2px);
+  }
+
+  .filter-sidebar .btn {
+    @apply bg-gradient-to-r from-light-accent-sport to-light-accent-info
+           dark:from-dark-accent-sport dark:to-dark-accent-info
+           text-white border-0 shadow-sport;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .filter-sidebar .btn:hover {
+    @apply shadow-sport-lg;
+    transform: translateY(-1px) scale(1.02);
+  }
+
   /* 💰 Price Display */
   .price {
     @apply font-bold text-lg text-light-accent-sport dark:text-dark-accent-sport;
