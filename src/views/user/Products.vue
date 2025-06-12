@@ -1,7 +1,7 @@
 <template>
   <div class="min-h-screen bg-gradient-page">
     <!-- Loading State -->
-    <div v-if="isLoading" class="flex items-center justify-center min-h-screen">
+    <div v-if="apiLoading" class="flex items-center justify-center min-h-screen">
       <Loading size="lg" color="sport" text="Đang tải sản phẩm..." />
     </div>
 
@@ -76,22 +76,35 @@ import { ref, onMounted, watch, computed } from "vue";
 import { useRouter } from "vue-router";
 import AOS from "aos";
 import { Loading } from "@/components/ui";
-import type { Product } from "@/components/examples";
 import {
   ProductHeroBanner,
   ProductFilterSidebar,
   ProductSection,
   AllProductsSection
 } from "@/components/user/products";
+import { usePublicProducts } from '@/composables';
+import type { Product } from '@/components/examples';
 
 // Router
 const router = useRouter();
 
-// Loading state
-const isLoading = ref(true);
+// Use the public products composable
+const {
+  products,
+  isLoading: apiLoading,
+  searchQuery,
+  sortBy,
+  fetchProducts,
+  filterByCategory,
+  filterByBrand,
+  filterByPriceRange,
+  resetFilters: resetApiFilters
+} = usePublicProducts();
+
+// Local loading state for page initialization
+const isLoading = ref(false);
 
 // Filter and sort states
-const sortBy = ref('default');
 const priceRange = ref('all');
 const selectedCategories = ref<string[]>([]);
 const selectedBrands = ref<string[]>([]);
@@ -102,75 +115,50 @@ const itemsPerPage = 50;
 
 // Reset filters function
 const resetFilters = () => {
-  sortBy.value = 'default';
+  sortBy.value = 'name';
   priceRange.value = 'all';
   selectedCategories.value = [];
   selectedBrands.value = [];
   currentPage.value = 1;
+  searchQuery.value = '';
+  resetApiFilters();
+  fetchProducts();
 };
 
 
 
-// News data
-const newsArticles = ref([
-  {
-    id: 1,
-    title: 'Những thành tựu nổi bật của ngành thể thao Việt Nam',
-    excerpt: 'Đội tuyển bóng đá Việt Nam đạt thành tích cao tại AFF Cup, các vận động viên xuất sắc tại SEA Games 32.',
-    image: 'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80',
-    category: 'Thể thao',
-    date: '15/12/2024',
-    readTime: 5
-  },
-  {
-    id: 2,
-    title: 'Giải vô địch bóng đá quốc gia 2024 khởi tranh',
-    excerpt: 'Giải đấu hứa hẹn sẽ mang đến những trận cầu hấp dẫn với sự tham gia của các đội bóng hàng đầu.',
-    image: 'https://plus.unsplash.com/premium_photo-1676637000058-96549206fe71?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80',
-    category: 'Bóng đá',
-    date: '12/12/2024',
-    readTime: 3
-  },
-  {
-    id: 3,
-    title: 'Đội tuyển Việt Nam chuẩn bị cho AFF Cup',
-    excerpt: 'HLV Park Hang-seo đã công bố danh sách 25 cầu thủ cho chiến dịch AFF Cup sắp tới.',
-    image: 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80',
-    category: 'Bóng đá',
-    date: '10/12/2024',
-    readTime: 4
-  },
-  {
-    id: 4,
-    title: 'Khai mạc giải Marathon quốc tế Hà Nội',
-    excerpt: 'Hơn 10,000 vận động viên từ khắp nơi trên thế giới tham gia giải chạy marathon lớn nhất năm.',
-    image: 'https://images.unsplash.com/photo-1552674605-db6ffd4facb5?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80',
-    category: 'Marathon',
-    date: '08/12/2024',
-    readTime: 3
-  },
-  {
-    id: 5,
-    title: 'Điểm nhấn vòng 10 V.League 2024: HAGL thoát đáy bảng',
-    excerpt: 'Chiến thắng quan trọng giúp HAGL có được 3 điểm quý giá trong cuộc đua trụ hạng.',
-    image: 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80',
-    category: 'V.League',
-    date: '05/12/2024',
-    readTime: 4
-  },
-  {
-    id: 6,
-    title: 'Thể thao Việt Nam hoàn thành xuất sắc chỉ tiêu tại SEA Games 32',
-    excerpt: 'Đoàn thể thao Việt Nam đã vượt qua chỉ tiêu đề ra và giành được nhiều huy chương quý giá.',
-    image: 'https://images.unsplash.com/photo-1517649763962-0c623066013b?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80',
-    category: 'SEA Games',
-    date: '02/12/2024',
-    readTime: 6
-  }
-]);
 
-// Sample product data
-const bestSellers = ref<Product[]>([
+// Adapter function to convert PublicProduct to Product
+const adaptPublicProductToProduct = (publicProduct: any): Product => {
+  return {
+    id: publicProduct.id.toString(),
+    name: publicProduct.name,
+    price: parseFloat(publicProduct.price),
+    originalPrice: publicProduct.discount_price ? parseFloat(publicProduct.discount_price) : undefined,
+    image: publicProduct.image || 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&h=400&fit=crop',
+    category: publicProduct.category?.name || 'Unknown',
+    brand: publicProduct.brand?.name || 'Unknown',
+    rating: 4.5, // Default rating since API doesn't provide this
+    reviews: Math.floor(Math.random() * 100) + 10, // Random reviews count
+    inStock: publicProduct.stock_quantity > 0,
+    isFavorite: false, // Default to false since API doesn't provide this
+    description: publicProduct.description || ''
+  };
+};
+
+// Computed properties for product sections
+const bestSellers = computed(() => {
+  // Get first 5 products as best sellers and adapt them
+  return products.value.slice(0, 5).map(adaptPublicProductToProduct);
+});
+
+const saleItems = computed(() => {
+  // Get next 5 products as sale items and adapt them
+  return products.value.slice(5, 10).map(adaptPublicProductToProduct);
+});
+
+// Fallback sample product data for when API is not available
+const fallbackBestSellers = ref<Product[]>([
   {
     id: "bs1",
     name: "Nike Air Max 270",
@@ -240,7 +228,7 @@ const bestSellers = ref<Product[]>([
   }
 ]);
 
-const saleItems = ref<Product[]>([
+const fallbackSaleItems = ref<Product[]>([
   {
     id: "sl1",
     name: "Nike Dri-FIT T-Shirt",
@@ -348,10 +336,44 @@ const initializePage = async () => {
 };
 
 // Computed properties for AllProductsSection
-const allProducts = computed(() => [
-  ...bestSellers.value,
-  ...saleItems.value
-]);
+const allProducts = computed(() => {
+  // Use API products if available, otherwise use fallback data
+  if (products.value.length > 0) {
+    return products.value.map(adaptPublicProductToProduct);
+  }
+  return [
+    ...fallbackBestSellers.value,
+    ...fallbackSaleItems.value
+  ];
+});
+
+// Watch for filter changes
+watch([selectedCategories, selectedBrands, priceRange], () => {
+  // Apply category filter
+  if (selectedCategories.value.length > 0) {
+    filterByCategory(parseInt(selectedCategories.value[0]));
+  } else {
+    filterByCategory(undefined);
+  }
+  
+  // Apply brand filter
+  if (selectedBrands.value.length > 0) {
+    filterByBrand(parseInt(selectedBrands.value[0]));
+  } else {
+    filterByBrand(undefined);
+  }
+  
+  // Apply price range filter
+  if (priceRange.value !== 'all') {
+    const [min, max] = priceRange.value.split('-').map(Number);
+    filterByPriceRange(min, max);
+  } else {
+    filterByPriceRange(undefined, undefined);
+  }
+  
+  // Fetch products with new filters
+  fetchProducts();
+});
 
 // Scroll to All Products section
 const scrollToAllProducts = () => {
@@ -365,7 +387,14 @@ const scrollToAllProducts = () => {
 };
 
 // Initialize when component is mounted
-onMounted(() => {
+onMounted(async () => {
+  try {
+    // Load products from API
+    await fetchProducts();
+  } catch (error) {
+    console.error('Failed to load products:', error);
+    // Fallback to sample data if API fails
+  }
   initializePage();
 });
 
