@@ -63,8 +63,7 @@
 
 
 
-      <!-- News Section -->
-      <NewsSection :news-articles="newsArticles" />
+
         </main>
       </div>
     </div>
@@ -82,8 +81,7 @@ import {
   ProductHeroBanner,
   ProductFilterSidebar,
   ProductSection,
-  AllProductsSection,
-  NewsSection
+  AllProductsSection
 } from "@/components/user/products";
 
 // Router

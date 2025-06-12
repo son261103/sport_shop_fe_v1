@@ -13,8 +13,7 @@
       <!-- Featured Categories Section -->
       <FeaturedCategories />
 
-    <!-- News Section -->
-    <NewsSection />
+
 
      <!-- LogoRun -->
     <LogoRun />
@@ -29,7 +28,6 @@ import AOS from "aos";
 import {
   HeroSection,
   FeaturedCategories,
-  NewsSection,
   LogoRun,
 } from "@/components/user/home";
 import { Loading } from "@/components/ui";

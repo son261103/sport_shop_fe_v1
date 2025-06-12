@@ -1,5 +1,5 @@
 <template>
-  <section class="py-16 px-4" style="background-color: #e9ecef;">
+  <section class="py-16 px-4" style="background-color: white;">
     <div class="container-custom">
       <!-- Header -->
       <div data-aos="fade-up" class="text-center mb-12">

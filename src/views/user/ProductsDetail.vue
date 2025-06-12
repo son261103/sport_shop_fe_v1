@@ -8,28 +8,20 @@
     <!-- Page Content -->
     <div v-else class="section-padding">
       <!-- Product Detail Section -->
-      <div data-aos="fade-up" class="mb-16">
+      <div data-aos="fade-up" class="pb-8 border-b border-gray-200">
         <ProductDetail :product="product" />
       </div>
 
-      <!-- Product Watch Section -->
-      <div data-aos="fade-up" data-aos-delay="200" class="mb-16">
+      <!-- Product Watch Section (Recently Viewed) -->
+      <div data-aos="fade-up" data-aos-delay="200" class="-mt-64 mb-16 pb-8 border-b border-gray-200">
         <ProductWatch :relatedProducts="relatedProducts" />
       </div>
 
-      <!-- Related Products Section -->
-      <div data-aos="fade-up" data-aos-delay="300" class="mb-16">
-        <RelatedProducts :relatedProducts="relatedProducts" />
-      </div>
+
 
       <!-- Product Reviews Section with Tabs -->
       <div data-aos="fade-up" data-aos-delay="400" class="mb-16">
         <ProductReviews :productId="productId" :comments="comments" />
-      </div>
-
-      <!-- News Section -->
-      <div data-aos="fade-up" data-aos-delay="500">
-        <NewsSection />
       </div>
     </div>
   </div>
@@ -42,9 +34,10 @@ import AOS from "aos";
 import {
   ProductDetail,
   ProductWatch,
-  NewsSection,
+  ProductReviews,
 } from "@/components/user/products_detail";
 import { Loading } from "@/components/ui";
+import type { Product, SportCategory } from "@/types/sport";
 
 // Route and product ID
 const route = useRoute();
@@ -59,10 +52,10 @@ const product = ref({
   name: '',
   price: 0,
   originalPrice: 0,
-  discount: 0,
+  image: '',
   images: [] as string[],
   description: '',
-  category: '',
+  category: 'fitness' as SportCategory,
   brand: '',
   sizes: [] as string[],
   colors: [] as Array<{ name: string; value: string; }>,
@@ -70,21 +63,12 @@ const product = ref({
   reviewCount: 0,
   inStock: true,
   features: [] as string[],
-  stock: 0
+  stock: 0,
+  discount: 0
 });
 
 // Related products
-const relatedProducts = ref([] as Array<{
-  id: string;
-  name: string;
-  price: number;
-  originalPrice: number;
-  discount: number;
-  image: string;
-  brand: string;
-  rating: number;
-  inStock: boolean;
-}>);
+const relatedProducts = ref([] as Product[]);
 
 // Comments
 const comments = ref([] as Array<{
@@ -111,6 +95,7 @@ const fetchProductData = async () => {
       price: 890000,
       originalPrice: 1200000,
       discount: 26,
+      image: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=800&h=800&fit=crop',
       images: [
         'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=800&h=800&fit=crop',
         'https://images.unsplash.com/photo-1503341504253-dff4815485f1?w=800&h=800&fit=crop',
@@ -118,7 +103,7 @@ const fetchProductData = async () => {
         'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&h=800&fit=crop'
       ],
       description: 'Áo thể thao Nike Dri-FIT Pro với công nghệ thấm hút mồ hôi tiên tiến, thiết kế ergonomic và chất liệu cao cấp. Hoàn hảo cho training, chạy bộ và các hoạt động thể thao cường độ cao.',
-      category: 'Áo thể thao',
+      category: 'fitness' as SportCategory,
       brand: 'Nike',
       sizes: ['S', 'M', 'L', 'XL', 'XXL'],
       colors: [
@@ -157,67 +142,79 @@ const fetchRelatedProducts = async () => {
       {
         id: '2',
         name: 'Quần short thể thao Adidas ClimaCool',
+        description: 'Quần short thể thao với công nghệ ClimaCool thoáng mát',
         price: 650000,
         originalPrice: 850000,
-        discount: 24,
+        category: 'fitness' as SportCategory,
         image: 'https://images.unsplash.com/photo-1506629905607-d9c36e0a3f90?w=400&h=400&fit=crop',
         brand: 'Adidas',
         rating: 4.3,
+        reviews: 89,
         inStock: true
       },
       {
         id: '3',
         name: 'Giày chạy bộ Nike Air Zoom',
+        description: 'Giày chạy bộ với công nghệ Air Zoom đệm êm ái',
         price: 2500000,
         originalPrice: 3000000,
-        discount: 17,
+        category: 'running' as SportCategory,
         image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&h=400&fit=crop',
         brand: 'Nike',
         rating: 4.7,
+        reviews: 156,
         inStock: true
       },
       {
         id: '4',
         name: 'Áo khoác thể thao Puma Training',
+        description: 'Áo khoác training chống gió và nước',
         price: 1200000,
         originalPrice: 1500000,
-        discount: 20,
+        category: 'gym' as SportCategory,
         image: 'https://images.unsplash.com/photo-1544966503-7cc5ac882d5f?w=400&h=400&fit=crop',
         brand: 'Puma',
         rating: 4.4,
+        reviews: 73,
         inStock: true
       },
       {
         id: '5',
         name: 'Quần legging thể thao Under Armour',
+        description: 'Quần legging co giãn 4 chiều thoải mái',
         price: 890000,
         originalPrice: 1100000,
-        discount: 19,
+        category: 'fitness' as SportCategory,
         image: 'https://images.unsplash.com/photo-1506629905607-d9c36e0a3f90?w=400&h=400&fit=crop',
         brand: 'Under Armour',
         rating: 4.5,
+        reviews: 124,
         inStock: true
       },
       {
         id: '6',
         name: 'Áo tank top thể thao Reebok',
+        description: 'Áo tank top thoáng mát cho tập luyện',
         price: 450000,
         originalPrice: 600000,
-        discount: 25,
+        category: 'gym' as SportCategory,
         image: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=400&fit=crop',
         brand: 'Reebok',
         rating: 4.2,
+        reviews: 67,
         inStock: true
       },
       {
         id: '7',
         name: 'Giày training Nike Metcon',
+        description: 'Giày training đa năng cho mọi bài tập',
         price: 3200000,
         originalPrice: 3800000,
-        discount: 16,
+        category: 'gym' as SportCategory,
         image: 'https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=400&h=400&fit=crop',
         brand: 'Nike',
         rating: 4.8,
+        reviews: 203,
         inStock: true
       }
     ];
