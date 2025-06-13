@@ -6,6 +6,12 @@ import router from "./router";
 import { useAuthStore } from "@/stores/auth";
 import AOS from "aos";
 import "aos/dist/aos.css";
+// import { createDiscreteApi } from 'naive-ui' // Commented out as it's not currently used;
+import { validateEnv, debugEnv } from '@/constants/env';
+
+// Validate environment variables
+validateEnv()
+debugEnv()
 
 // Create Vue app
 const app = createApp(App);

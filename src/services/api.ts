@@ -34,14 +34,17 @@ import type {
   User,
 } from "../types/auth";
 import { useLoading } from "../composables/useLoading";
+import { ENV } from "@/constants";
 
 // Base API configuration
-const API_BASE_URL = "http://localhost:8000/api";
+const API_BASE_URL = ENV.API.BASE_URL;
+const API_TIMEOUT = ENV.API.TIMEOUT;
+const AUTH_TOKEN_KEY = ENV.AUTH.TOKEN_KEY;
 
 // Create axios instance with default config
 const apiClient: AxiosInstance = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 10000,
+  timeout: API_TIMEOUT,
   headers: {
     "Content-Type": "application/json",
     Accept: "application/json",
@@ -72,7 +75,7 @@ apiClient.interceptors.request.use(
     }
 
     // Add auth token if available
-    const token = localStorage.getItem("auth_token");
+    const token = localStorage.getItem(AUTH_TOKEN_KEY);
     if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -111,7 +114,7 @@ apiClient.interceptors.response.use(
     // Handle other HTTP errors
     if (error.response?.status === 401) {
       // Unauthorized - clear token and redirect to login
-      localStorage.removeItem("auth_token");
+      localStorage.removeItem(AUTH_TOKEN_KEY);
       window.location.href = "/login";
     }
 

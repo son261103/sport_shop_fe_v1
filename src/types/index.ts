@@ -33,3 +33,13 @@ export type {
   AuthFormData,
   AuthFormErrors,
 } from "./auth";
+
+// Location types
+export type {
+  Province,
+  District,
+  Ward,
+  LocationSelectOption,
+  ProvinceApiResponse,
+  DistrictApiResponse,
+} from "./location";

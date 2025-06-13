@@ -25,8 +25,10 @@ router.afterEach(() => {
   }, 300);
 });
 
+// Initialize theme immediately when component is created
+themeStore.initTheme();
+
 onMounted(() => {
-  themeStore.initTheme();
   themeStore.setupSystemThemeListener();
 });
 </script>

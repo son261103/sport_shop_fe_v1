@@ -16,6 +16,10 @@
 # Install dependencies
 npm install
 
+# Setup environment variables
+cp .env.example .env
+# Edit .env file with your configuration
+
 # Start development server
 npm run dev
 
@@ -24,6 +28,34 @@ npm run build
 ```
 
 **🌐 Development URL**: http://localhost:5173
+
+## 🔧 Environment Configuration
+
+The application uses environment variables for configuration. Copy `.env.example` to `.env` and configure:
+
+```bash
+# API Configuration
+VITE_API_BASE_URL=http://localhost:8000/api
+VITE_API_TIMEOUT=10000
+
+# Application URLs
+VITE_APP_URL=http://localhost:5173
+
+# External APIs
+VITE_PROVINCES_API_URL=https://provinces.open-api.vn/api
+
+# Authentication
+VITE_AUTH_TOKEN_KEY=auth_token
+
+# Development Settings
+VITE_DEV_MODE=true
+VITE_DEBUG_MODE=false
+```
+
+### 🔐 Security Notes
+- Never commit `.env` files to version control
+- Use `.env.example` as a template for required variables
+- All environment variables must be prefixed with `VITE_` to be accessible in the frontend
 
 ## 📁 Project Structure
 

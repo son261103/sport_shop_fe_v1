@@ -1,31 +1,9 @@
 import { ref, computed } from 'vue'
+import type { Province, District, Ward } from '@/types'
+import { ENV } from '@/constants'
 
-// Types for Province API
-interface Province {
-  name: string
-  code: number
-  division_type: string
-  phone_code: number
-  codename: string
-  districts?: District[]
-}
-
-interface District {
-  name: string
-  code: number
-  codename: string
-  division_type: string
-  province_code: number
-  wards?: Ward[]
-}
-
-interface Ward {
-  name: string
-  code: number
-  codename: string
-  division_type: string
-  district_code: number
-}
+// Environment variables
+const PROVINCES_API_URL = ENV.API.PROVINCES_URL
 
 export function useProvinces() {
   const provinces = ref<Province[]>([])
@@ -40,7 +18,7 @@ export function useProvinces() {
       loading.value = true
       error.value = null
       
-      const response = await fetch('https://provinces.open-api.vn/api/')
+      const response = await fetch(`${PROVINCES_API_URL}/`)
       if (!response.ok) {
         throw new Error('Failed to fetch provinces')
       }
@@ -61,7 +39,7 @@ export function useProvinces() {
       loading.value = true
       error.value = null
       
-      const response = await fetch(`https://provinces.open-api.vn/api/p/${provinceCode}?depth=2`)
+      const response = await fetch(`${PROVINCES_API_URL}/p/${provinceCode}?depth=2`)
       if (!response.ok) {
         throw new Error('Failed to fetch districts')
       }
@@ -82,7 +60,7 @@ export function useProvinces() {
       loading.value = true
       error.value = null
       
-      const response = await fetch(`https://provinces.open-api.vn/api/d/${districtCode}?depth=2`)
+      const response = await fetch(`${PROVINCES_API_URL}/d/${districtCode}?depth=2`)
       if (!response.ok) {
         throw new Error('Failed to fetch wards')
       }
@@ -103,7 +81,7 @@ export function useProvinces() {
       loading.value = true
       error.value = null
       
-      const response = await fetch(`https://provinces.open-api.vn/api/p/search/?q=${encodeURIComponent(query)}`)
+      const response = await fetch(`${PROVINCES_API_URL}/p/search/?q=${encodeURIComponent(query)}`)
       if (!response.ok) {
         throw new Error('Failed to search provinces')
       }
@@ -125,7 +103,7 @@ export function useProvinces() {
       loading.value = true
       error.value = null
       
-      const response = await fetch(`https://provinces.open-api.vn/api/d/search/?q=${encodeURIComponent(query)}`)
+      const response = await fetch(`${PROVINCES_API_URL}/d/search/?q=${encodeURIComponent(query)}`)
       if (!response.ok) {
         throw new Error('Failed to search districts')
       }
@@ -143,22 +121,22 @@ export function useProvinces() {
 
   // Get province by code
   const getProvinceByCode = (code: number) => {
-    return provinces.value.find(p => p.code === code)
+    return provinces.value.find((p: Province) => p.code === code)
   }
 
   // Get district by code
   const getDistrictByCode = (code: number) => {
-    return districts.value.find(d => d.code === code)
+    return districts.value.find((d: District) => d.code === code)
   }
 
   // Get ward by code
   const getWardByCode = (code: number) => {
-    return wards.value.find(w => w.code === code)
+    return wards.value.find((w: Ward) => w.code === code)
   }
 
   // Computed properties for formatted data
   const provincesForSelect = computed(() => 
-    provinces.value.map(p => ({
+    provinces.value.map((p: Province) => ({
       value: p.code.toString(),
       label: p.name,
       code: p.code,
@@ -167,7 +145,7 @@ export function useProvinces() {
   )
 
   const districtsForSelect = computed(() => 
-    districts.value.map(d => ({
+    districts.value.map((d: District) => ({
       value: d.code.toString(),
       label: d.name,
       code: d.code,
@@ -176,7 +154,7 @@ export function useProvinces() {
   )
 
   const wardsForSelect = computed(() => 
-    wards.value.map(w => ({
+    wards.value.map((w: Ward) => ({
       value: w.code.toString(),
       label: w.name,
       code: w.code,

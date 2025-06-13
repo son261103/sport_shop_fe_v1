@@ -7,6 +7,10 @@ import type {
   RegisterRequest,
   User,
 } from "@/types/auth";
+import { ENV } from '@/constants'
+
+// Environment variables
+const AUTH_TOKEN_KEY = ENV.AUTH.TOKEN_KEY
 
 // Auth API endpoints are now defined in api.ts
 
@@ -20,7 +24,7 @@ export class AuthService {
 
       // Store token if registration successful
       if (response.status && response.data.token) {
-        localStorage.setItem("auth_token", response.data.token);
+        localStorage.setItem(AUTH_TOKEN_KEY, response.data.token);
         localStorage.setItem("user_data", JSON.stringify(response.data.user));
       }
 
@@ -40,7 +44,7 @@ export class AuthService {
 
       // Store token and user data if login successful
       if (response.status && response.data.token) {
-        localStorage.setItem("auth_token", response.data.token);
+        localStorage.setItem(AUTH_TOKEN_KEY, response.data.token);
         localStorage.setItem("user_data", JSON.stringify(response.data.user));
 
         // Store remember preference
@@ -92,7 +96,7 @@ export class AuthService {
    * Check if user is authenticated
    */
   static isAuthenticated(): boolean {
-    const token = localStorage.getItem("auth_token");
+    const token = localStorage.getItem(AUTH_TOKEN_KEY);
     return !!token;
   }
 
@@ -100,7 +104,7 @@ export class AuthService {
    * Get stored auth token
    */
   static getToken(): string | null {
-    return localStorage.getItem("auth_token");
+    return localStorage.getItem(AUTH_TOKEN_KEY);
   }
 
   /**
@@ -120,7 +124,7 @@ export class AuthService {
    * Clear all authentication data
    */
   static clearAuthData(): void {
-    localStorage.removeItem("auth_token");
+    localStorage.removeItem(AUTH_TOKEN_KEY);
     localStorage.removeItem("user_data");
     localStorage.removeItem("remember_me");
   }

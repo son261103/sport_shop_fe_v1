@@ -150,8 +150,39 @@ export const useThemeStore = defineStore('theme', () => {
       currentTheme.value = prefersDark ? 'dark' : 'light'
     }
 
+    // Apply theme immediately after setting it
+    applyTheme(currentTheme.value)
+    
     isInitialized.value = true
   }
+
+  // Initialize theme immediately when store is created to prevent flash
+  const initThemeOnLoad = () => {
+    const savedTheme = localStorage.getItem('sport-shop-theme') as ThemeMode | null
+    
+    if (savedTheme && ['light', 'dark'].includes(savedTheme)) {
+      // Apply dark class immediately if saved theme is dark
+      if (savedTheme === 'dark') {
+        document.documentElement.classList.add('dark')
+      } else {
+        document.documentElement.classList.remove('dark')
+      }
+      currentTheme.value = savedTheme
+    } else {
+      // Check system preference
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+      if (prefersDark) {
+        document.documentElement.classList.add('dark')
+        currentTheme.value = 'dark'
+      } else {
+        document.documentElement.classList.remove('dark')
+        currentTheme.value = 'light'
+      }
+    }
+  }
+
+  // Call initThemeOnLoad immediately when store is created
+  initThemeOnLoad()
 
   const applyTheme = (theme: ThemeMode) => {
     const htmlElement = document.documentElement
