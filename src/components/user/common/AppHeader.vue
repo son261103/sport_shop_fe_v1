@@ -57,96 +57,179 @@
 
             <!-- User Dropdown -->
             <div class="dropdown-menu w-52" :class="{ show: isUserMenuOpen }">
-              <div class="dropdown-header">
-                <div
-                  class="font-medium text-light-text-primary dark:text-dark-text-primary text-base"
-                >
-                  Tài khoản của tôi
+              <!-- Authenticated User Content -->
+              <template v-if="isAuthenticated">
+                <div class="dropdown-header">
+                  <div
+                    class="font-medium text-light-text-primary dark:text-dark-text-primary text-base"
+                  >
+                    {{ userName || "Tài khoản của tôi" }}
+                  </div>
+                  <div
+                    class="text-sm text-light-text-secondary dark:text-dark-text-secondary mt-1"
+                  >
+                    {{ userEmail }}
+                  </div>
                 </div>
-              </div>
-              <div class="py-1.5 font-medium">
-                <a href="#" class="dropdown-item">
-                  <div class="flex items-center">
-                    <n-icon
-                      size="16"
-                      class="mr-2.5 text-light-accent-sport dark:text-dark-accent-sport"
-                    >
-                      <PersonOutline />
-                    </n-icon>
-                    <span>Hồ sơ</span>
+                <div class="py-1.5 font-medium">
+                  <a href="#" class="dropdown-item">
+                    <div class="flex items-center">
+                      <n-icon
+                        size="16"
+                        class="mr-2.5 text-light-accent-sport dark:text-dark-accent-sport"
+                      >
+                        <PersonOutline />
+                      </n-icon>
+                      <span>Hồ sơ</span>
+                    </div>
+                  </a>
+                  <a href="#" class="dropdown-item">
+                    <div class="flex items-center">
+                      <n-icon
+                        size="16"
+                        class="mr-2.5 text-light-accent-sport dark:text-dark-accent-sport"
+                      >
+                        <HeartOutline />
+                      </n-icon>
+                      <span>Yêu thích</span>
+                    </div>
+                  </a>
+                  <a href="#" class="dropdown-item">
+                    <div class="flex items-center">
+                      <n-icon
+                        size="16"
+                        class="mr-2.5 text-light-accent-sport dark:text-dark-accent-sport"
+                      >
+                        <BagOutline />
+                      </n-icon>
+                      <span>Đơn hàng</span>
+                    </div>
+                  </a>
+                  <a href="#" class="dropdown-item">
+                    <div class="flex items-center">
+                      <n-icon
+                        size="16"
+                        class="mr-2.5 text-light-accent-sport dark:text-dark-accent-sport"
+                      >
+                        <SettingsOutline />
+                      </n-icon>
+                      <span>Cài đặt</span>
+                    </div>
+                  </a>
+                  <a href="#" class="dropdown-item">
+                    <div class="flex items-center">
+                      <n-icon
+                        size="16"
+                        class="mr-2.5 text-light-accent-sport dark:text-dark-accent-sport"
+                      >
+                        <NotificationsOutline />
+                      </n-icon>
+                      <span>Thông báo</span>
+                    </div>
+                  </a>
+                  <!-- Admin Access for Admin Users -->
+                  <button
+                    v-if="isAdmin"
+                    @click="handleAdminAccess"
+                    class="dropdown-item w-full text-left"
+                  >
+                    <div class="flex items-center">
+                      <n-icon
+                        size="16"
+                        class="mr-2.5 text-light-accent-sport dark:text-dark-accent-sport"
+                      >
+                        <SettingsOutline />
+                      </n-icon>
+                      <span>Quản trị</span>
+                    </div>
+                  </button>
+                  <div class="dropdown-divider"></div>
+                  <button
+                    @click="toggleTheme"
+                    class="dropdown-item w-full text-left"
+                  >
+                    <div class="flex items-center">
+                      <n-icon
+                        size="16"
+                        class="mr-2.5 text-light-accent-sport dark:text-dark-accent-sport"
+                      >
+                        <component :is="isDark ? SunnyOutline : MoonOutline" />
+                      </n-icon>
+                      <span>{{ isDark ? "Chế độ sáng" : "Chế độ tối" }}</span>
+                    </div>
+                  </button>
+                  <button
+                    @click="handleLogout"
+                    class="dropdown-item danger w-full text-left"
+                  >
+                    <div class="flex items-center">
+                      <n-icon
+                        size="16"
+                        class="mr-2.5 text-light-accent-danger dark:text-dark-accent-danger"
+                      >
+                        <LogOutOutline />
+                      </n-icon>
+                      <span>Đăng xuất</span>
+                    </div>
+                  </button>
+                </div>
+              </template>
+
+              <!-- Not Authenticated Content -->
+              <template v-else>
+                <div class="dropdown-header">
+                  <div
+                    class="font-medium text-light-text-primary dark:text-dark-text-primary text-base"
+                  >
+                    Tài khoản
                   </div>
-                </a>
-                <a href="#" class="dropdown-item">
-                  <div class="flex items-center">
-                    <n-icon
-                      size="16"
-                      class="mr-2.5 text-light-accent-sport dark:text-dark-accent-sport"
-                    >
-                      <HeartOutline />
-                    </n-icon>
-                    <span>Yêu thích</span>
-                  </div>
-                </a>
-                <a href="#" class="dropdown-item">
-                  <div class="flex items-center">
-                    <n-icon
-                      size="16"
-                      class="mr-2.5 text-light-accent-sport dark:text-dark-accent-sport"
-                    >
-                      <BagOutline />
-                    </n-icon>
-                    <span>Đơn hàng</span>
-                  </div>
-                </a>
-                <a href="#" class="dropdown-item">
-                  <div class="flex items-center">
-                    <n-icon
-                      size="16"
-                      class="mr-2.5 text-light-accent-sport dark:text-dark-accent-sport"
-                    >
-                      <SettingsOutline />
-                    </n-icon>
-                    <span>Cài đặt</span>
-                  </div>
-                </a>
-                <a href="#" class="dropdown-item">
-                  <div class="flex items-center">
-                    <n-icon
-                      size="16"
-                      class="mr-2.5 text-light-accent-sport dark:text-dark-accent-sport"
-                    >
-                      <NotificationsOutline />
-                    </n-icon>
-                    <span>Thông báo</span>
-                  </div>
-                </a>
-                <div class="dropdown-divider"></div>
-                <button
-                  @click="toggleTheme"
-                  class="dropdown-item w-full text-left"
-                >
-                  <div class="flex items-center">
-                    <n-icon
-                      size="16"
-                      class="mr-2.5 text-light-accent-sport dark:text-dark-accent-sport"
-                    >
-                      <component :is="isDark ? SunnyOutline : MoonOutline" />
-                    </n-icon>
-                    <span>{{ isDark ? "Chế độ sáng" : "Chế độ tối" }}</span>
-                  </div>
-                </button>
-                <a href="#" class="dropdown-item danger">
-                  <div class="flex items-center">
-                    <n-icon
-                      size="16"
-                      class="mr-2.5 text-light-accent-danger dark:text-dark-accent-danger"
-                    >
-                      <LogOutOutline />
-                    </n-icon>
-                    <span>Đăng xuất</span>
-                  </div>
-                </a>
-              </div>
+                </div>
+                <div class="py-1.5 font-medium">
+                  <button
+                    @click="handleLogin"
+                    class="dropdown-item w-full text-left"
+                  >
+                    <div class="flex items-center">
+                      <n-icon
+                        size="16"
+                        class="mr-2.5 text-light-accent-sport dark:text-dark-accent-sport"
+                      >
+                        <PersonOutline />
+                      </n-icon>
+                      <span>Đăng nhập</span>
+                    </div>
+                  </button>
+                  <button
+                    @click="handleRegister"
+                    class="dropdown-item w-full text-left"
+                  >
+                    <div class="flex items-center">
+                      <n-icon
+                        size="16"
+                        class="mr-2.5 text-light-accent-sport dark:text-dark-accent-sport"
+                      >
+                        <PersonOutline />
+                      </n-icon>
+                      <span>Đăng ký</span>
+                    </div>
+                  </button>
+                  <div class="dropdown-divider"></div>
+                  <button
+                    @click="toggleTheme"
+                    class="dropdown-item w-full text-left"
+                  >
+                    <div class="flex items-center">
+                      <n-icon
+                        size="16"
+                        class="mr-2.5 text-light-accent-sport dark:text-dark-accent-sport"
+                      >
+                        <component :is="isDark ? SunnyOutline : MoonOutline" />
+                      </n-icon>
+                      <span>{{ isDark ? "Chế độ sáng" : "Chế độ tối" }}</span>
+                    </div>
+                  </button>
+                </div>
+              </template>
             </div>
           </div>
 
@@ -196,14 +279,15 @@
             {{ item.label }}
           </router-link>
 
-          <!-- Mobile Account Links -->
+          <!-- Mobile Account Links - Authenticated -->
           <div
+            v-if="isAuthenticated"
             class="mt-4 pt-3 border-t border-light-border-primary dark:border-dark-border-primary"
           >
             <div
               class="text-xs uppercase text-light-text-muted dark:text-dark-text-muted font-semibold tracking-wider mb-2 px-3"
             >
-              Tài khoản
+              {{ userName || "Tài khoản" }}
             </div>
             <a
               href="#"
@@ -265,6 +349,39 @@
               </n-icon>
               Thông báo
             </a>
+            <!-- Admin Access for Admin Users in Mobile -->
+            <button
+              v-if="isAdmin"
+              @click="handleAdminAccess"
+              class="w-full block py-2 px-3 rounded-md font-medium text-light-text-secondary dark:text-dark-text-secondary hover:text-light-accent-sport dark:hover:text-dark-accent-sport transition-colors text-left"
+            >
+              <n-icon
+                size="16"
+                class="mr-2.5 text-light-accent-sport dark:text-dark-accent-sport"
+              >
+                <SettingsOutline />
+              </n-icon>
+              Quản trị
+            </button>
+          </div>
+
+          <!-- Mobile Login/Register - Not Authenticated -->
+          <div
+            v-else
+            class="mt-4 pt-3 border-t border-light-border-primary dark:border-dark-border-primary space-y-2"
+          >
+            <button
+              @click="handleLogin"
+              class="w-full py-2 px-3 rounded-md font-medium text-light-text-secondary dark:text-dark-text-secondary hover:text-light-accent-sport dark:hover:text-dark-accent-sport transition-colors text-left"
+            >
+              Đăng nhập
+            </button>
+            <button
+              @click="handleRegister"
+              class="w-full py-2 px-3 rounded-md font-medium bg-gradient-sport text-white hover:opacity-90 transition-opacity"
+            >
+              Đăng ký
+            </button>
           </div>
 
           <!-- Theme Toggle in Mobile Menu -->
@@ -281,9 +398,11 @@
             <span>{{ isDark ? "Chế độ sáng" : "Chế độ tối" }}</span>
           </button>
 
-          <a
-            href="#"
-            class="block py-2 px-3 rounded-md font-medium text-light-text-secondary dark:text-dark-text-secondary hover:text-light-accent-sport dark:hover:text-dark-accent-sport transition-colors"
+          <!-- Logout for Authenticated Users in Mobile -->
+          <button
+            v-if="isAuthenticated"
+            @click="handleLogout"
+            class="w-full block py-2 px-3 rounded-md font-medium text-light-text-secondary dark:text-dark-text-secondary hover:text-light-accent-sport dark:hover:text-dark-accent-sport transition-colors text-left"
           >
             <n-icon
               size="16"
@@ -292,7 +411,7 @@
               <LogOutOutline />
             </n-icon>
             Đăng xuất
-          </a>
+          </button>
         </nav>
       </div>
     </div>
@@ -301,6 +420,7 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
+import { useRouter } from "vue-router";
 import { NIcon } from "naive-ui";
 import {
   SunnyOutline,
@@ -315,6 +435,7 @@ import {
   LogOutOutline,
 } from "@vicons/ionicons5";
 import { useTheme, useNaiveTheme } from "@/composables/useTheme";
+import { useAuth } from "@/composables/useAuth";
 import { SearchBar, ShoppingCart } from "@/components/examples";
 
 interface NavigationItem {
@@ -323,8 +444,10 @@ interface NavigationItem {
   icon?: any;
 }
 
+const router = useRouter();
 const { toggleTheme } = useTheme();
 const { isDark } = useNaiveTheme();
+const { logout, isAuthenticated, userName, userEmail, isAdmin } = useAuth();
 
 // Refs
 const searchBarRef = ref();
@@ -363,5 +486,28 @@ const hideUserMenu = () => {
   hideMenuTimeout = setTimeout(() => {
     isUserMenuOpen.value = false;
   }, 200);
+};
+
+const handleLogout = async () => {
+  try {
+    await logout();
+    // Logout sẽ tự động redirect về trang chủ
+  } catch (error) {
+    console.error("Logout failed:", error);
+  }
+};
+
+const handleLogin = () => {
+  router.push("/login");
+};
+
+const handleRegister = () => {
+  router.push("/register");
+};
+
+const handleAdminAccess = () => {
+  if (isAdmin.value) {
+    router.push("/admin");
+  }
 };
 </script>
