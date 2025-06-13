@@ -1,20 +1,7 @@
 <template>
   <div class="min-h-screen bg-gradient-page">
-    <!-- Page Title -->
-    <div class="section-padding pt-8 pb-4">
-      <div class="container-custom">
-        <div class="max-w-full mx-auto px-8 ml-28">
-          <h1 class="text-3xl font-bold text-light-text-primary dark:text-dark-text-primary mb-2">
-            <i class="fas fa-shopping-bag mr-3 text-light-accent-sport dark:text-dark-accent-sport"></i>
-            Giỏ hàng của bạn
-          </h1>
-          <div class="w-20 h-1 bg-gradient-sport rounded-full"></div>
-        </div>
-      </div>
-    </div>
-    
     <!-- Main Product Section -->
-    <section class="section-padding pt-4">
+    <section class="pt-4 pb-8">
       <div class="container-custom">
         <div class="max-w-full mx-auto px-8 ml-28">
           <div class="grid grid-cols-1 xl:grid-cols-2 gap-8 lg:gap-12">

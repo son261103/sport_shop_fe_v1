@@ -13,7 +13,7 @@
       </div>
 
       <!-- Product Watch Section (Recently Viewed) -->
-      <div data-aos="fade-up" data-aos-delay="200" class="-mt-64 mb-16 pb-8 border-b border-gray-200">
+      <div data-aos="fade-up" data-aos-delay="200" class="mt-8 mb-16 pb-8 border-b border-gray-200">
         <ProductWatch :relatedProducts="relatedProducts" />
       </div>
 
