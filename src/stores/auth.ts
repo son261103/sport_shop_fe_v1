@@ -2,17 +2,16 @@
 
 import { defineStore } from "pinia";
 import { ref, computed, readonly } from "vue";
-import { AuthService } from "@/services/auth";
-import type {
-  User,
-  LoginRequest,
-  RegisterRequest,
-  AuthError,
-} from "@/types/auth";
+import { AuthService } from '@/services/auth'
+import type { User, LoginRequest, RegisterRequest, AuthError } from '@/types/auth'
+import { ENV } from '@/constants'
+
+// Environment variables
+const AUTH_TOKEN_KEY = ENV.AUTH.TOKEN_KEY
 
 export const useAuthStore = defineStore("auth", () => {
   // State
-  const user = ref<User | null>(AuthService.getStoredUser());
+  const user = ref<User | null>(null);
   const token = ref<string | null>(AuthService.getToken());
   const isLoading = ref(false);
   const error = ref<AuthError | null>(null);
@@ -30,7 +29,12 @@ export const useAuthStore = defineStore("auth", () => {
   };
 
   const setToken = (tokenValue: string | null) => {
-    token.value = tokenValue;
+    token.value = tokenValue
+    if (tokenValue) {
+      localStorage.setItem(AUTH_TOKEN_KEY, tokenValue)
+    } else {
+      localStorage.removeItem(AUTH_TOKEN_KEY)
+    }
   };
 
   const setLoading = (loading: boolean) => {
