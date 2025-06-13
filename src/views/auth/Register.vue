@@ -382,7 +382,7 @@
                 <button
                   type="submit"
                   class="btn-primary w-full"
-                  :disabled="isLoading || !isFormValid"
+                  :disabled="isLoading"
                 >
                   <Loading
                     v-if="isLoading"
@@ -434,7 +434,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from "vue";
+import { ref, onMounted } from "vue";
 import { useAuth } from "@/composables/useAuth";
 import { useTheme, useNaiveTheme } from "@/composables/useTheme";
 import { Loading } from "@/components/ui";
@@ -497,26 +497,6 @@ const validatePasswordFormat = (password: string) => {
     errors,
   };
 };
-
-// Password validation
-const passwordValidation = computed(() => {
-  return validatePasswordFormat(formData.value.password || "");
-});
-
-// Computed
-const isFormValid = computed(() => {
-  return (
-    formData.value.name &&
-    formData.value.email &&
-    formData.value.password &&
-    formData.value.password_confirmation &&
-    validateEmailFormat(formData.value.email) &&
-    passwordValidation.value.isValid &&
-    formData.value.password === formData.value.password_confirmation &&
-    acceptTerms.value &&
-    !Object.keys(formErrors.value).length
-  );
-});
 
 const validateForm = (): boolean => {
   const errors: AuthFormErrors = {};

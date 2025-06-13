@@ -322,7 +322,7 @@
                 <button
                   type="submit"
                   class="btn-primary w-full"
-                  :disabled="isLoading || !isFormValid"
+                  :disabled="isLoading"
                 >
                   <Loading
                     v-if="isLoading"
@@ -388,7 +388,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from "vue";
+import { ref, onMounted } from "vue";
 import { useAuth } from "@/composables/useAuth";
 import { useTheme, useNaiveTheme } from "@/composables/useTheme";
 import { Loading } from "@/components/ui";
@@ -416,15 +416,7 @@ const validateEmail = (email: string): boolean => {
   return emailRegex.test(email);
 };
 
-// Computed
-const isFormValid = computed(() => {
-  return (
-    formData.value.email &&
-    formData.value.password &&
-    validateEmail(formData.value.email) &&
-    !Object.keys(formErrors.value).length
-  );
-});
+// Computed - removed isFormValid as it's no longer used
 
 // Methods
 const validateForm = (): boolean => {
