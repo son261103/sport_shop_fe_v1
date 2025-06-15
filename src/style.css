@@ -216,7 +216,7 @@
 
   /* 🌟 Gradient Background Classes */
   .bg-gradient-page {
-    @apply bg-gradient-bg-sport dark:bg-gradient-bg-sport-dark;
+    @apply bg-white dark:bg-gray-900;
   }
 
   .btn-secondary {
@@ -623,7 +623,7 @@
   }
 
   .section-padding {
-    @apply py-12 lg:py-20;
+    @apply pt-4 pb-12 lg:pt-6 lg:pb-20;
   }
 
   /* 🎭 Animation Utilities */

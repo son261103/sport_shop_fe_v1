@@ -285,7 +285,102 @@ export const api = {
     },
   },
 
-  // Product CRUD operations
+  // Public Products API (for frontend users)
+  publicProducts: {
+    // Get all active products with pagination, search and filters (Public)
+    getAll: (params?: {
+      page?: number;
+      per_page?: number;
+      search?: string;
+      category_id?: number;
+      brand_id?: number;
+      min_price?: number;
+      max_price?: number;
+      sort_by?: 'name' | 'price' | 'created_at';
+      sort_order?: 'asc' | 'desc';
+    }): Promise<{
+      status: boolean;
+      message: string;
+      data: {
+        current_page: number;
+        data: Array<{
+          id: number;
+          name: string;
+          price: string;
+          discount_price?: string;
+          description?: string;
+          image?: string;
+          stock_quantity: number;
+          is_active: boolean;
+          category_id?: number;
+          brand_id?: number;
+          created_at: string;
+          updated_at: string;
+          category?: {
+            id: number;
+            name: string;
+            description?: string;
+          };
+          brand?: {
+            id: number;
+            name: string;
+            description?: string;
+          };
+        }>;
+        first_page_url: string;
+        from: number;
+        last_page: number;
+        last_page_url: string;
+        links: Array<{
+          url: string | null;
+          label: string;
+          active: boolean;
+        }>;
+        next_page_url: string | null;
+        path: string;
+        per_page: number;
+        prev_page_url: string | null;
+        to: number;
+        total: number;
+      };
+    }> => {
+      return api.get("/products", params);
+    },
+
+    // Get a specific product by ID (Public)
+    getById: (id: number): Promise<{
+      status: boolean;
+      message: string;
+      data: {
+        id: number;
+        name: string;
+        price: string;
+        discount_price?: string;
+        description?: string;
+        image?: string;
+        stock_quantity: number;
+        is_active: boolean;
+        category_id?: number;
+        brand_id?: number;
+        created_at: string;
+        updated_at: string;
+        category?: {
+          id: number;
+          name: string;
+          description?: string;
+        };
+        brand?: {
+          id: number;
+          name: string;
+          description?: string;
+        };
+      };
+    }> => {
+      return api.get(`/products/${id}`);
+    },
+  },
+
+  // Product CRUD operations (Admin)
   products: {
     // Get all products with pagination and filters
     getAll: (params?: ProductListParams): Promise<ProductListResponse> => {

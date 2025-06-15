@@ -40,9 +40,6 @@
               <i class="fas fa-arrow-right text-sm"></i>
             </span>
           </button>
-          <p class="text-xs text-light-text-muted dark:text-dark-text-muted mt-2">
-            {{ selectedItemsCount }} sản phẩm được chọn
-          </p>
         </div>
       </div>
     </div>

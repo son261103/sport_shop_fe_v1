@@ -16,13 +16,24 @@
             </span>
           </div>
           
-          <button 
-            @click="$emit('clearCart')" 
-            class="flex items-center gap-2 px-4 py-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-all duration-200 font-medium border border-red-200 dark:border-red-800 hover:border-red-300 dark:hover:border-red-700"
-          >
-            <i class="fas fa-trash"></i>
-            <span class="hidden sm:inline">Xóa tất cả</span>
-          </button>
+          <div class="flex gap-2">
+            <button 
+              v-if="selectedItems.length > 0"
+              @click="$emit('removeSelected')" 
+              class="flex items-center gap-2 px-4 py-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-all duration-200 font-medium border border-red-200 dark:border-red-800 hover:border-red-300 dark:hover:border-red-700"
+            >
+              <i class="fas fa-trash"></i>
+              <span class="hidden sm:inline">Xóa đã chọn ({{ selectedItems.length }})</span>
+            </button>
+            
+            <button 
+              @click="$emit('clearCart')" 
+              class="flex items-center gap-2 px-4 py-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-all duration-200 font-medium border border-red-200 dark:border-red-800 hover:border-red-300 dark:hover:border-red-700"
+            >
+              <i class="fas fa-trash"></i>
+              <span class="hidden sm:inline">Xóa tất cả</span>
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -152,6 +163,7 @@ interface Props {
 interface Emits {
   toggleSelectAll: [];
   clearCart: [];
+  removeSelected: [];
   toggleItem: [id: string];
   updateQuantity: [id: string, quantity: number];
   removeItem: [id: string];

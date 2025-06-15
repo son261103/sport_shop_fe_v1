@@ -7,6 +7,26 @@
 
     <!-- Page Content -->
     <div v-else class="section-padding">
+      <!-- Page Title -->
+      <div class="container-custom mb-8">
+        <div data-aos="fade-up" class="text-center">
+          <h1 class="text-gradient-sport-animated font-bold mb-4">
+            <i class="fas fa-shopping-cart mr-3"></i>
+            Giỏ hàng
+          </h1>
+          <div class="w-24 h-1 bg-gradient-sport mx-auto rounded-full"></div>
+        </div>
+      </div>
+      
+      <!-- Cart Header -->
+      <CartHeader 
+        :cart-items="cartItems"
+        :selected-items="selectedItems"
+        @select-all="toggleSelectAll"
+        @remove-selected="clearCart"
+        @sort-items="sortBy = $event"
+      />
+
       <!-- Progress Steps -->
       <ProgressSteps :current-step="currentStep" />
 
@@ -21,6 +41,7 @@
           @toggle-item="selectedItems.includes($event) ? selectedItems.splice(selectedItems.indexOf($event), 1) : selectedItems.push($event)"
           @toggle-select-all="toggleSelectAll"
           @clear-cart="clearCart"
+          @remove-selected="removeSelectedItems"
           @update-quantity="updateQuantity"
           @remove-item="removeFromCart"
         />
@@ -45,7 +66,7 @@
       <!-- Payment Step -->
       <PaymentMethod 
         v-else-if="currentStep === 3"
-        :payment-methods="[{id: 'cod', name: 'Thanh toán khi nhận hàng', description: 'Thanh toán bằng tiền mặt khi nhận hàng', icon: 'fas fa-money-bill-wave'}, {id: 'bank', name: 'Chuyển khoản ngân hàng', description: 'Chuyển khoản qua ngân hàng', icon: 'fas fa-university'}, {id: 'card', name: 'Thẻ tín dụng/ghi nợ', description: 'Thanh toán bằng thẻ', icon: 'fas fa-credit-card'}]"
+        :payment-methods="[{id: 'cod', name: 'Thanh toán khi nhận hàng', description: 'Thanh toán bằng tiền mặt khi nhận hàng', icon: 'fas fa-money-bill-wave'}, {id: 'bank', name: 'Chuyển khoản ngân hàng', description: 'Chuyển khoản qua ngân hàng', icon: 'fas fa-university'}, {id: 'vnpay', name: 'Thanh toán bằng VNPay', description: 'Thanh toán qua ví điện tử VNPay', icon: 'fas fa-wallet'}]"
         :selected-payment-method="selectedPayment"
         :subtotal="subtotal"
         :shipping-fee="shippingFee"
@@ -155,6 +176,7 @@ const {
   voucherCode,
   appliedDiscount,
   shippingFee,
+  sortBy,
   selectedPayment,
   deliveryInfo,
   showSuccessModal,
@@ -187,6 +209,24 @@ const {
   showSuccessModal,
   successMessage
 );
+
+// Remove selected items
+const removeSelectedItems = () => {
+  if (selectedItems.value.length === 0) return;
+  
+  if (confirm(`Bạn có chắc chắn muốn xóa ${selectedItems.value.length} sản phẩm đã chọn?`)) {
+    // Remove selected items from cart
+    cartItems.value = cartItems.value.filter(item => !selectedItems.value.includes(item.id));
+    // Clear selected items
+    selectedItems.value = [];
+    // Show success message
+    successMessage.value = {
+      title: 'Xóa thành công',
+      content: 'Các sản phẩm đã chọn đã được xóa khỏi giỏ hàng'
+    };
+    showSuccessModal.value = true;
+  }
+};
 
 // Initialize page
 const initializePage = async () => {
