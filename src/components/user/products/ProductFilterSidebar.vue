@@ -1,9 +1,9 @@
 <template>
-  <aside class="lg:w-80 flex-shrink-0">
-    <div class="filter-sidebar sticky top-4">
-      <div class="filter-sidebar-body">
+  <aside class="lg:w-80 flex-shrink-0 overflow-x-hidden">
+    <div class="filter-sidebar sticky top-4 overflow-x-hidden">
+      <div class="filter-sidebar-body overflow-x-hidden">
         <h3 class="text-xl font-bold text-light-text-primary dark:text-dark-text-primary mb-6">
-          <!-- Filter title can be added here -->
+          Bộ lọc sản phẩm
         </h3>
         
         <!-- Sort Options -->
@@ -53,24 +53,29 @@
         <div class="mb-6">
           <label class="block text-sm font-medium text-light-text-primary dark:text-dark-text-primary mb-2">
             Danh mục
+            <span v-if="isLoadingCategories" class="text-xs text-gray-500 ml-2">(Đang tải...)</span>
           </label>
-          <div class="space-y-2">
-            <label class="flex items-center">
-              <input type="checkbox" v-model="selectedCategories" value="shoes" class="mr-2">
-              <span class="text-sm">Giày thể thao</span>
-            </label>
-            <label class="flex items-center">
-              <input type="checkbox" v-model="selectedCategories" value="clothing" class="mr-2">
-              <span class="text-sm">Quần áo</span>
-            </label>
-            <label class="flex items-center">
-              <input type="checkbox" v-model="selectedCategories" value="accessories" class="mr-2">
-              <span class="text-sm">Phụ kiện</span>
-            </label>
-            <label class="flex items-center">
-              <input type="checkbox" v-model="selectedCategories" value="equipment" class="mr-2">
-              <span class="text-sm">Dụng cụ</span>
-            </label>
+          <div v-if="categoriesError" class="text-red-500 text-xs mb-2">
+            {{ categoriesError }}
+          </div>
+          <div class="space-y-2 max-h-48 overflow-y-auto overflow-x-hidden">
+            <div v-if="isLoadingCategories" class="text-center py-4">
+              <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500 mx-auto"></div>
+            </div>
+            <template v-else>
+              <label v-for="category in categories" :key="category.id" class="flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700 p-1 rounded transition-colors">
+                <div class="flex items-center min-w-0 flex-1">
+                  <input 
+                    type="checkbox" 
+                    v-model="selectedCategories" 
+                    :value="category.id.toString()" 
+                    class="mr-2 flex-shrink-0"
+                  >
+                  <span class="text-sm truncate">{{ category.name }}</span>
+                </div>
+                <span class="text-xs text-gray-500 flex-shrink-0 ml-2">({{ category.products_count }})</span>
+              </label>
+            </template>
           </div>
         </div>
 
@@ -78,24 +83,29 @@
         <div class="mb-6">
           <label class="block text-sm font-medium text-light-text-primary dark:text-dark-text-primary mb-2">
             Thương hiệu
+            <span v-if="isLoadingBrands" class="text-xs text-gray-500 ml-2">(Đang tải...)</span>
           </label>
-          <div class="space-y-2">
-            <label class="flex items-center">
-              <input type="checkbox" v-model="selectedBrands" value="nike" class="mr-2">
-              <span class="text-sm">Nike</span>
-            </label>
-            <label class="flex items-center">
-              <input type="checkbox" v-model="selectedBrands" value="adidas" class="mr-2">
-              <span class="text-sm">Adidas</span>
-            </label>
-            <label class="flex items-center">
-              <input type="checkbox" v-model="selectedBrands" value="puma" class="mr-2">
-              <span class="text-sm">Puma</span>
-            </label>
-            <label class="flex items-center">
-              <input type="checkbox" v-model="selectedBrands" value="jordan" class="mr-2">
-              <span class="text-sm">Jordan</span>
-            </label>
+          <div v-if="brandsError" class="text-red-500 text-xs mb-2">
+            {{ brandsError }}
+          </div>
+          <div class="space-y-2 max-h-48 overflow-y-auto overflow-x-hidden">
+            <div v-if="isLoadingBrands" class="text-center py-4">
+              <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500 mx-auto"></div>
+            </div>
+            <template v-else>
+              <label v-for="brand in brands" :key="brand.id" class="flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700 p-1 rounded transition-colors">
+                <div class="flex items-center min-w-0 flex-1">
+                  <input 
+                    type="checkbox" 
+                    v-model="selectedBrands" 
+                    :value="brand.id.toString()" 
+                    class="mr-2 flex-shrink-0"
+                  >
+                  <span class="text-sm truncate">{{ brand.name }}</span>
+                </div>
+                <span class="text-xs text-gray-500 flex-shrink-0 ml-2">({{ brand.products_count }})</span>
+              </label>
+            </template>
           </div>
         </div>
 
@@ -109,8 +119,9 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, onMounted } from "vue";
 import { Button } from "@/components/ui";
+import { usePublicData } from "@/composables/usePublicData";
 
 // Props
 interface Props {
@@ -132,6 +143,17 @@ interface Emits {
 }
 
 const emit = defineEmits<Emits>();
+
+// Use public data composable
+const {
+  categories,
+  brands,
+  isLoadingCategories,
+  isLoadingBrands,
+  categoriesError,
+  brandsError,
+  loadAll,
+} = usePublicData();
 
 // Computed properties for v-model
 const sortBy = computed({
@@ -157,4 +179,13 @@ const selectedBrands = computed({
 const resetFilters = () => {
   emit('reset-filters');
 };
+
+// Load data on component mount
+onMounted(async () => {
+  try {
+    await loadAll();
+  } catch (error) {
+    console.error('Failed to load filter data:', error);
+  }
+});
 </script>
