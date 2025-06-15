@@ -134,71 +134,14 @@
 
       <!-- Products Grid -->
       <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        <div
+        <ProductCard
           v-for="product in products"
           :key="product.id"
-          class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
+          :product="transformProductForCard(product)"
           @click="viewProduct(product.id)"
-        >
-          <!-- Product Image -->
-          <div class="aspect-square bg-gray-200 relative">
-            <img
-              v-if="product.image"
-              :src="product.image"
-              :alt="product.name"
-              class="w-full h-full object-cover"
-            />
-            <div v-else class="w-full h-full flex items-center justify-center text-gray-400">
-              Không có ảnh
-            </div>
-            
-            <!-- Discount Badge -->
-            <div
-              v-if="product.discount_price"
-              class="absolute top-2 left-2 bg-red-500 text-white px-2 py-1 rounded text-sm font-semibold"
-            >
-              -{{ Math.round((1 - parseFloat(product.discount_price) / parseFloat(product.price)) * 100) }}%
-            </div>
-          </div>
-
-          <!-- Product Info -->
-          <div class="p-4">
-            <h3 class="font-semibold text-lg mb-2 line-clamp-2">{{ product.name }}</h3>
-            
-            <!-- Category and Brand -->
-            <div class="text-sm text-gray-500 mb-2">
-              <span v-if="product.category">{{ product.category.name }}</span>
-              <span v-if="product.category && product.brand"> • </span>
-              <span v-if="product.brand">{{ product.brand.name }}</span>
-            </div>
-
-            <!-- Price -->
-            <div class="flex items-center gap-2 mb-2">
-              <span class="text-lg font-bold text-blue-600">
-                {{ formatPrice(product.discount_price || product.price) }}
-              </span>
-              <span
-                v-if="product.discount_price"
-                class="text-sm text-gray-500 line-through"
-              >
-                {{ formatPrice(product.price) }}
-              </span>
-            </div>
-
-            <!-- Stock Status -->
-            <div class="text-sm">
-              <span
-                v-if="product.stock_quantity > 0"
-                class="text-green-600"
-              >
-                Còn {{ product.stock_quantity }} sản phẩm
-              </span>
-              <span v-else class="text-red-500">
-                Hết hàng
-              </span>
-            </div>
-          </div>
-        </div>
+          @add-to-cart="handleAddToCart"
+          @toggle-favorite="handleToggleFavorite"
+        />
       </div>
 
       <!-- Pagination -->
@@ -254,6 +197,8 @@
 import { ref, computed, onMounted, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { usePublicProducts } from '@/composables/usePublicProducts';
+import { ProductCard } from '@/components/examples';
+import type { Product } from '@/components/examples';
 
 // Router
 const router = useRouter();
@@ -344,12 +289,51 @@ const viewProduct = (productId: number) => {
   router.push(`/products/${productId}`);
 };
 
-const formatPrice = (price: string | number) => {
-  const numPrice = typeof price === 'string' ? parseFloat(price) : price;
-  return new Intl.NumberFormat('vi-VN', {
-    style: 'currency',
-    currency: 'VND',
-  }).format(numPrice);
+// Transform PublicProduct to Product format for ProductCard
+const transformProductForCard = (product: any): Product => {
+  
+  // Hiển thị đúng giá từ database
+  // price = giá gốc, discount_price = giá giảm
+  const currentPrice = product.discount_price ? parseFloat(product.discount_price) : parseFloat(product.price);
+  const originalPrice = product.discount_price ? parseFloat(product.price) : undefined;
+  
+  const transformedProduct = {
+    id: product.id.toString(),
+    name: product.name,
+    price: currentPrice,
+    originalPrice: originalPrice,
+    image: product.image || '/placeholder.svg',
+    category: product.category?.name || 'Chưa phân loại',
+    brand: product.brand?.name || 'Chưa có thương hiệu',
+    rating: 4.5, // Default rating since API doesn't provide this
+    reviews: Math.floor(Math.random() * 100), // Random reviews for demo
+    inStock: product.stock_quantity > 0,
+    isFavorite: false, // Default to false, can be managed by wishlist store
+    description: product.description || '',
+  };
+  
+  // Debug: Log transformed product data
+  console.log('Transformed product for ProductCard:', transformedProduct);
+  
+  return transformedProduct;
+};
+
+// Handle add to cart
+const handleAddToCart = (product: Product) => {
+  // Find original product data
+  const originalProduct = products.value.find(p => p.id.toString() === product.id);
+  if (originalProduct && originalProduct.stock_quantity > 0) {
+    // Add to cart logic here
+    console.log('Adding to cart:', originalProduct);
+    // You can emit an event or use a cart composable here
+  }
+};
+
+// Handle toggle favorite
+const handleToggleFavorite = (product: Product) => {
+  // Toggle favorite logic here
+  console.log('Toggling favorite:', product);
+  // You can use wishlist store here
 };
 
 // Watch for search query changes

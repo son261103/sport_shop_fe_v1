@@ -19,7 +19,7 @@
 
       <!-- Sale Badge -->
       <div
-        v-if="product.originalPrice && product.originalPrice > product.price"
+        v-if="product.originalPrice && product.price < product.originalPrice"
         class="absolute top-3 right-3 bg-light-accent-danger dark:bg-dark-accent-danger text-white px-2 py-1 rounded-full text-xs font-semibold shadow-lg"
       >
         SALE
@@ -45,9 +45,10 @@
 
     <!-- Product Info -->
     <div class="p-3">
-      <!-- Category Badge -->
-      <div class="mb-1">
+      <!-- Category and Brand -->
+      <div class="mb-1 flex items-center justify-between gap-2">
         <span :class="categoryBadgeClasses" class="text-xs">{{ product.category }}</span>
+        <span :class="brandBadgeClasses" class="text-xs">{{ product.brand }}</span>
       </div>
 
       <!-- Product Name -->
@@ -68,22 +69,19 @@
 
       <!-- Price -->
       <div class="mt-2">
+        
         <div class="flex items-center justify-between gap-2">
           <div class="flex items-center gap-2 flex-1">
+            <span :class="priceClasses">{{ formatPrice(product.price) }}</span>
             <span
-              v-if="
-                product.originalPrice && product.originalPrice > product.price
-              "
+              v-if="product.originalPrice"
               :class="originalPriceClasses"
             >
               {{ formatPrice(product.originalPrice) }}
             </span>
-            <span :class="priceClasses">{{ formatPrice(product.price) }}</span>
           </div>
           <span
-            v-if="
-              product.originalPrice && product.originalPrice > product.price
-            "
+            v-if="product.originalPrice"
             class="text-xs font-bold text-white bg-red-500 px-2 py-1 rounded-full whitespace-nowrap flex-shrink-0"
           >
             -{{ discountPercentage }}%
@@ -123,6 +121,9 @@ interface Props {
 
 const props = defineProps<Props>();
 
+
+
+
 const emit = defineEmits<{
   click: [product: Product];
   addToCart: [product: Product];
@@ -137,6 +138,14 @@ const categoryBadgeClasses = computed(() =>
     "inline-block px-2 py-1 text-xs font-medium rounded-md",
     "bg-light-accent-sport/10 dark:bg-dark-accent-sport/10",
     "text-light-accent-sport dark:text-dark-accent-sport",
+  ].join(" ")
+);
+
+const brandBadgeClasses = computed(() =>
+  [
+    "inline-block px-2 py-1 text-xs font-medium rounded-md",
+    "bg-blue-100 dark:bg-blue-900/30",
+    "text-blue-700 dark:text-blue-300",
   ].join(" ")
 );
 
@@ -167,12 +176,10 @@ const originalPriceClasses = computed(() =>
 );
 
 const discountPercentage = computed(() => {
-  if (!props.product.originalPrice) return 0;
-  return Math.round(
-    ((props.product.originalPrice - props.product.price) /
-      props.product.originalPrice) *
-      100
-  );
+  if (props.product.originalPrice && props.product.price < props.product.originalPrice) {
+    return Math.round(((props.product.originalPrice - props.product.price) / props.product.originalPrice) * 100);
+  }
+  return 0;
 });
 
 // Methods

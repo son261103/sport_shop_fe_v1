@@ -142,13 +142,26 @@ export function usePublicProducts() {
 
     try {
       const queryParams = params || buildQueryParams();
-      const response = await api.publicProducts.getAll(queryParams);
+      console.log('Fetching products with params:', queryParams);
       
-      products.value = response.data.data;
-      paginationData.value = response.data;
+      const response = await api.publicProducts.getAll(queryParams);
+      console.log('API Response:', response);
+      
+      // Handle the response structure correctly
+      if (response.data && response.data.data) {
+        products.value = response.data.data;
+        paginationData.value = response.data;
+        console.log('Products loaded:', products.value);
+        console.log('Pagination data:', paginationData.value);
+      } else {
+        console.error('Unexpected response structure:', response);
+        products.value = [];
+        paginationData.value = null;
+      }
       
       return response;
     } catch (err: any) {
+      console.error('Fetch products error:', err);
       error.value = err.message || 'Failed to fetch products';
       showError('Không thể tải danh sách sản phẩm');
       throw err;
