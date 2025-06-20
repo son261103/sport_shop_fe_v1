@@ -170,9 +170,30 @@ export const useAuthStore = defineStore("auth", () => {
   const initAuth = async (): Promise<void> => {
     if (AuthService.isAuthenticated()) {
       try {
+        // Try to get current user data with existing token
         await refreshUser();
-      } catch (error) {
+      } catch (error: any) {
         console.error("Auth initialization error:", error);
+        
+        // Only try to refresh token if we get a 401 error (unauthorized)
+        if (error.type === 'unauthorized' || error.status === 401) {
+          try {
+            const refreshResponse = await AuthService.refreshToken();
+            if (refreshResponse.status && refreshResponse.data.token) {
+              setToken(refreshResponse.data.token);
+              // Retry getting user data with new token
+              await refreshUser();
+              return;
+            }
+          } catch (refreshError: any) {
+            console.error("Token refresh failed:", refreshError);
+            // If refresh fails with 404, the endpoint might not exist
+            if (refreshError.type === 'network' && refreshError.message.includes('404')) {
+              console.warn('Refresh token endpoint not available. Clearing authentication.');
+            }
+          }
+        }
+        
         // Clear invalid authentication
         AuthService.clearAuthData();
         setUser(null);

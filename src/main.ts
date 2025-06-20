@@ -52,3 +52,25 @@ authStore
       mirror: false,
     });
   });
+
+// Auto refresh token every 30 minutes
+setInterval(async () => {
+  if (authStore.isAuthenticated) {
+    try {
+      await authStore.refreshUser();
+    } catch (error) {
+      console.error('Auto token refresh failed:', error);
+    }
+  }
+}, 30 * 60 * 1000); // 30 minutes
+
+// Refresh token when page becomes visible again
+document.addEventListener('visibilitychange', async () => {
+  if (!document.hidden && authStore.isAuthenticated) {
+    try {
+      await authStore.refreshUser();
+    } catch (error) {
+      console.error('Visibility token refresh failed:', error);
+    }
+  }
+});

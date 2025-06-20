@@ -123,6 +123,7 @@
       @toggle-selection="toggleSelection"
       @select-all="selectAll"
       @bulk-delete="bulkDeleteProducts"
+      @manage-variants="openVariantModal"
       @sort="handleSort"
     />
 
@@ -143,6 +144,14 @@
       @close="closeModal"
       @success="handleProductSuccess"
     />
+
+    <!-- Variant Modal -->
+    <VariantModal
+      :is-open="isVariantModalOpen"
+      :product="selectedProductForVariants"
+      @close="closeVariantModal"
+      @success="handleVariantSuccess"
+    />
   </div>
 </template>
 
@@ -157,6 +166,7 @@ import type { Product } from "@/types/admin/product";
 import ProductTable from "@/components/admin/products/ProductTable.vue";
 import ProductPagination from "@/components/admin/products/ProductPagination.vue";
 import ProductModal from "@/components/admin/products/ProductModal.vue";
+import VariantModal from "@/components/admin/products/VariantModal.vue";
 
 const router = useRouter();
 const toast = useNotification();
@@ -196,6 +206,10 @@ const statusFilter = ref("");
 const isModalOpen = ref(false);
 const selectedProduct = ref<Product | null>(null);
 
+// Variant Modal state
+const isVariantModalOpen = ref(false);
+const selectedProductForVariants = ref<Product | null>(null);
+
 // Modal handlers
 const openEditModal = (product: Product) => {
   selectedProduct.value = product;
@@ -216,6 +230,21 @@ const handleProductSuccess = () => {
 const openAddModal = () => {
   selectedProduct.value = null;
   isModalOpen.value = true;
+};
+
+// Variant Modal handlers
+const openVariantModal = (product: Product) => {
+  selectedProductForVariants.value = product;
+  isVariantModalOpen.value = true;
+};
+
+const closeVariantModal = () => {
+  isVariantModalOpen.value = false;
+  selectedProductForVariants.value = null;
+};
+
+const handleVariantSuccess = () => {
+  toast.showSuccess("Thao tác biến thể thành công!");
 };
 
 // Handle view product details

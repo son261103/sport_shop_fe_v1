@@ -5,6 +5,11 @@ import type {
   AxiosResponse,
   InternalAxiosRequestConfig,
 } from "axios";
+
+// Extend the Axios request config to include our custom _retry property
+interface ExtendedAxiosRequestConfig extends InternalAxiosRequestConfig {
+  _retry?: boolean;
+}
 import type { ValidationError } from "../types/api";
 import type {
   CategoryFormData,
@@ -88,18 +93,32 @@ apiClient.interceptors.request.use(
   }
 );
 
+// Track retry attempts to prevent infinite loops
+const retryAttempts = new Map<string, number>();
+let isRefreshing = false;
+let failedQueue: Array<{ resolve: Function; reject: Function }> = [];
+
 // Response interceptor
 apiClient.interceptors.response.use(
   (response: AxiosResponse) => {
     // Hide loading on successful response
     const { hideLoading } = useLoading();
     setTimeout(() => hideLoading(), 100);
+    // Clear retry attempts on success
+    if (response.config.url) {
+      retryAttempts.delete(response.config.url);
+    }
     return response;
   },
-  (error: AxiosError) => {
+  async (error: AxiosError) => {
     // Hide loading on error
     const { hideLoading } = useLoading();
     hideLoading();
+
+    const originalRequest = error.config as ExtendedAxiosRequestConfig;
+    const requestKey = `${originalRequest?.method}-${originalRequest?.url}`;
+    const currentRetries = retryAttempts.get(requestKey) || 0;
+
     // Handle validation errors
     if (error.response?.status === 422 || error.response?.status === 400) {
       const responseData = error.response.data as any;
@@ -111,11 +130,100 @@ apiClient.interceptors.response.use(
       };
     }
 
-    // Handle other HTTP errors
+    // Handle authentication errors (401) - only retry for 401, not 500
+    if (error.response?.status === 401 && 
+        originalRequest && 
+        !originalRequest.url?.includes('/refresh') && 
+        !originalRequest._retry &&
+        currentRetries < 1) {
+      
+      // Mark this request as retried to prevent infinite loops
+      originalRequest._retry = true;
+      
+      // If already refreshing, queue this request
+      if (isRefreshing) {
+        return new Promise((resolve, reject) => {
+          failedQueue.push({ resolve, reject });
+        }).then(token => {
+          originalRequest.headers.Authorization = `Bearer ${token}`;
+          return apiClient.request(originalRequest);
+        }).catch(err => {
+          return Promise.reject(err);
+        });
+      }
+      
+      isRefreshing = true;
+      
+      try {
+        // Increment retry count
+        retryAttempts.set(requestKey, currentRetries + 1);
+        
+        // Try to refresh token
+        const refreshResponse = await api.auth.refresh();
+        if (refreshResponse.status && refreshResponse.data.token) {
+          const newToken = refreshResponse.data.token;
+          localStorage.setItem(AUTH_TOKEN_KEY, newToken);
+          
+          // Process all queued requests
+          failedQueue.forEach(({ resolve }) => resolve(newToken));
+          failedQueue = [];
+          
+          // Update the authorization header for the retry
+          originalRequest.headers = originalRequest.headers || {};
+          originalRequest.headers.Authorization = `Bearer ${newToken}`;
+          
+          // Clear retry attempts before retrying
+          retryAttempts.delete(requestKey);
+          
+          // Retry the original request
+          return apiClient.request(originalRequest);
+        } else {
+          // Refresh response doesn't have valid token
+          throw new Error('Invalid refresh response');
+        }
+      } catch (refreshError: any) {
+        console.error("Token refresh failed:", refreshError);
+        
+        // Reject all queued requests
+        failedQueue.forEach(({ reject }) => reject(refreshError));
+        failedQueue = [];
+        
+        // Clear retry attempts and auth data
+        retryAttempts.delete(requestKey);
+        
+        // Only clear auth data if it's not a 404 (endpoint not found)
+        if (!refreshError.message?.includes('404')) {
+          localStorage.removeItem(AUTH_TOKEN_KEY);
+        }
+        
+        // Log appropriate error message
+        if (refreshError.message?.includes('404')) {
+          console.warn("Refresh token endpoint not available (404). Skipping token refresh.");
+        } else {
+          console.error("Authentication error - token refresh failed. Please login again.");
+          localStorage.removeItem(AUTH_TOKEN_KEY);
+        }
+        
+        throw {
+          type: "unauthorized",
+          message: "Authentication required",
+        };
+      } finally {
+        isRefreshing = false;
+      }
+    }
+
+    // Clear retry attempts if we're not retrying
+    retryAttempts.delete(requestKey);
+
     if (error.response?.status === 401) {
-      // Unauthorized - clear token and redirect to login
+      // If we reach here, token refresh failed or wasn't attempted
       localStorage.removeItem(AUTH_TOKEN_KEY);
-      window.location.href = "/login";
+      console.error("401 Unauthorized error:", error.response?.data || error.message);
+      throw {
+        type: "unauthorized",
+        message: "Authentication required",
+      };
     }
 
     if (error.response?.status === 403) {
@@ -181,27 +289,37 @@ export const api = {
   auth: {
     // Register a new user
     register: (data: RegisterRequest): Promise<AuthResponse> => {
-      return api.post<AuthResponse>("/register", data);
+      return apiClient
+        .post("/register", data)
+        .then((response: AxiosResponse) => response.data);
     },
 
     // Login user
     login: (data: LoginRequest): Promise<AuthResponse> => {
-      return api.post<AuthResponse>("/login", data);
+      return apiClient
+        .post("/login", data)
+        .then((response: AxiosResponse) => response.data);
     },
 
     // Logout user
     logout: (): Promise<{ status: boolean; message: string }> => {
-      return api.post<{ status: boolean; message: string }>("/logout");
+      return apiClient
+        .post("/logout")
+        .then((response: AxiosResponse) => response.data);
     },
 
     // Get current user
     me: (): Promise<User> => {
-      return api.get<User>("/me");
+      return apiClient
+        .get("/me")
+        .then((response: AxiosResponse) => response.data);
     },
 
     // Refresh token
     refresh: (): Promise<AuthResponse> => {
-      return api.post<AuthResponse>("/refresh");
+      return apiClient
+        .post("/refresh")
+        .then((response: AxiosResponse) => response.data);
     },
   },
 

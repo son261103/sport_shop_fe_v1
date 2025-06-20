@@ -61,19 +61,36 @@ export class AuthService {
   }
 
   /**
+   * Refresh authentication token
+   */
+  static async refreshToken(): Promise<AuthResponse> {
+    try {
+      const response = await api.auth.refresh();
+      
+      // Store new token if refresh successful
+      if (response.status && response.data.token) {
+        localStorage.setItem(AUTH_TOKEN_KEY, response.data.token);
+      }
+      
+      return response;
+    } catch (error) {
+      console.error("Token refresh error:", error);
+      this.clearAuthData();
+      throw error;
+    }
+  }
+
+  /**
    * Logout user
    */
-  static async logout(): Promise<{ status: boolean; message: string }> {
+  static async logout(): Promise<void> {
     try {
       const response = await api.auth.logout();
-
-      // Clear stored data regardless of API response
+      console.log("Logout response:", response);
       this.clearAuthData();
-
-      return response;
-    } catch (error: any) {
+    } catch (error) {
       console.error("Logout error:", error);
-      // Clear data even if API call fails
+      // Clear data even if logout request fails
       this.clearAuthData();
       throw error;
     }
