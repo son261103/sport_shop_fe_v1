@@ -19,7 +19,7 @@ export function useProduct() {
   // Local state
   const selectedIds = ref<number[]>([]);
   const searchQuery = ref("");
-  const sortBy = ref("name");
+  const sortBy = ref("");
   const sortOrder = ref<"asc" | "desc">("asc");
   const currentPage = ref(1);
   const perPage = ref(10);

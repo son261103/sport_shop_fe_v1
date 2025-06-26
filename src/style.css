@@ -159,6 +159,7 @@
            border border-light-border-primary dark:border-dark-border-primary
            text-light-text-primary dark:text-dark-text-primary
            placeholder:text-light-text-muted dark:placeholder:text-dark-text-muted;
+    transition: background-color var(--transition-normal), color var(--transition-normal), border-color var(--transition-normal);
   }
 
   /* 🎯 Focus States */
@@ -315,6 +316,45 @@
            relative;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     letter-spacing: -0.01em;
+  }
+
+  /* 🎛️ Select Components */
+  select {
+    @apply text-light-text-primary dark:text-dark-text-primary !important;
+    @apply bg-white dark:bg-gray-800 !important;
+    transition: color var(--transition-normal), background-color var(--transition-normal) !important;
+  }
+
+  select option {
+    @apply text-light-text-primary dark:text-dark-text-primary !important;
+    @apply bg-white dark:bg-gray-800 !important;
+    transition: color var(--transition-normal), background-color var(--transition-normal) !important;
+  }
+
+  /* Ensure proper contrast in dark mode */
+  .dark select {
+    color: rgb(248 250 252) !important;
+    background-color: rgb(31 41 55) !important;
+    transition: color var(--transition-normal), background-color var(--transition-normal) !important;
+  }
+
+  .dark select option {
+    color: rgb(248 250 252) !important;
+    background-color: rgb(31 41 55) !important;
+    transition: color var(--transition-normal), background-color var(--transition-normal) !important;
+  }
+
+  /* Light mode explicit styling */
+  :not(.dark) select {
+    color: rgb(33 37 41) !important;
+    background-color: rgb(255 255 255) !important;
+    transition: color var(--transition-normal), background-color var(--transition-normal) !important;
+  }
+
+  :not(.dark) select option {
+    color: rgb(33 37 41) !important;
+    background-color: rgb(255 255 255) !important;
+    transition: color var(--transition-normal), background-color var(--transition-normal) !important;
   }
 
   .nav-link:hover {
