@@ -223,14 +223,14 @@
                     class="text-lg font-bold text-light-accent-sport dark:text-dark-accent-sport"
                   >
                     {{
-                      formatCurrency(product.discount_price || product.price)
+                      formatPrice(product.discount_price || product.price)
                     }}
                   </p>
                   <p
                     v-if="product.discount_price"
                     class="text-sm text-gray-500 line-through"
                   >
-                    {{ formatCurrency(product.price) }}
+                    {{ formatPrice(product.price) }}
                   </p>
                 </div>
               </div>
@@ -404,6 +404,7 @@ import { useProduct } from "@/composables/useProduct";
 import { useCategory } from "@/composables/useCategory";
 import { useBrand } from "@/composables/useBrand";
 import { useNotification } from "@/composables/useNotification";
+import { formatPrice } from "@/utils";
 import type { Product } from "@/types/admin/product";
 import ProductModal from "@/components/admin/products/ProductModal.vue";
 
@@ -475,13 +476,7 @@ const toggleStatus = async () => {
   }
 };
 
-const formatCurrency = (amount: string | number) => {
-  const num = typeof amount === "string" ? parseFloat(amount) : amount;
-  return new Intl.NumberFormat("vi-VN", {
-    style: "currency",
-    currency: "VND",
-  }).format(num);
-};
+
 
 const formatDate = (dateString: string) => {
   if (!dateString) {

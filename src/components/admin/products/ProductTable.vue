@@ -533,6 +533,7 @@
 
 <script setup lang="ts">
 import { computed } from "vue";
+import { formatPrice } from "@/utils";
 import type { Product } from "@/types/admin/product";
 
 // Props
@@ -621,13 +622,6 @@ const handleSort = (field: string) => {
 };
 
 // Utility functions
-const formatPrice = (price: string | number) => {
-  const numPrice = typeof price === "string" ? parseFloat(price) : price;
-  return new Intl.NumberFormat("vi-VN", {
-    style: "currency",
-    currency: "VND",
-  }).format(numPrice);
-};
 
 const formatDate = (dateString: string) => {
   if (!dateString) {
