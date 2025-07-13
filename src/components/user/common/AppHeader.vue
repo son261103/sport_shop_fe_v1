@@ -35,7 +35,7 @@
           <SearchBar ref="searchBarRef" />
 
           <!-- Shopping Cart -->
-          <ShoppingCart ref="shoppingCartRef" />
+          <ShoppingCart />
 
           <!-- User Menu -->
           <div
@@ -451,7 +451,6 @@ const { logout, isAuthenticated, userName, userEmail, isAdmin } = useAuth();
 
 // Refs
 const searchBarRef = ref();
-const shoppingCartRef = ref();
 const isMobileMenuOpen = ref(false);
 const isUserMenuOpen = ref(false);
 let hideMenuTimeout: number | null = null;

@@ -54,7 +54,7 @@
               v-model="formData.name"
               type="text"
               required
-              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-light-accent-sport focus:border-light-accent-sport dark:focus:ring-dark-accent-sport dark:focus:border-dark-accent-sport bg-white dark:bg-dark-bg-primary text-light-text-primary dark:text-dark-text-primary transition-colors"
+              class="w-full px-4 py-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-light-text-primary dark:text-dark-text-primary placeholder:text-gray-400 transition-all duration-200 hover:bg-gray-50 dark:hover:bg-gray-700"
               placeholder="Nhập tên danh mục"
             />
           </div>
@@ -215,3 +215,44 @@ const handleSubmit = async () => {
   }
 };
 </script>
+
+<style scoped>
+/* Force dark mode styles for modal forms */
+.form-input,
+input,
+select,
+textarea {
+  background-color: white !important;
+  color: rgb(55 65 81) !important;
+  border-color: rgb(229 231 235) !important;
+}
+
+:global(.dark) .form-input,
+:global(.dark) input,
+:global(.dark) select,
+:global(.dark) textarea {
+  background-color: rgb(31 41 55) !important;
+  color: rgb(248 250 252) !important;
+  border-color: rgb(75 85 99) !important;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: rgb(156 163 175) !important;
+}
+
+:global(.dark) input::placeholder,
+:global(.dark) textarea::placeholder {
+  color: rgb(107 114 128) !important;
+}
+
+select option {
+  background-color: white !important;
+  color: rgb(55 65 81) !important;
+}
+
+:global(.dark) select option {
+  background-color: rgb(31 41 55) !important;
+  color: rgb(248 250 252) !important;
+}
+</style>

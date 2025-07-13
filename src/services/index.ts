@@ -6,6 +6,7 @@ export { api, apiClient, API_BASE_URL, handleApiError } from "./api";
 // Services
 export { categoryService } from "./categoryService";
 export { brandService } from "./brandService";
+export { default as CartService } from "./cartService";
 
 // Auth Service
 // Note: AuthService is deprecated, use useAuthStore from @/stores/auth instead

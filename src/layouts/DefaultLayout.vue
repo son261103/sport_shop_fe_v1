@@ -1,16 +1,14 @@
 <template>
-  <div class="min-h-screen bg-light-bg-primary dark:bg-dark-bg-primary">
+  <div class="min-h-screen bg-light-bg-primary dark:bg-dark-bg-primary flex flex-col">
     <!-- Header -->
     <AppHeader />
 
     <!-- Main Content -->
-    <main>
+    <main class="flex-1">
       <!-- Breadcrumb -->
       <AppBreadcrumb :current-path="currentPath" />
-
-      <div class="mt-4">
-        <router-view />
-      </div>
+      
+      <router-view />
     </main>
 
     <!-- Footer -->

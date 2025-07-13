@@ -113,6 +113,7 @@ import { NIcon } from "naive-ui";
 import { Star, Heart, HeartOutline, CartOutline } from "@vicons/ionicons5";
 import { Button } from "@/components/ui";
 import { useThemeClasses } from "@/composables/useTheme";
+import { useCart } from "@/composables/useCart";
 import type { Product } from "./index";
 
 interface Props {
@@ -131,6 +132,7 @@ const emit = defineEmits<{
 }>();
 
 const { getTextClass } = useThemeClasses();
+const { addProductToCart } = useCart();
 
 // Computed
 const categoryBadgeClasses = computed(() =>
@@ -194,8 +196,13 @@ const handleClick = () => {
   emit("click", props.product);
 };
 
-const handleAddToCart = () => {
-  emit("addToCart", props.product);
+const handleAddToCart = async () => {
+  try {
+    await addProductToCart(parseInt(props.product.id), 1);
+    emit("addToCart", props.product);
+  } catch (error) {
+    console.error('Error adding to cart:', error);
+  }
 };
 
 const handleToggleFavorite = () => {

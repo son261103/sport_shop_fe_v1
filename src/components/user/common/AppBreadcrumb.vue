@@ -1,20 +1,22 @@
 <template>
-  <nav v-if="breadcrumbItems.length > 1" class="mb-6">
-    <n-breadcrumb>
-      <n-breadcrumb-item
-        v-for="(item, index) in breadcrumbItems"
-        :key="item.path"
-        :clickable="index < breadcrumbItems.length - 1"
-        @click="handleBreadcrumbClick(item.path, index)"
-      >
-        <div class="flex items-center">
-          <n-icon v-if="item.icon" class="mr-1">
-            <component :is="item.icon" />
-          </n-icon>
-          {{ item.label }}
-        </div>
-      </n-breadcrumb-item>
-    </n-breadcrumb>
+  <nav v-if="breadcrumbItems.length > 1" class="bg-gray-50 dark:bg-gray-800/50 border-b border-gray-200 dark:border-gray-700">
+    <div class="container-custom py-3">
+      <n-breadcrumb>
+        <n-breadcrumb-item
+          v-for="(item, index) in breadcrumbItems"
+          :key="item.path"
+          :clickable="index < breadcrumbItems.length - 1"
+          @click="handleBreadcrumbClick(item.path, index)"
+        >
+          <div class="flex items-center">
+            <n-icon v-if="item.icon" class="mr-1">
+              <component :is="item.icon" />
+            </n-icon>
+            {{ item.label }}
+          </div>
+        </n-breadcrumb-item>
+      </n-breadcrumb>
+    </div>
   </nav>
 </template>
 

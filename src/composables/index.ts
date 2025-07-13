@@ -1,5 +1,6 @@
 export { useAuth } from './useAuth'
 export { useBrand } from './useBrand'
+export { useCart } from './useCart'
 export { useCartActions } from './useCartActions'
 export { useCartData } from './useCartData'
 export { useCategory } from './useCategory'

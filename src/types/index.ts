@@ -55,3 +55,17 @@ export type {
   FilterOption,
   DataState,
 } from "./public";
+
+// Cart types
+export type {
+  CartItem as ApiCartItem,
+  CartResponse,
+  AddToCartRequest,
+  AddToCartResponse,
+  UpdateCartItemRequest,
+  UpdateCartItemResponse,
+  RemoveFromCartResponse,
+  ClearCartResponse,
+  CartCountResponse,
+  CartErrorResponse
+} from "./cart";

@@ -1,19 +1,19 @@
 <template>
-  <div class="products-page">
+  <div class="min-h-screen bg-gradient-page">
     <!-- Page Header -->
-    <div class="bg-white shadow-sm border-b">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <div class="bg-light-bg-secondary dark:bg-dark-bg-secondary shadow-sm border-b border-light-border-primary dark:border-dark-border-primary">
+      <div class="container-custom py-6">
         <div class="flex items-center justify-between">
           <div>
-            <h1 class="text-3xl font-bold text-gray-900">Sản phẩm</h1>
-            <p class="mt-2 text-gray-600">Khám phá bộ sưu tập sản phẩm thể thao của chúng tôi</p>
+            <h1 class="text-3xl font-bold text-light-text-primary dark:text-dark-text-primary">🛍️ Sản phẩm</h1>
+            <p class="mt-2 text-light-text-secondary dark:text-dark-text-secondary">Khám phá bộ sưu tập sản phẩm thể thao của chúng tôi</p>
           </div>
           
           <!-- Quick Actions -->
           <div class="flex items-center gap-4">
             <button
               @click="toggleView"
-              class="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+              class="btn-secondary flex items-center gap-2"
             >
               <svg v-if="viewMode === 'grid'" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
@@ -29,24 +29,27 @@
     </div>
 
     <!-- Main Content -->
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="container-custom section-padding">
       <div class="flex gap-8">
         <!-- Sidebar Filters (Optional) -->
         <div v-if="showSidebar" class="w-64 flex-shrink-0">
-          <div class="bg-white rounded-lg shadow-sm border p-6">
-            <h3 class="text-lg font-semibold mb-4">Bộ lọc</h3>
-            
-            <!-- Quick Filters -->
-            <div class="space-y-4">
-              <!-- Categories -->
-              <div>
-                <h4 class="font-medium text-gray-900 mb-2">Danh mục</h4>
-                <div class="space-y-2">
-                  <label class="flex items-center">
-                    <input type="radio" :value="undefined" v-model="selectedCategory" class="mr-2">
-                    <span class="text-sm">Tất cả</span>
-                  </label>
-                  <!-- Add more category options here -->
+          <div class="card">
+            <div class="card-header">
+              <h3 class="text-lg font-semibold">🎯 Bộ lọc</h3>
+            </div>
+            <div class="card-body">
+              <!-- Quick Filters -->
+              <div class="space-y-4">
+                <!-- Categories -->
+                <div>
+                  <h4 class="font-medium text-light-text-primary dark:text-dark-text-primary mb-2">📂 Danh mục</h4>
+                  <div class="space-y-2">
+                    <label class="flex items-center">
+                      <input type="radio" :value="undefined" v-model="selectedCategory" class="mr-2">
+                      <span class="text-sm">Tất cả</span>
+                    </label>
+                    <!-- Add more category options here -->
+                  </div>
                 </div>
               </div>
               

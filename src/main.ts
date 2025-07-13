@@ -25,6 +25,7 @@ app.use(router);
 
 // Initialize authentication before mounting
 const authStore = useAuthStore();
+
 authStore
   .initAuth()
   .then(() => {

@@ -1,5 +1,5 @@
 <template>
-  <div class="p-2">
+  <div class="admin-page p-2">
     <!-- Page Header -->
     <div class="mb-4">
       <h1
@@ -24,11 +24,11 @@
               v-model="searchQuery"
               type="text"
               placeholder="Tìm kiếm thương hiệu..."
-              class="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-dark-bg-primary text-light-text-primary dark:text-dark-text-primary"
+              class="w-full pl-12 pr-4 py-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-light-text-primary dark:text-dark-text-primary placeholder:text-gray-400 transition-all duration-200 hover:bg-gray-50 dark:hover:bg-gray-700"
               @input="(event) => debouncedSearch((event.target as HTMLInputElement).value)"
             />
             <svg
-              class="absolute left-3 top-2.5 h-5 w-5 text-gray-400"
+              class="absolute left-4 top-3 h-5 w-5 text-gray-400"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -45,25 +45,39 @@
 
         <!-- Sort Options -->
         <div class="flex gap-2">
-          <select
-            v-model="sortBy"
-            @change="() => loadBrands()"
-            class="form-input min-w-[140px]"
-          >
-            <option value="">Sắp xếp theo</option>
-            <option value="name">Tên</option>
-            <option value="created_at">Ngày tạo</option>
-            <option value="updated_at">Ngày cập nhật</option>
-          </select>
+          <div class="relative">
+            <select
+              v-model="sortBy"
+              @change="() => loadBrands()"
+              class="w-full px-4 py-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-light-text-primary dark:text-dark-text-primary appearance-none cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-200 min-w-[140px]"
+            >
+              <option value="">Sắp xếp theo</option>
+              <option value="name">Tên</option>
+              <option value="created_at">Ngày tạo</option>
+              <option value="updated_at">Ngày cập nhật</option>
+            </select>
+            <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+              <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+              </svg>
+            </div>
+          </div>
 
-          <select
-            v-model="sortOrder"
-            @change="() => loadBrands()"
-            class="form-input min-w-[120px]"
-          >
-            <option value="asc">Tăng dần</option>
-            <option value="desc">Giảm dần</option>
-          </select>
+          <div class="relative">
+            <select
+              v-model="sortOrder"
+              @change="() => loadBrands()"
+              class="w-full px-4 py-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-light-text-primary dark:text-dark-text-primary appearance-none cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-200 min-w-[120px]"
+            >
+              <option value="asc">Tăng dần</option>
+              <option value="desc">Giảm dần</option>
+            </select>
+            <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+              <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+              </svg>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -165,3 +179,48 @@ onMounted(() => {
   loadBrands();
 });
 </script>
+
+<style scoped>
+/* Force dark mode styles for this component */
+.admin-page select {
+  background-color: white !important;
+  color: rgb(55 65 81) !important;
+  border-color: rgb(229 231 235) !important;
+}
+
+:global(.dark) .admin-page select {
+  background-color: rgb(31 41 55) !important;
+  color: rgb(248 250 252) !important;
+  border-color: rgb(75 85 99) !important;
+}
+
+.admin-page select option {
+  background-color: white !important;
+  color: rgb(55 65 81) !important;
+}
+
+:global(.dark) .admin-page select option {
+  background-color: rgb(31 41 55) !important;
+  color: rgb(248 250 252) !important;
+}
+
+.admin-page input {
+  background-color: white !important;
+  color: rgb(55 65 81) !important;
+  border-color: rgb(229 231 235) !important;
+}
+
+:global(.dark) .admin-page input {
+  background-color: rgb(31 41 55) !important;
+  color: rgb(248 250 252) !important;
+  border-color: rgb(75 85 99) !important;
+}
+
+.admin-page input::placeholder {
+  color: rgb(156 163 175) !important;
+}
+
+:global(.dark) .admin-page input::placeholder {
+  color: rgb(107 114 128) !important;
+}
+</style>

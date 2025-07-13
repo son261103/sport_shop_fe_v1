@@ -159,7 +159,8 @@
            border border-light-border-primary dark:border-dark-border-primary
            text-light-text-primary dark:text-dark-text-primary
            placeholder:text-light-text-muted dark:placeholder:text-dark-text-muted;
-    transition: background-color var(--transition-normal), color var(--transition-normal), border-color var(--transition-normal);
+    transition: background-color var(--transition-normal),
+      color var(--transition-normal), border-color var(--transition-normal);
   }
 
   /* 🎯 Focus States */
@@ -267,17 +268,18 @@
     border-top: 1px solid rgba(255, 255, 255, 0.1);
   }
 
-  /* 📝 Form Components */
-  .form-input {
-    @apply w-full px-4 py-3 rounded-xl border border-light-border-primary dark:border-dark-border-primary
+  /* 📝 Form Components - Enhanced for Admin */
+  .form-input,
+  .admin-page .form-input {
+    @apply w-full px-4 py-3 rounded-xl
            bg-white dark:bg-gray-800
-           text-light-text-primary dark:text-dark-text-primary
-           placeholder:text-light-text-muted dark:placeholder:text-dark-text-muted
-           focus:ring-2 focus:ring-light-accent-sport dark:focus:ring-dark-accent-sport
-           focus:border-transparent;
-    backdrop-filter: blur(10px);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+           border border-gray-200 dark:border-gray-600
+           text-gray-700 dark:text-gray-100
+           placeholder:text-gray-400 dark:placeholder:text-gray-500
+           focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400
+           focus:border-transparent
+           hover:bg-gray-50 dark:hover:bg-gray-700;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .form-input:focus {
@@ -318,43 +320,45 @@
     letter-spacing: -0.01em;
   }
 
-  /* 🎛️ Select Components */
+  /* 🎛️ Select Components - Enhanced Dark Mode Support */
   select {
-    @apply text-light-text-primary dark:text-dark-text-primary !important;
-    @apply bg-white dark:bg-gray-800 !important;
-    transition: color var(--transition-normal), background-color var(--transition-normal) !important;
+    color: rgb(55 65 81) !important;
+    background-color: rgb(255 255 255) !important;
+    border-color: rgb(229 231 235) !important;
+    transition: all 0.2s ease-in-out !important;
   }
 
   select option {
-    @apply text-light-text-primary dark:text-dark-text-primary !important;
-    @apply bg-white dark:bg-gray-800 !important;
-    transition: color var(--transition-normal), background-color var(--transition-normal) !important;
+    color: rgb(55 65 81) !important;
+    background-color: rgb(255 255 255) !important;
   }
 
-  /* Ensure proper contrast in dark mode */
+  /* Dark mode for select elements */
   .dark select {
     color: rgb(248 250 252) !important;
     background-color: rgb(31 41 55) !important;
-    transition: color var(--transition-normal), background-color var(--transition-normal) !important;
+    border-color: rgb(75 85 99) !important;
   }
 
   .dark select option {
     color: rgb(248 250 252) !important;
     background-color: rgb(31 41 55) !important;
-    transition: color var(--transition-normal), background-color var(--transition-normal) !important;
   }
 
-  /* Light mode explicit styling */
-  :not(.dark) select {
-    color: rgb(33 37 41) !important;
-    background-color: rgb(255 255 255) !important;
-    transition: color var(--transition-normal), background-color var(--transition-normal) !important;
+  /* Hover states */
+  select:hover {
+    background-color: rgb(249 250 251) !important;
   }
 
-  :not(.dark) select option {
-    color: rgb(33 37 41) !important;
-    background-color: rgb(255 255 255) !important;
-    transition: color var(--transition-normal), background-color var(--transition-normal) !important;
+  .dark select:hover {
+    background-color: rgb(55 65 81) !important;
+  }
+
+  /* Focus states */
+  select:focus {
+    outline: none !important;
+    box-shadow: 0 0 0 2px rgb(59 130 246) !important;
+    border-color: transparent !important;
   }
 
   .nav-link:hover {
@@ -539,9 +543,11 @@
     backdrop-filter: blur(15px);
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     border: 1px solid rgba(255, 255, 255, 0.1);
-    background: linear-gradient(135deg, 
-      rgba(255, 255, 255, 0.1) 0%, 
-      rgba(255, 255, 255, 0.05) 100%);
+    background: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.1) 0%,
+      rgba(255, 255, 255, 0.05) 100%
+    );
   }
 
   .filter-sidebar:hover {
@@ -560,9 +566,11 @@
 
   .filter-sidebar select {
     @apply form-input;
-    background: linear-gradient(135deg, 
-      rgba(255, 255, 255, 0.9) 0%, 
-      rgba(255, 255, 255, 0.7) 100%);
+    background: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.9) 0%,
+      rgba(255, 255, 255, 0.7) 100%
+    );
     backdrop-filter: blur(10px);
     border: 1px solid rgba(0, 200, 151, 0.2);
   }
@@ -780,4 +788,91 @@
   .card {
     @apply border border-gray-300 shadow-none;
   }
+}
+
+/* Admin specific select styling with higher specificity */
+.admin-page select,
+[class*="admin"] select,
+div[class*="bg-white dark:bg-dark-bg-secondary"] select {
+  color: rgb(55 65 81) !important;
+  background-color: rgb(255 255 255) !important;
+  border-color: rgb(229 231 235) !important;
+}
+
+.dark .admin-page select,
+.dark [class*="admin"] select,
+.dark div[class*="bg-white dark:bg-dark-bg-secondary"] select {
+  color: rgb(248 250 252) !important;
+  background-color: rgb(31 41 55) !important;
+  border-color: rgb(75 85 99) !important;
+}
+
+.admin-page select option,
+[class*="admin"] select option,
+div[class*="bg-white dark:bg-dark-bg-secondary"] select option {
+  color: rgb(55 65 81) !important;
+  background-color: rgb(255 255 255) !important;
+}
+
+.dark .admin-page select option,
+.dark [class*="admin"] select option,
+.dark div[class*="bg-white dark:bg-dark-bg-secondary"] select option {
+  color: rgb(248 250 252) !important;
+  background-color: rgb(31 41 55) !important;
+}
+
+/* More specific targeting for admin select boxes */
+.p-2 select,
+.p-4 select {
+  color: rgb(55 65 81) !important;
+  background-color: rgb(255 255 255) !important;
+  border-color: rgb(229 231 235) !important;
+}
+
+.dark .p-2 select,
+.dark .p-4 select {
+  color: rgb(248 250 252) !important;
+  background-color: rgb(31 41 55) !important;
+  border-color: rgb(75 85 99) !important;
+}
+
+/* Force dark mode for admin select elements - FINAL OVERRIDE */
+.admin-page select,
+.admin-page .form-input {
+  background-color: rgb(255 255 255) !important;
+  color: rgb(55 65 81) !important;
+  border-color: rgb(229 231 235) !important;
+}
+
+.dark .admin-page select,
+.dark .admin-page .form-input,
+html.dark .admin-page select,
+html.dark .admin-page .form-input {
+  background-color: rgb(31 41 55) !important;
+  color: rgb(248 250 252) !important;
+  border-color: rgb(75 85 99) !important;
+}
+
+.admin-page select option {
+  background-color: rgb(255 255 255) !important;
+  color: rgb(55 65 81) !important;
+}
+
+.dark .admin-page select option,
+html.dark .admin-page select option {
+  background-color: rgb(31 41 55) !important;
+  color: rgb(248 250 252) !important;
+}
+
+/* Hover states for admin */
+.admin-page select:hover,
+.admin-page .form-input:hover {
+  background-color: rgb(249 250 251) !important;
+}
+
+.dark .admin-page select:hover,
+.dark .admin-page .form-input:hover,
+html.dark .admin-page select:hover,
+html.dark .admin-page .form-input:hover {
+  background-color: rgb(55 65 81) !important;
 }

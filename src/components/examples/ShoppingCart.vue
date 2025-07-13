@@ -49,27 +49,27 @@
       <!-- Cart Items -->
       <div v-else class="max-h-80 overflow-y-auto">
         <div 
-          v-for="(item, index) in cartItems" 
-          :key="index"
+          v-for="item in cartItems" 
+          :key="item.id"
           class="p-3 border-b border-light-border-primary dark:border-dark-border-primary flex items-center gap-3 hover:bg-light-bg-secondary dark:hover:bg-dark-bg-secondary transition-colors"
         >
           <!-- Product Image -->
           <div class="w-16 h-16 bg-light-bg-secondary dark:bg-dark-bg-secondary rounded-md overflow-hidden flex-shrink-0">
-            <img :src="item.image" :alt="item.name" class="w-full h-full object-cover" />
+            <img :src="item.product_image || '/placeholder.jpg'" :alt="item.product_name" class="w-full h-full object-cover" />
           </div>
           
           <!-- Product Details -->
           <div class="flex-grow min-w-0">
-            <h4 class="text-sm font-medium text-light-text-primary dark:text-dark-text-primary truncate">{{ item.name }}</h4>
-            <div class="text-xs text-light-text-muted dark:text-dark-text-muted mt-1">{{ item.variant }}</div>
+            <h4 class="text-sm font-medium text-light-text-primary dark:text-dark-text-primary truncate">{{ item.product_name }}</h4>
+            <div class="text-xs text-light-text-muted dark:text-dark-text-muted mt-1">{{ item.variant_name || 'Mặc định' }}</div>
             
             <!-- Quantity Controls -->
             <div class="flex items-center justify-between mt-2">
               <div class="flex items-center border border-light-border-primary dark:border-dark-border-primary rounded-md overflow-hidden bg-light-bg-primary dark:bg-dark-bg-primary">
                 <button 
-                  @click="updateItemQuantity(index, item.quantity - 1)"
+                  @click="updateItemQuantity(item.id, item.quantity - 1)"
                   class="px-2 py-1 text-light-text-secondary dark:text-dark-text-secondary hover:text-light-accent-sport dark:hover:text-dark-accent-sport hover:bg-light-bg-secondary dark:hover:bg-dark-bg-secondary transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                  :disabled="item.quantity <= 1"
+                  :disabled="item.quantity <= 1 || isLoading"
                 >
                   <n-icon size="14">
                     <RemoveOutline />
@@ -77,8 +77,9 @@
                 </button>
                 <span class="px-3 py-1 text-xs text-light-text-primary dark:text-dark-text-primary font-medium min-w-[2rem] text-center">{{ item.quantity }}</span>
                 <button 
-                  @click="updateItemQuantity(index, item.quantity + 1)"
+                  @click="updateItemQuantity(item.id, item.quantity + 1)"
                   class="px-2 py-1 text-light-text-secondary dark:text-dark-text-secondary hover:text-light-accent-sport dark:hover:text-dark-accent-sport hover:bg-light-bg-secondary dark:hover:bg-dark-bg-secondary transition-all"
+                  :disabled="isLoading"
                 >
                   <n-icon size="14">
                     <AddOutline />
@@ -86,15 +87,16 @@
                 </button>
               </div>
               <div class="text-sm font-medium text-light-text-primary dark:text-dark-text-primary">
-                {{ formatPrice(item.price * item.quantity) }}
+                {{ formatPrice(item.total_price) }}
               </div>
             </div>
           </div>
           
           <!-- Remove Button -->
           <button 
-            @click="removeItem(index)"
+            @click="removeItem(item.id)"
             class="text-light-text-secondary dark:text-dark-text-secondary hover:text-light-accent-danger dark:hover:text-dark-accent-danger transition-colors p-1 rounded-md hover:bg-red-50 dark:hover:bg-red-900/20"
+            :disabled="isLoading"
           >
             <n-icon size="18">
               <TrashOutline />
@@ -129,49 +131,26 @@
 
 <script setup lang="ts">
 import { ref, computed, onBeforeUnmount } from 'vue'
+import { useRouter } from 'vue-router'
 import { NIcon, NBadge, NButton } from 'naive-ui'
 import { CartOutline, CloseOutline, TrashOutline, AddOutline, RemoveOutline } from '@vicons/ionicons5'
+import { useCartStore } from '@/stores/cart'
+import { useCartNotifications } from '@/composables/useCartNotifications'
 
-interface CartItem {
-  id: number
-  name: string
-  price: number
-  image: string
-  quantity: number
-  variant?: string
-}
+// Store and composables
+const cartStore = useCartStore()
+const router = useRouter()
+const { updateCartItemWithNotification, removeFromCartWithNotification } = useCartNotifications()
 
-// Sample cart items for demonstration
-const cartItems = ref<CartItem[]>([
-  {
-    id: 1,
-    name: 'Giày thể thao Nike Air Max',
-    price: 2500000,
-    image: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTUwIiBoZWlnaHQ9IjE1MCIgdmlld0JveD0iMCAwIDE1MCAxNTAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxNTAiIGhlaWdodD0iMTUwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik03NSA2MEw5MCA3NUg4MFY5MEg3MFY3NUg2MEw3NSA2MFoiIGZpbGw9IiM5Q0EzQUYiLz4KPC9zdmc+',
-    quantity: 1,
-    variant: 'Màu: Đen, Kích thước: 42'
-  },
-  {
-    id: 2,
-    name: 'Áo thun Adidas Originals',
-    price: 850000,
-    image: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTUwIiBoZWlnaHQ9IjE1MCIgdmlld0JveD0iMCAwIDE1MCAxNTAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxNTAiIGhlaWdodD0iMTUwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik03NSA2MEw5MCA3NUg4MFY5MEg3MFY3NUg2MEw3NSA2MFoiIGZpbGw9IiM5Q0EzQUYiLz4KPC9zdmc+',
-    quantity: 2,
-    variant: 'Màu: Trắng, Kích thước: L'
-  }
-])
-
+// Cart dropdown state
 const isOpen = ref(false)
 const hideTimer = ref<number | null>(null)
 
-// Computed properties
-const cartItemCount = computed(() => {
-  return cartItems.value.reduce((total, item) => total + item.quantity, 0)
-})
-
-const cartTotal = computed(() => {
-  return cartItems.value.reduce((total, item) => total + (item.price * item.quantity), 0)
-})
+// Computed properties from store
+const cartItems = computed(() => cartStore.items)
+const cartItemCount = computed(() => cartStore.cartCount)
+const cartTotal = computed(() => cartStore.totalPrice)
+const isLoading = computed(() => cartStore.isLoading)
 
 // Methods
 const showCart = () => {
@@ -179,18 +158,10 @@ const showCart = () => {
   isOpen.value = true
 }
 
-const hideCart = () => {
-  isOpen.value = false
-}
-
-const closeCart = () => {
-  isOpen.value = false
-}
-
 const startHideTimer = () => {
   hideTimer.value = setTimeout(() => {
-    hideCart()
-  }, 300)
+    isOpen.value = false
+  }, 300) // Delay to prevent accidental closes
 }
 
 const cancelHideTimer = () => {
@@ -200,37 +171,37 @@ const cancelHideTimer = () => {
   }
 }
 
-const updateItemQuantity = (index: number, quantity: number) => {
+const closeCart = () => {
+  cancelHideTimer()
+  isOpen.value = false
+}
+
+const updateItemQuantity = async (itemId: number, quantity: number) => {
   if (quantity <= 0) {
-    // Optional: Show confirmation before removing
-    removeItem(index)
+    await removeFromCartWithNotification(itemId)
     return
   }
   
-  cartItems.value[index].quantity = quantity
+  await updateCartItemWithNotification(itemId, quantity)
 }
 
-const removeItem = (index: number) => {
-  cartItems.value.splice(index, 1)
+const removeItem = async (itemId: number) => {
+  await removeFromCartWithNotification(itemId)
 }
 
 const viewCart = () => {
-  // Navigate to cart page
-  console.log('Navigate to cart page')
+  router.push('/cart')
   closeCart()
 }
 
 const checkout = () => {
-  // Navigate to checkout page
-  console.log('Navigate to checkout page')
+  router.push('/checkout')
   closeCart()
 }
 
 const formatPrice = (price: number) => {
   return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price)
 }
-
-
 
 // Cleanup timer on unmount
 onBeforeUnmount(() => {
@@ -245,22 +216,7 @@ defineExpose({
     cancelHideTimer()
     isOpen.value = true
   },
-  closeCart,
-  addItem: (item: CartItem) => {
-    const existingItemIndex = cartItems.value.findIndex(i => i.id === item.id)
-    
-    if (existingItemIndex >= 0) {
-      // Update quantity if item already exists
-      cartItems.value[existingItemIndex].quantity += item.quantity
-    } else {
-      // Add new item
-      cartItems.value.push(item)
-    }
-    
-    // Optionally open cart when adding items
-    cancelHideTimer()
-    isOpen.value = true
-  }
+  closeCart
 })
 </script>
 
