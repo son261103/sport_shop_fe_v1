@@ -38,6 +38,16 @@ import type {
   RegisterRequest,
   User,
 } from "../types/auth";
+import type {
+  CartResponse,
+  AddToCartRequest,
+  AddToCartResponse,
+  UpdateCartItemRequest,
+  UpdateCartItemResponse,
+  RemoveFromCartResponse,
+  CartCountResponse,
+  ClearCartResponse
+} from "../types/cart";
 import { useLoading } from "../composables/useLoading";
 import { ENV } from "@/constants";
 
@@ -191,17 +201,15 @@ apiClient.interceptors.response.use(
         // Clear retry attempts and auth data
         retryAttempts.delete(requestKey);
         
-        // Only clear auth data if it's not a 404 (endpoint not found)
-        if (!refreshError.message?.includes('404')) {
-          localStorage.removeItem(AUTH_TOKEN_KEY);
-        }
-        
+        // Clear auth data for any refresh error
+        localStorage.removeItem(AUTH_TOKEN_KEY);
+        localStorage.removeItem("user_data");
+
         // Log appropriate error message
-        if (refreshError.message?.includes('404')) {
-          console.warn("Refresh token endpoint not available (404). Skipping token refresh.");
+        if (refreshError.response?.status === 404) {
+          console.warn("Refresh token endpoint not available (404). Clearing authentication.");
         } else {
           console.error("Authentication error - token refresh failed. Please login again.");
-          localStorage.removeItem(AUTH_TOKEN_KEY);
         }
         
         throw {
@@ -574,15 +582,82 @@ export const api = {
     bulkDelete: (
       data: ProductBulkDeleteRequest
     ): Promise<{ status: boolean; message: string }> => {
-      return api.delete<{ status: boolean; message: string }>(
-        "/admin/products/bulk-delete",
-        { data }
-      );
+      // Validate data before sending
+      if (!data.ids || data.ids.length === 0) {
+        throw new Error("Không có ID sản phẩm để xóa");
+      }
+
+      return apiClient
+        .delete<{ status: boolean; message: string }>("/admin/products/bulk-delete", {
+          data,
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        })
+        .then((response: AxiosResponse) => {
+          console.log("🗑️ API: Bulk delete success response:", response.data);
+          return response.data;
+        })
+        .catch((error) => {
+          console.error("🗑️ API: Bulk delete error details:");
+          console.error("🗑️ API: Error status:", error.response?.status);
+          console.error("🗑️ API: Error data:", error.response?.data);
+          console.error("🗑️ API: Error headers:", error.response?.headers);
+          console.error("🗑️ API: Request config:", error.config);
+
+          // Enhanced error handling
+          if (error.response?.status === 404) {
+            if (error.response?.data?.message === "Product not found") {
+              throw new Error("Một hoặc nhiều sản phẩm không tồn tại trong hệ thống");
+            } else {
+              throw new Error("Endpoint xóa hàng loạt không tồn tại trên server");
+            }
+          } else if (error.response?.status === 401) {
+            throw new Error("Phiên đăng nhập đã hết hạn");
+          } else if (error.response?.status === 403) {
+            throw new Error("Không có quyền thực hiện thao tác này");
+          }
+
+          throw error;
+        });
     },
 
     // Toggle product active status
     toggleStatus: (id: number): Promise<ProductResponse> => {
       return api.put<ProductResponse>(`/admin/products/${id}/toggle-status`);
+    },
+  },
+
+  // Cart operations
+  cart: {
+    // Get user's cart
+    getCart: (): Promise<CartResponse> => {
+      return api.get<CartResponse>("/cart");
+    },
+
+    // Add item to cart
+    addToCart: (request: AddToCartRequest): Promise<AddToCartResponse> => {
+      return api.post<AddToCartResponse>("/cart/add", request);
+    },
+
+    // Update cart item quantity
+    updateCartItem: (itemId: number, request: UpdateCartItemRequest): Promise<UpdateCartItemResponse> => {
+      return api.put<UpdateCartItemResponse>(`/cart/update/${itemId}`, request);
+    },
+
+    // Remove item from cart
+    removeFromCart: (itemId: number): Promise<RemoveFromCartResponse> => {
+      return api.delete<RemoveFromCartResponse>(`/cart/remove/${itemId}`);
+    },
+
+    // Clear all items from cart
+    clearCart: (): Promise<ClearCartResponse> => {
+      return api.delete<ClearCartResponse>("/cart/clear");
+    },
+
+    // Get cart items count
+    getCartCount: (): Promise<CartCountResponse> => {
+      return api.get<CartCountResponse>("/cart/count");
     },
   },
 };

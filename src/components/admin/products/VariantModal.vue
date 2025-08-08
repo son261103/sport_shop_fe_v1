@@ -748,11 +748,14 @@ const cancelEdit = () => {
 const confirmDelete = async (variant: ProductVariant) => {
   if (!props.product) return;
 
-  if (
-    confirm(
-      `Bạn có chắc chắn muốn xóa biến thể "${variant.size} - ${variant.color}"?`
-    )
-  ) {
+  const confirmed = await toast.showConfirm(
+    "Xác nhận xóa biến thể",
+    `Bạn có chắc chắn muốn xóa biến thể "${variant.size} - ${variant.color}"? Hành động này không thể hoàn tác.`,
+    "Xóa",
+    "Hủy"
+  );
+
+  if (confirmed) {
     try {
       await deleteVariant(props.product.id, variant.id);
       toast.showSuccess("Xóa biến thể thành công!");

@@ -9,28 +9,21 @@ import type {
   CartCountResponse,
   ClearCartResponse
 } from '../types/cart';
-import { apiClient } from './api';
+import { api } from './api';
 
 export class CartService {
-  private static readonly BASE_URL = '/api/cart';
-
   /**
    * Get user's cart
    */
   static async getCart(): Promise<CartResponse> {
-    const response = await apiClient.get<CartResponse>(this.BASE_URL);
-    return response.data;
+    return await api.cart.getCart();
   }
 
   /**
    * Add item to cart
    */
   static async addToCart(request: AddToCartRequest): Promise<AddToCartResponse> {
-    const response = await apiClient.post<AddToCartResponse>(
-      `${this.BASE_URL}/add`,
-      request
-    );
-    return response.data;
+    return await api.cart.addToCart(request);
   }
 
   /**
@@ -40,41 +33,28 @@ export class CartService {
     itemId: number,
     request: UpdateCartItemRequest
   ): Promise<UpdateCartItemResponse> {
-    const response = await apiClient.put<UpdateCartItemResponse>(
-      `${this.BASE_URL}/update/${itemId}`,
-      request
-    );
-    return response.data;
+    return await api.cart.updateCartItem(itemId, request);
   }
 
   /**
    * Remove item from cart
    */
   static async removeFromCart(itemId: number): Promise<RemoveFromCartResponse> {
-    const response = await apiClient.delete<RemoveFromCartResponse>(
-      `${this.BASE_URL}/remove/${itemId}`
-    );
-    return response.data;
+    return await api.cart.removeFromCart(itemId);
   }
 
   /**
    * Clear all items from cart
    */
   static async clearCart(): Promise<ClearCartResponse> {
-    const response = await apiClient.delete<ClearCartResponse>(
-      `${this.BASE_URL}/clear`
-    );
-    return response.data;
+    return await api.cart.clearCart();
   }
 
   /**
    * Get cart items count
    */
   static async getCartCount(): Promise<CartCountResponse> {
-    const response = await apiClient.get<CartCountResponse>(
-      `${this.BASE_URL}/count`
-    );
-    return response.data;
+    return await api.cart.getCartCount();
   }
 }
 

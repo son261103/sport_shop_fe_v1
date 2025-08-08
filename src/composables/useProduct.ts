@@ -140,7 +140,6 @@ export function useProduct() {
   const createProduct = async (data: ProductFormData) => {
     try {
       const response = await productStore.createProduct(data);
-      showSuccess("Tạo sản phẩm thành công!");
       clearSelection();
       return response;
     } catch (error: any) {
@@ -154,7 +153,6 @@ export function useProduct() {
   const updateProduct = async (id: number, data: ProductFormData) => {
     try {
       const response = await productStore.updateProduct(id, data);
-      showSuccess("Cập nhật sản phẩm thành công!");
       return response;
     } catch (error: any) {
       if (error.type === "validation") {
@@ -178,6 +176,7 @@ export function useProduct() {
 
   const bulkDeleteProducts = async () => {
     if (selectedIds.value.length === 0) {
+      showError("Vui lòng chọn ít nhất một sản phẩm để xóa");
       return;
     }
 
@@ -188,6 +187,7 @@ export function useProduct() {
       return response;
     } catch (error: any) {
       console.error("Failed to bulk delete products:", error);
+      showError(error.message || "Có lỗi xảy ra khi xóa sản phẩm");
       throw error;
     }
   };

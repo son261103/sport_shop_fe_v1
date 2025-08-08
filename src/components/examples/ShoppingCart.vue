@@ -147,9 +147,9 @@ const isOpen = ref(false)
 const hideTimer = ref<number | null>(null)
 
 // Computed properties from store
-const cartItems = computed(() => cartStore.items)
-const cartItemCount = computed(() => cartStore.cartCount)
-const cartTotal = computed(() => cartStore.totalPrice)
+const cartItems = computed(() => cartStore.items || [])
+const cartItemCount = computed(() => cartStore.cartCount || 0)
+const cartTotal = computed(() => cartStore.totalPrice || 0)
 const isLoading = computed(() => cartStore.isLoading)
 
 // Methods

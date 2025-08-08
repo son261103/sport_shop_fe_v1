@@ -30,16 +30,25 @@ export const useCartStore = defineStore('cart', () => {
     try {
       isLoading.value = true;
       const response = await CartService.getCart();
-      
-      items.value = response.data.items;
-      totalItems.value = response.data.total_items;
-      totalPrice.value = response.data.total_price;
-      subtotal.value = response.data.subtotal;
-      shippingFee.value = response.data.shipping_fee;
-      discountAmount.value = response.data.discount_amount;
-      
-    } catch (error) {
+
+      if (response && response.data) {
+        items.value = response.data.items || [];
+        totalItems.value = response.data.total_items || 0;
+        totalPrice.value = response.data.total_price || 0;
+        subtotal.value = response.data.subtotal || 0;
+        shippingFee.value = response.data.shipping_fee || 0;
+        discountAmount.value = response.data.discount_amount || 0;
+      }
+
+    } catch (error: any) {
       console.error('Error fetching cart:', error);
+      // Reset to default values on error
+      items.value = [];
+      totalItems.value = 0;
+      totalPrice.value = 0;
+      subtotal.value = 0;
+      shippingFee.value = 0;
+      discountAmount.value = 0;
     } finally {
       isLoading.value = false;
     }
@@ -134,10 +143,14 @@ export const useCartStore = defineStore('cart', () => {
   const getCartCount = async () => {
     try {
       const response = await CartService.getCartCount();
-      totalItems.value = response.data.count;
-      return response.data.count;
-    } catch (error) {
+      if (response && response.data) {
+        totalItems.value = response.data.count || 0;
+        return response.data.count || 0;
+      }
+      return 0;
+    } catch (error: any) {
       console.error('Error getting cart count:', error);
+      totalItems.value = 0;
       return 0;
     }
   };

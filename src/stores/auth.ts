@@ -143,7 +143,7 @@ export const useAuthStore = defineStore("auth", () => {
    * Refresh current user data
    */
   const refreshUser = async (): Promise<void> => {
-    if (!isAuthenticated.value) return;
+    if (!token.value) return;
 
     setLoading(true);
     clearError();
@@ -168,38 +168,66 @@ export const useAuthStore = defineStore("auth", () => {
    * Initialize authentication state
    */
   const initAuth = async (): Promise<void> => {
-    if (AuthService.isAuthenticated()) {
+    console.log('🔐 Initializing authentication...');
+
+    const storedToken = AuthService.getToken();
+    const storedUser = AuthService.getStoredUser();
+
+    console.log('🔐 Stored token exists:', !!storedToken);
+    console.log('🔐 Stored user exists:', !!storedUser);
+
+    if (storedToken) {
+      // Set token first
+      setToken(storedToken);
+      console.log('🔐 Token set in store');
+
+      // If we have stored user data, set it temporarily
+      if (storedUser) {
+        setUser(storedUser);
+        console.log('🔐 User data restored from localStorage:', storedUser.name);
+      }
+
       try {
-        // Try to get current user data with existing token
-        await refreshUser();
+        // Try to get fresh user data from server
+        console.log('🔐 Fetching fresh user data from server...');
+        const userData = await AuthService.getCurrentUser();
+        setUser(userData);
+        console.log('🔐 Fresh user data loaded:', userData.name);
       } catch (error: any) {
-        console.error("Auth initialization error:", error);
-        
+        console.error("🔐 Auth initialization error:", error);
+
         // Only try to refresh token if we get a 401 error (unauthorized)
         if (error.type === 'unauthorized' || error.status === 401) {
+          console.log('🔐 Attempting token refresh...');
           try {
             const refreshResponse = await AuthService.refreshToken();
             if (refreshResponse.status && refreshResponse.data.token) {
               setToken(refreshResponse.data.token);
+              console.log('🔐 Token refreshed successfully');
               // Retry getting user data with new token
-              await refreshUser();
+              const userData = await AuthService.getCurrentUser();
+              setUser(userData);
+              console.log('🔐 User data loaded after token refresh:', userData.name);
               return;
             }
           } catch (refreshError: any) {
-            console.error("Token refresh failed:", refreshError);
-            // If refresh fails with 404, the endpoint might not exist
-            if (refreshError.type === 'network' && refreshError.message.includes('404')) {
-              console.warn('Refresh token endpoint not available. Clearing authentication.');
-            }
+            console.error("🔐 Token refresh failed:", refreshError);
+            // Clear authentication for any refresh error
+            console.warn('🔐 Token refresh failed. Clearing authentication.');
           }
         }
-        
+
         // Clear invalid authentication
+        console.log('🔐 Clearing invalid authentication data');
         AuthService.clearAuthData();
         setUser(null);
         setToken(null);
       }
+    } else {
+      console.log('🔐 No stored token found');
     }
+
+    console.log('🔐 Authentication initialization complete. Authenticated:', isAuthenticated.value);
   };
 
   /**

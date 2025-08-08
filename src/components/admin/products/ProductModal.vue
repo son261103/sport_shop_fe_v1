@@ -7,10 +7,11 @@
     ></div>
 
     <!-- Modal -->
-    <div class="flex min-h-full items-center justify-center p-2">
+    <div class="flex min-h-full items-center justify-center p-2 sm:p-4">
       <div
-        class="relative bg-white dark:bg-dark-bg-secondary rounded-lg shadow-xl max-w-4xl w-full max-h-[95vh] overflow-y-auto"
+        class="modal-container relative bg-white dark:bg-dark-bg-secondary rounded-lg shadow-xl w-full max-w-4xl max-h-[95vh] overflow-hidden"
       >
+        <div class="overflow-y-auto max-h-[95vh]">
         <!-- Header -->
         <div
           class="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700"
@@ -197,17 +198,34 @@
               <div class="space-y-3">
                 <!-- Upload Input -->
                 <div class="relative">
+                  <!-- Hidden file input -->
                   <input
                     id="image"
                     ref="fileInput"
                     type="file"
                     accept="image/jpeg,image/png,image/jpg,image/gif,image/webp"
                     @change="handleFileChange"
-                    class="form-input file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-light-accent-sport file:text-white hover:file:bg-opacity-90 file:cursor-pointer"
+                    class="hidden"
                   />
-                  <p
-                    class="text-xs text-light-text-muted dark:text-dark-text-muted mt-1"
-                  >
+
+                  <!-- Custom upload button -->
+                  <div class="flex items-center space-x-3">
+                    <label
+                      for="image"
+                      class="custom-file-button"
+                      style="display: inline-flex !important; align-items: center !important; padding: 8px 16px !important; background-color: #10b981 !important; color: white !important; font-size: 14px !important; font-weight: 500 !important; border-radius: 8px !important; cursor: pointer !important; transition: background-color 0.2s ease !important; border: none !important;"
+                    >
+                      <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                      </svg>
+                      Chọn tệp
+                    </label>
+                    <span class="text-sm text-gray-500 dark:text-gray-400">
+                      {{ selectedFileName || "Không có tệp nào được chọn" }}
+                    </span>
+                  </div>
+
+                  <p class="text-xs text-light-text-muted dark:text-dark-text-muted mt-2">
                     JPEG, PNG, JPG, GIF, WEBP. Tối đa 2MB.
                   </p>
                 </div>
@@ -343,6 +361,7 @@
             </button>
           </div>
         </form>
+        </div>
       </div>
     </div>
   </div>
@@ -350,6 +369,8 @@
 
 <script setup lang="ts">
 import { ref, computed, watch, nextTick } from "vue";
+import { useProduct } from "@/composables/useProduct";
+import { useNotification } from "@/composables/useNotification";
 import type { Product, ProductFormData } from "@/types/admin/product";
 import type { Category } from "@/types/admin/category";
 import type { Brand } from "@/types/admin/brand";
@@ -369,16 +390,21 @@ const props = withDefaults(defineProps<Props>(), {
 // Emits
 interface Emits {
   close: [];
-  success: [response: any];
+  success: [product: Product];
 }
 
 const emit = defineEmits<Emits>();
+
+// Use composables
+const { createProduct, updateProduct } = useProduct();
+const toast = useNotification();
 
 // Refs
 const fileInput = ref<HTMLInputElement>();
 const isSubmitting = ref(false);
 const imagePreview = ref<string | null>(null);
 const imageRemoved = ref(false);
+const selectedFileName = ref<string>("");
 
 // Form data
 const formData = ref<ProductFormData>({
@@ -411,9 +437,12 @@ const resetForm = () => {
   };
   imagePreview.value = null;
   imageRemoved.value = false;
+  selectedFileName.value = "";
   if (fileInput.value) {
     fileInput.value.value = "";
   }
+  // Clear any submission state
+  isSubmitting.value = false;
 };
 
 const populateForm = () => {
@@ -438,6 +467,7 @@ const populateForm = () => {
 const removeImage = () => {
   imagePreview.value = null;
   formData.value.image = undefined;
+  selectedFileName.value = "";
   if (fileInput.value) {
     fileInput.value.value = "";
   }
@@ -446,6 +476,7 @@ const removeImage = () => {
 const removeExistingImage = () => {
   imageRemoved.value = true;
   formData.value.image = undefined;
+  selectedFileName.value = "";
   if (fileInput.value) {
     fileInput.value.value = "";
   }
@@ -478,6 +509,7 @@ const handleFileChange = (event: Event) => {
     }
 
     formData.value.image = file;
+    selectedFileName.value = file.name;
 
     // Create preview
     const reader = new FileReader();
@@ -486,6 +518,7 @@ const handleFileChange = (event: Event) => {
     };
     reader.readAsDataURL(file);
   } else {
+    selectedFileName.value = "";
     formData.value.image = undefined;
     imagePreview.value = null;
   }
@@ -501,12 +534,12 @@ const handleSubmit = async () => {
 
   // Validate required fields
   if (!formData.value.name.trim()) {
-    alert("Vui lòng nhập tên sản phẩm");
+    toast.showError("Vui lòng nhập tên sản phẩm");
     return;
   }
 
   if (formData.value.price <= 0) {
-    alert("Giá sản phẩm phải lớn hơn 0");
+    toast.showError("Giá sản phẩm phải lớn hơn 0");
     return;
   }
 
@@ -514,7 +547,7 @@ const handleSubmit = async () => {
     formData.value.discount_price &&
     formData.value.discount_price > formData.value.price
   ) {
-    alert("Giá khuyến mãi không được lớn hơn giá gốc");
+    toast.showError("Giá khuyến mãi không được lớn hơn giá gốc");
     return;
   }
 
@@ -537,9 +570,31 @@ const handleSubmit = async () => {
       submitData.brand_id = undefined;
     }
 
-    emit("success", submitData);
-  } catch (error) {
+    let response;
+    if (isEdit.value && props.product) {
+      // Update existing product
+      response = await updateProduct(props.product.id, submitData);
+      toast.showSuccess("Cập nhật sản phẩm thành công!");
+    } else {
+      // Create new product
+      response = await createProduct(submitData);
+      toast.showSuccess("Tạo sản phẩm thành công!");
+    }
+
+    // Emit success with the created/updated product
+    emit("success", response.data);
+
+    // Close modal after a short delay to ensure success handler completes
+    setTimeout(() => {
+      closeModal();
+    }, 100);
+  } catch (error: any) {
     console.error("Form submission error:", error);
+    if (error.message?.includes('401') || error.message?.includes('Unauthorized')) {
+      toast.showError("Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.");
+    } else {
+      toast.showError(error.message || "Có lỗi xảy ra khi xử lý sản phẩm");
+    }
   } finally {
     isSubmitting.value = false;
   }
@@ -574,21 +629,154 @@ watch(
 <style scoped>
 /* Force dark mode styles for modal forms */
 .form-input,
-input,
+input:not([type="file"]),
 select,
 textarea {
-  background-color: white !important;
-  color: rgb(55 65 81) !important;
-  border-color: rgb(229 231 235) !important;
+  background-color: white;
+  color: rgb(55 65 81);
+  border-color: rgb(229 231 235);
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
 }
 
 :global(.dark) .form-input,
-:global(.dark) input,
+:global(.dark) input:not([type="file"]),
 :global(.dark) select,
 :global(.dark) textarea {
-  background-color: rgb(31 41 55) !important;
-  color: rgb(248 250 252) !important;
-  border-color: rgb(75 85 99) !important;
+  background-color: rgb(31 41 55);
+  color: rgb(248 250 252);
+  border-color: rgb(75 85 99);
+}
+
+.form-input option,
+select option {
+  background-color: white;
+  color: rgb(55 65 81);
+}
+
+:global(.dark) .form-input option,
+:global(.dark) select option {
+  background-color: rgb(31 41 55);
+  color: rgb(248 250 252);
+}
+
+.modal-overlay {
+  transition: background-color 0.2s ease;
+}
+
+.modal-content {
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+:global(.dark) .modal-content {
+  background-color: rgb(31 41 55);
+  border-color: rgb(75 85 99);
+}
+
+/* Prevent horizontal scrolling */
+.modal-container {
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+@media (max-width: 768px) {
+  .modal-container {
+    margin: 0.5rem;
+    max-width: calc(100vw - 1rem);
+  }
+}
+
+/* Custom file input styles */
+.file-input-custom {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  background-color: #ffffff;
+  color: #374151;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.file-input-custom::-webkit-file-upload-button {
+  background-color: #10b981;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 16px;
+  margin-right: 12px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.file-input-custom::-webkit-file-upload-button:hover {
+  background-color: #059669;
+}
+
+.file-input-custom::file-selector-button {
+  background-color: #10b981;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 16px;
+  margin-right: 12px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.file-input-custom::file-selector-button:hover {
+  background-color: #059669;
+}
+
+/* Dark mode */
+:global(.dark) .file-input-custom {
+  background-color: #374151;
+  color: #f9fafb;
+  border-color: #6b7280;
+}
+
+:global(.dark) .file-input-custom::-webkit-file-upload-button {
+  background-color: #059669;
+}
+
+:global(.dark) .file-input-custom::-webkit-file-upload-button:hover {
+  background-color: #047857;
+}
+
+:global(.dark) .file-input-custom::file-selector-button {
+  background-color: #059669;
+}
+
+:global(.dark) .file-input-custom::file-selector-button:hover {
+  background-color: #047857;
+}
+
+/* Custom file button */
+.custom-file-button {
+  display: inline-flex !important;
+  align-items: center !important;
+  padding: 8px 16px !important;
+  background-color: #10b981 !important;
+  color: white !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  border-radius: 8px !important;
+  cursor: pointer !important;
+  transition: background-color 0.2s ease !important;
+  border: none !important;
+}
+
+.custom-file-button:hover {
+  background-color: #059669 !important;
+}
+
+:global(.dark) .custom-file-button {
+  background-color: #059669 !important;
+}
+
+:global(.dark) .custom-file-button:hover {
+  background-color: #047857 !important;
 }
 
 input::placeholder,

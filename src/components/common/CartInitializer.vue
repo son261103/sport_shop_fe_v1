@@ -17,7 +17,10 @@ onMounted(async () => {
       await cartStore.initializeCart();
     } catch (error) {
       console.error('Failed to initialize cart:', error);
+      // Don't throw error, just log it
     }
+  } else {
+    console.log('User not authenticated, skipping cart initialization');
   }
 });
 </script>
