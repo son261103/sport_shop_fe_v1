@@ -5,6 +5,7 @@ import { ref, computed, readonly } from "vue";
 import { AuthService } from '@/services/auth'
 import type { User, LoginRequest, RegisterRequest, AuthError } from '@/types/auth'
 import { ENV } from '@/constants'
+import { useCartStore } from './cart'
 
 // Environment variables
 const AUTH_TOKEN_KEY = ENV.AUTH.TOKEN_KEY
@@ -66,6 +67,16 @@ export const useAuthStore = defineStore("auth", () => {
       if (response.status) {
         setUser(response.data.user);
         setToken(response.data.token);
+        
+        // Initialize cart after successful login
+        try {
+          const cartStore = useCartStore();
+          await cartStore.initializeCart();
+        } catch (cartError) {
+          console.error('Failed to initialize cart after login:', cartError);
+          // Don't fail login if cart initialization fails
+        }
+        
         return true;
       }
 
@@ -99,6 +110,16 @@ export const useAuthStore = defineStore("auth", () => {
       if (response.status) {
         setUser(response.data.user);
         setToken(response.data.token);
+        
+        // Initialize cart after successful registration
+        try {
+          const cartStore = useCartStore();
+          await cartStore.initializeCart();
+        } catch (cartError) {
+          console.error('Failed to initialize cart after registration:', cartError);
+          // Don't fail registration if cart initialization fails
+        }
+        
         return true;
       }
 
@@ -120,7 +141,7 @@ export const useAuthStore = defineStore("auth", () => {
   };
 
   /**
-   * Logout current user
+   * Logout user
    */
   const logout = async (): Promise<void> => {
     setLoading(true);
@@ -135,6 +156,15 @@ export const useAuthStore = defineStore("auth", () => {
       // Clear local state regardless of API response
       setUser(null);
       setToken(null);
+      
+      // Clear cart data on logout
+      try {
+        const cartStore = useCartStore();
+        cartStore.clearCart();
+      } catch (cartError) {
+        console.error('Failed to clear cart during logout:', cartError);
+      }
+      
       setLoading(false);
     }
   };
@@ -168,10 +198,30 @@ export const useAuthStore = defineStore("auth", () => {
    * Initialize authentication state
    */
   const initAuth = async (): Promise<void> => {
-    if (AuthService.isAuthenticated()) {
+    const storedToken = AuthService.getToken();
+    const storedUser = AuthService.getStoredUser();
+    
+    if (storedToken) {
+      // Restore token and user data from localStorage
+      setToken(storedToken);
+      
+      if (storedUser) {
+        setUser(storedUser);
+      }
+      
       try {
-        // Try to get current user data with existing token
+        // Try to refresh user data from server to ensure it's up to date
         await refreshUser();
+        
+        // Initialize cart after successful auth restoration
+        try {
+          const cartStore = useCartStore();
+          await cartStore.initializeCart();
+        } catch (cartError) {
+          console.error('Failed to initialize cart during auth init:', cartError);
+          // Don't fail auth if cart initialization fails
+        }
+        
       } catch (error: any) {
         console.error("Auth initialization error:", error);
         
@@ -183,6 +233,15 @@ export const useAuthStore = defineStore("auth", () => {
               setToken(refreshResponse.data.token);
               // Retry getting user data with new token
               await refreshUser();
+              
+              // Initialize cart after successful token refresh
+              try {
+                const cartStore = useCartStore();
+                await cartStore.initializeCart();
+              } catch (cartError) {
+                console.error('Failed to initialize cart after token refresh:', cartError);
+              }
+              
               return;
             }
           } catch (refreshError: any) {
@@ -192,6 +251,22 @@ export const useAuthStore = defineStore("auth", () => {
               console.warn('Refresh token endpoint not available. Clearing authentication.');
             }
           }
+        }
+        
+        // If we have stored user data but can't refresh from server,
+        // keep the user logged in with cached data (offline mode)
+        if (storedUser && error.type === 'network') {
+          console.warn('Network error during auth init. Using cached user data.');
+          
+          // Initialize cart even in offline mode
+          try {
+            const cartStore = useCartStore();
+            await cartStore.initializeCart();
+          } catch (cartError) {
+            console.error('Failed to initialize cart in offline mode:', cartError);
+          }
+          
+          return;
         }
         
         // Clear invalid authentication

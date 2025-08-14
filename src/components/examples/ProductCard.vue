@@ -108,12 +108,13 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, ref } from "vue";
 import { NIcon } from "naive-ui";
 import { Star, Heart, HeartOutline, CartOutline } from "@vicons/ionicons5";
 import { Button } from "@/components/ui";
 import { useThemeClasses } from "@/composables/useTheme";
 import { useCart } from "@/composables/useCart";
+import { useCartAnimation } from "@/composables/useCartAnimation";
 import type { Product } from "./index";
 
 interface Props {
@@ -133,6 +134,10 @@ const emit = defineEmits<{
 
 const { getTextClass } = useThemeClasses();
 const { addProductToCart } = useCart();
+const { animateToCart } = useCartAnimation();
+
+// Refs
+const addToCartButtonRef = ref<HTMLElement>();
 
 // Computed
 const categoryBadgeClasses = computed(() =>
@@ -196,8 +201,14 @@ const handleClick = () => {
   emit("click", props.product);
 };
 
-const handleAddToCart = async () => {
+const handleAddToCart = async (event: Event) => {
   try {
+    // Trigger animation trước khi thêm vào giỏ hàng
+    const buttonElement = event.currentTarget as HTMLElement;
+    if (buttonElement) {
+      animateToCart(buttonElement);
+    }
+    
     await addProductToCart(parseInt(props.product.id), 1);
     emit("addToCart", props.product);
   } catch (error) {

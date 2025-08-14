@@ -496,6 +496,26 @@ export const api = {
     }> => {
       return api.get(`/products/${id}`);
     },
+
+    // Get all active variants of a product (Public)
+    getVariants: (productId: number): Promise<{
+      success: boolean;
+      message: string;
+      data: Array<{
+        id: number;
+        product_id: number;
+        size: string;
+        color: string;
+        stock_quantity: number;
+        image: string;
+        cloudinary_public_id: string;
+        is_active: boolean;
+        created_at: string;
+        updated_at: string;
+      }>;
+    }> => {
+      return api.get(`/products/${productId}/variants`);
+    },
   },
 
   // Product CRUD operations (Admin)

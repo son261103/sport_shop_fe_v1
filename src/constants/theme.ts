@@ -26,9 +26,9 @@ export const SPORT_THEME: ThemeConfig = {
   },
   dark: {
     bg: {
-      primary: '#121212',
-      secondary: '#1E1E1E',
-      tertiary: '#0A0F0D',
+      primary: '#000000',
+      secondary: '#000000',
+      tertiary: '#000000',
     },
     text: {
       primary: '#F8F9FA',

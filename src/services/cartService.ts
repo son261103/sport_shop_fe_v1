@@ -12,7 +12,7 @@ import type {
 import { apiClient } from './api';
 
 export class CartService {
-  private static readonly BASE_URL = '/api/cart';
+  private static readonly BASE_URL = '/cart';
 
   /**
    * Get user's cart

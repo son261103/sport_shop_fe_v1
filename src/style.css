@@ -59,8 +59,8 @@
 
 /* Dark Mode Variables */
 .dark {
-  --bg-primary: #121212;
-  --bg-secondary: #1e1e1e;
+  --bg-primary: #000000;
+  --bg-secondary: #000000;
   --text-primary: #f8f9fa;
   --text-secondary: #e9ecef;
   --text-muted: #6c757d;
@@ -218,7 +218,7 @@
 
   /* 🌟 Gradient Background Classes */
   .bg-gradient-page {
-    @apply bg-white dark:bg-gray-900;
+    @apply bg-white dark:bg-black;
   }
 
   .btn-secondary {

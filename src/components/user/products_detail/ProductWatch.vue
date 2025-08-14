@@ -27,91 +27,12 @@
               class="animate-slide-up"
               :style="{ 'animation-delay': `${index * 0.1}s` }"
             >
-              <div class="card group cursor-pointer overflow-hidden hover:shadow-2xl transition-all duration-500 transform hover:scale-105 glow-sport bg-light-bg-secondary/90 dark:bg-dark-bg-secondary/90 backdrop-blur-xl border-2 border-light-border-secondary dark:border-dark-border-secondary hover:border-light-accent-sport dark:hover:border-dark-accent-sport"
-                   @click="navigateToProduct(product)">
-                <!-- Product Image -->
-                <div class="relative overflow-hidden">
-                  <img
-                    :src="product.image"
-                    :alt="product.name"
-                    class="w-full h-48 object-cover transition-all duration-500 group-hover:scale-110"
-                  />
-                  <!-- Discount Badge -->
-                  <div
-                    v-if="product.originalPrice && product.price"
-                    class="absolute top-3 left-3 bg-gradient-to-r from-red-500 to-red-600 text-white px-2 py-1 rounded-full text-xs font-bold shadow-lg animate-pulse"
-                  >
-                    -{{ Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100) }}%
-                  </div>
-                  <!-- Stock Status -->
-                  <div
-                    v-if="!product.inStock"
-                    class="absolute top-3 right-3 bg-gray-900/80 text-white px-2 py-1 rounded-full text-xs font-medium backdrop-blur-sm"
-                  >
-                    Hết hàng
-                  </div>
-                </div>
-
-                <!-- Product Info -->
-                <div class="p-4 space-y-3">
-                  <!-- Product Name -->
-                  <h3 class="font-semibold text-light-text-primary dark:text-dark-text-primary line-clamp-2 group-hover:text-light-accent-sport dark:group-hover:text-dark-accent-sport transition-colors duration-300">
-                    {{ product.name }}
-                  </h3>
-
-                  <!-- Brand -->
-                  <p v-if="product.brand" class="text-sm text-light-text-secondary dark:text-dark-text-secondary">
-                    {{ product.brand }}
-                  </p>
-
-                  <!-- Rating -->
-                  <div class="flex items-center gap-2">
-                    <div class="flex items-center gap-1">
-                      <i v-for="star in 5" :key="star" 
-                         :class="star <= Math.floor(product.rating || 0) ? 'fas fa-star text-yellow-500' : star <= (product.rating || 0) ? 'fas fa-star-half-alt text-yellow-500' : 'far fa-star text-gray-300'"
-                         class="text-sm"></i>
-                    </div>
-                    <span class="text-sm text-light-text-secondary dark:text-dark-text-secondary">
-                      ({{ product.reviews || 0 }})
-                    </span>
-                  </div>
-
-                  <!-- Price -->
-                  <div class="flex items-center justify-between">
-                    <div class="space-y-1">
-                      <div class="flex items-center gap-2">
-                        <span class="text-lg font-bold text-gradient-sport-animated animate-gradient-x">
-                          {{ formatPrice(product.price) }}
-                        </span>
-                        <span
-                          v-if="product.originalPrice"
-                          class="text-sm text-light-text-muted dark:text-dark-text-muted line-through"
-                        >
-                          {{ formatPrice(product.originalPrice) }}
-                        </span>
-                      </div>
-                    </div>
-                    
-                    <!-- Action Buttons -->
-                    <div class="flex items-center gap-2">
-                      <button
-                        @click.stop="toggleWishlist(product)"
-                        class="p-2 rounded-full bg-light-bg-primary dark:bg-dark-bg-primary border border-light-border-primary dark:border-dark-border-primary hover:border-light-accent-sport dark:hover:border-dark-accent-sport transition-all duration-300 hover:scale-110 shadow-sm hover:shadow-sport"
-                        :class="isInWishlist(product.id) ? 'text-red-500' : 'text-light-text-secondary dark:text-dark-text-secondary'"
-                      >
-                        <i :class="isInWishlist(product.id) ? 'fas fa-heart' : 'far fa-heart'" class="text-sm"></i>
-                      </button>
-                      <button
-                        @click.stop="addToCart(product)"
-                        :disabled="!product.inStock"
-                        class="p-2 rounded-full bg-gradient-to-r from-light-accent-sport to-light-accent-info dark:from-dark-accent-sport dark:to-dark-accent-info text-white hover:shadow-sport transition-all duration-300 hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed shadow-sport"
-                      >
-                        <i class="fas fa-shopping-cart text-sm"></i>
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <ProductCard
+                :product="product"
+                @click="navigateToProduct"
+                @add-to-cart="addToCart"
+                @toggle-favorite="toggleWishlist"
+              />
             </div>
           </div>
 
@@ -130,18 +51,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
-import type { Product } from "@/types/sport";
-
-// Props
-interface Props {
-  relatedProducts: Product[];
-}
-
-const props = withDefaults(defineProps<Props>(), {
-  relatedProducts: () => []
-});
+import ProductCard from '@/components/examples/ProductCard.vue';
+import type { Product as CardProduct } from "@/components/examples";
 
 // Router
 const router = useRouter();
@@ -149,23 +62,83 @@ const router = useRouter();
 // Wishlist state
 const wishlist = ref<string[]>([]);
 
-// Methods
-const formatPrice = (price: number) => {
-  return new Intl.NumberFormat("vi-VN", {
-    style: "currency",
-    currency: "VND",
-  }).format(price);
+// Related products state
+const relatedProducts = ref<CardProduct[]>([]);
+
+// Generate sample products for recently viewed
+const generateRecentlyViewedProducts = (): CardProduct[] => {
+  const products = [
+    {
+      id: '1',
+      name: 'Nike Air Max 270',
+      price: 120,
+      originalPrice: 150,
+      image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=300&h=300&fit=crop',
+      category: 'Running',
+      brand: 'Nike',
+      rating: 4.5,
+      reviews: 39,
+      inStock: true,
+      isFavorite: false,
+      description: 'Comfortable running shoes with excellent cushioning'
+    },
+    {
+      id: '2',
+      name: 'Adidas Ultraboost 22',
+      price: 180,
+      originalPrice: 220,
+      image: 'https://images.unsplash.com/photo-1549298916-b41d501d3772?w=300&h=300&fit=crop',
+      category: 'Running',
+      brand: 'Adidas',
+      rating: 4.8,
+      reviews: 156,
+      inStock: true,
+      isFavorite: false,
+      description: 'Revolutionary running shoes with boost technology'
+    },
+    {
+      id: '3',
+      name: 'Nike Pro Training T-Shirt',
+      price: 35,
+      originalPrice: 45,
+      image: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=300&h=300&fit=crop',
+      category: 'Training',
+      brand: 'Nike',
+      rating: 4.5,
+      reviews: 71,
+      inStock: true,
+      isFavorite: true,
+      description: 'Premium training t-shirt with moisture-wicking technology'
+    },
+    {
+      id: '4',
+      name: 'Puma Football Jersey',
+      price: 45,
+      originalPrice: 60,
+      image: 'https://images.unsplash.com/photo-1551698618-1dfe5d97d256?w=300&h=300&fit=crop',
+      category: 'Football',
+      brand: 'Puma',
+      rating: 4.2,
+      reviews: 89,
+      inStock: true,
+      isFavorite: false,
+      description: 'Official team jersey with moisture-wicking fabric'
+    }
+  ];
+  
+  return products;
 };
 
-const navigateToProduct = (product: Product) => {
+onMounted(() => {
+  relatedProducts.value = generateRecentlyViewedProducts();
+});
+
+// Methods
+const navigateToProduct = (product: CardProduct) => {
   router.push(`/products/${product.id}`);
 };
 
-const isInWishlist = (productId: string) => {
-  return wishlist.value.includes(productId);
-};
-
-const toggleWishlist = (product: Product) => {
+const toggleWishlist = (product: CardProduct) => {
   const index = wishlist.value.indexOf(product.id);
   if (index > -1) {
     wishlist.value.splice(index, 1);
@@ -177,7 +150,7 @@ const toggleWishlist = (product: Product) => {
   console.log('Wishlist updated:', wishlist.value);
 };
 
-const addToCart = (product: Product) => {
+const addToCart = (product: CardProduct) => {
   if (!product.inStock) {
     alert('Sản phẩm hiện đang hết hàng');
     return;

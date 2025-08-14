@@ -6,6 +6,7 @@
       @mouseleave="startHideTimer"
       class="header-icon p-1.5 text-light-text-secondary dark:text-dark-text-secondary transition-colors relative"
       :class="{ 'text-light-accent-sport dark:text-dark-accent-sport active-icon': isOpen }"
+      data-cart-icon
     >
       <n-badge :value="cartItemCount" :max="99" :show-zero="false" :offset="[2, 2]" processing>
         <n-icon size="22">
@@ -41,9 +42,14 @@
           <CartOutline />
         </n-icon>
         <p class="text-light-text-secondary dark:text-dark-text-secondary mb-4">Giỏ hàng của bạn đang trống</p>
-        <n-button size="small" @click="closeCart" class="btn-primary">
-          Tiếp tục mua sắm
-        </n-button>
+        <div class="flex gap-2 justify-center">
+          <n-button size="small" @click="loadSampleData" class="btn-secondary">
+            Tải dữ liệu mẫu
+          </n-button>
+          <n-button size="small" @click="closeCart" class="btn-primary">
+            Tiếp tục mua sắm
+          </n-button>
+        </div>
       </div>
 
       <!-- Cart Items -->
@@ -130,15 +136,17 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onBeforeUnmount } from 'vue'
+import { ref, computed, onBeforeUnmount, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { NIcon, NBadge, NButton } from 'naive-ui'
 import { CartOutline, CloseOutline, TrashOutline, AddOutline, RemoveOutline } from '@vicons/ionicons5'
 import { useCartStore } from '@/stores/cart'
 import { useCartNotifications } from '@/composables/useCartNotifications'
+import { useAuthStore } from '@/stores/auth'
 
 // Store and composables
 const cartStore = useCartStore()
+const authStore = useAuthStore()
 const router = useRouter()
 const { updateCartItemWithNotification, removeFromCartWithNotification } = useCartNotifications()
 
@@ -147,10 +155,10 @@ const isOpen = ref(false)
 const hideTimer = ref<number | null>(null)
 
 // Computed properties from store
-const cartItems = computed(() => cartStore.items)
-const cartItemCount = computed(() => cartStore.cartCount)
-const cartTotal = computed(() => cartStore.totalPrice)
-const isLoading = computed(() => cartStore.isLoading)
+const cartItems = computed(() => cartStore.items || [])
+const cartItemCount = computed(() => cartStore.cartCount || 0)
+const cartTotal = computed(() => cartStore.totalPrice || 0)
+const isLoading = computed(() => cartStore.isLoading || false)
 
 // Methods
 const showCart = () => {
@@ -189,6 +197,12 @@ const removeItem = async (itemId: number) => {
   await removeFromCartWithNotification(itemId)
 }
 
+const loadSampleData = () => {
+  cartStore.addSampleData()
+  // Optional: show a notification
+  console.log('Đã tải dữ liệu mẫu vào giỏ hàng')
+}
+
 const viewCart = () => {
   router.push('/cart')
   closeCart()
@@ -202,6 +216,32 @@ const checkout = () => {
 const formatPrice = (price: number) => {
   return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price)
 }
+
+// Initialize cart on mount and auto-load sample data if empty
+onMounted(async () => {
+  await cartStore.initializeCart()
+  if (cartItems.value.length === 0) {
+    loadSampleData()
+  }
+})
+
+// Watch for auth state changes and refresh cart
+watch(
+  () => authStore.isAuthenticated,
+  async (isAuthenticated, wasAuthenticated) => {
+    // Only refresh if auth state actually changed
+    if (isAuthenticated !== wasAuthenticated) {
+      if (isAuthenticated) {
+        // User just logged in - initialize cart
+        await cartStore.initializeCart()
+      } else {
+        // User just logged out - clear cart
+        cartStore.clearCart()
+      }
+    }
+  },
+  { immediate: false }
+)
 
 // Cleanup timer on unmount
 onBeforeUnmount(() => {

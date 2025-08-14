@@ -15,6 +15,19 @@ export interface PublicProductsParams {
   sort_order?: 'asc' | 'desc';
 }
 
+export interface ProductVariant {
+  id: number;
+  product_id: number;
+  size: string;
+  color: string;
+  stock_quantity: number;
+  image: string;
+  cloudinary_public_id: string;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface PublicProduct {
   id: number;
   name: string;
@@ -38,6 +51,7 @@ export interface PublicProduct {
     name: string;
     description?: string;
   };
+  variants?: ProductVariant[];
 }
 
 export interface PublicProductsResponse {
@@ -78,8 +92,11 @@ export function usePublicProducts() {
   // Reactive state
   const products = ref<PublicProduct[]>([]);
   const selectedProduct = ref<PublicProduct | null>(null);
+  const productVariants = ref<ProductVariant[]>([]);
   const isLoading = ref(false);
+  const isLoadingVariants = ref(false);
   const error = ref<string | null>(null);
+  const variantsError = ref<string | null>(null);
   const paginationData = ref<PublicProductsResponse['data'] | null>(null);
 
   // Search and filter state
@@ -177,6 +194,8 @@ export function usePublicProducts() {
     try {
       const response = await api.publicProducts.getById(id);
       selectedProduct.value = response.data;
+      // After fetching product, fetch its variants
+      await fetchProductVariants(id);
       return response.data;
     } catch (err: any) {
       error.value = err.message || 'Failed to fetch product';
@@ -184,6 +203,30 @@ export function usePublicProducts() {
       throw err;
     } finally {
       isLoading.value = false;
+    }
+  };
+  
+  // Fetch product variants
+  const fetchProductVariants = async (productId: number) => {
+    isLoadingVariants.value = true;
+    variantsError.value = null;
+    
+    try {
+      const response = await api.publicProducts.getVariants(productId);
+      productVariants.value = response.data;
+      
+      // Add variants to the selected product
+      if (selectedProduct.value && selectedProduct.value.id === productId) {
+        selectedProduct.value.variants = response.data;
+      }
+      
+      return response.data;
+    } catch (err: any) {
+      variantsError.value = err.message || 'Failed to fetch product variants';
+      console.error('Error fetching product variants:', err);
+      // Don't show error notification for variants as it's not critical
+    } finally {
+      isLoadingVariants.value = false;
     }
   };
 
@@ -262,8 +305,11 @@ export function usePublicProducts() {
     // State
     products: readonly(products),
     selectedProduct: readonly(selectedProduct),
+    productVariants: readonly(productVariants),
     isLoading: readonly(isLoading),
+    isLoadingVariants: readonly(isLoadingVariants),
     error: readonly(error),
+    variantsError: readonly(variantsError),
     paginationData: readonly(paginationData),
     
     // Filter state
@@ -287,6 +333,7 @@ export function usePublicProducts() {
     // Methods
     fetchProducts,
     fetchProduct,
+    fetchProductVariants,
     searchProducts,
     filterByCategory,
     filterByBrand,

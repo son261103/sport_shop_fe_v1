@@ -10,7 +10,7 @@ export default {
         light: {
           bg: {
             primary: "#F8F9FA", // Nền chính - Trắng ngà
-            secondary: "#E9ECEF", // Nền phụ/card - Xám nhạt
+            secondary: "#F9FCFF", // Nền phụ/card - Trắng xanh nhạt
           },
           text: {
             primary: "#212529", // Chữ chính - Xám đậm/đen
@@ -32,9 +32,9 @@ export default {
         // Dark Mode Colors
         dark: {
           bg: {
-            primary: "#121212", // Nền chính - Gần đen
-            secondary: "#1E1E1E", // Nền phụ/card - Xám đậm
-            tertiary: "#0A0F0D", // Nền xanh đen
+            primary: "#000000", // Nền chính - Đen hoàn toàn
+            secondary: "#000000", // Nền phụ/card - Đen hoàn toàn
+            tertiary: "#000000", // Nền xanh đen - Đen hoàn toàn
           },
           text: {
             primary: "#F8F9FA", // Chữ chính - Trắng

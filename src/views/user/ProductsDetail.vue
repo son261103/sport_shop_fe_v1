@@ -120,7 +120,8 @@ const product = computed(() => {
     inStock: apiProduct.stock_quantity > 0,
     stock: apiProduct.stock_quantity,
     discount: originalPrice ? Math.round(((originalPrice - currentPrice) / originalPrice) * 100) : 0,
-    sku: `SP${apiProduct.id.toString().padStart(6, '0')}`
+    sku: `SP${apiProduct.id.toString().padStart(6, '0')}`,
+    variants: [...(apiProduct.variants || [])]
   };
 });
 
