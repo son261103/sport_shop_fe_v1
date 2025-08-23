@@ -42,10 +42,7 @@
           <CartOutline />
         </n-icon>
         <p class="text-light-text-secondary dark:text-dark-text-secondary mb-4">Giỏ hàng của bạn đang trống</p>
-        <div class="flex gap-2 justify-center">
-          <n-button size="small" @click="loadSampleData" class="btn-secondary">
-            Tải dữ liệu mẫu
-          </n-button>
+        <div class="flex justify-center">
           <n-button size="small" @click="closeCart" class="btn-primary">
             Tiếp tục mua sắm
           </n-button>
@@ -197,11 +194,7 @@ const removeItem = async (itemId: number) => {
   await removeFromCartWithNotification(itemId)
 }
 
-const loadSampleData = () => {
-  cartStore.addSampleData()
-  // Optional: show a notification
-  console.log('Đã tải dữ liệu mẫu vào giỏ hàng')
-}
+
 
 const viewCart = () => {
   router.push('/cart')
@@ -217,12 +210,9 @@ const formatPrice = (price: number) => {
   return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price)
 }
 
-// Initialize cart on mount and auto-load sample data if empty
+// Initialize cart on mount without auto-loading sample data
 onMounted(async () => {
   await cartStore.initializeCart()
-  if (cartItems.value.length === 0) {
-    loadSampleData()
-  }
 })
 
 // Watch for auth state changes and refresh cart

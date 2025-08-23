@@ -597,8 +597,12 @@ const isSelected = (id: number) => {
   return props.selectedIds.includes(id);
 };
 
-const handleBulkDelete = () => {
-  emit("bulk-delete");
+const handleBulkDelete = async () => {
+  try {
+    emit("bulk-delete");
+  } catch (error) {
+    console.error("Bulk delete error:", error);
+  }
 };
 
 const handleEdit = (product: Product) => {

@@ -184,6 +184,9 @@ const validationErrors = ref<Record<string, string>>({});
 const provinceSearchText = ref('');
 const showProvinceDropdown = ref(false);
 
+// District search functionality
+const districtSearchText = ref('');
+
 // Computed for filtered provinces
 const filteredProvinces = computed(() => {
   if (!provinceSearchText.value.trim()) {
@@ -363,6 +366,13 @@ const hideProvinceDropdown = () => {
 watch(() => props.deliveryInfo.province, (newProvince) => {
   if (newProvince && newProvince !== provinceSearchText.value) {
     provinceSearchText.value = newProvince;
+  }
+});
+
+// Watch for changes in district to update search text
+watch(() => props.deliveryInfo.district, (newDistrict) => {
+  if (newDistrict && newDistrict !== districtSearchText.value) {
+    districtSearchText.value = newDistrict;
   }
 });
 </script>

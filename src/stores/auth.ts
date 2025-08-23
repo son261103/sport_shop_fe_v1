@@ -173,7 +173,7 @@ export const useAuthStore = defineStore("auth", () => {
    * Refresh current user data
    */
   const refreshUser = async (): Promise<void> => {
-    if (!isAuthenticated.value) return;
+    if (!token.value) return;
 
     setLoading(true);
     clearError();
@@ -223,14 +223,16 @@ export const useAuthStore = defineStore("auth", () => {
         }
         
       } catch (error: any) {
-        console.error("Auth initialization error:", error);
-        
+        console.error("🔐 Auth initialization error:", error);
+
         // Only try to refresh token if we get a 401 error (unauthorized)
         if (error.type === 'unauthorized' || error.status === 401) {
+          console.log('🔐 Attempting token refresh...');
           try {
             const refreshResponse = await AuthService.refreshToken();
             if (refreshResponse.status && refreshResponse.data.token) {
               setToken(refreshResponse.data.token);
+              console.log('🔐 Token refreshed successfully');
               // Retry getting user data with new token
               await refreshUser();
               
@@ -245,11 +247,9 @@ export const useAuthStore = defineStore("auth", () => {
               return;
             }
           } catch (refreshError: any) {
-            console.error("Token refresh failed:", refreshError);
-            // If refresh fails with 404, the endpoint might not exist
-            if (refreshError.type === 'network' && refreshError.message.includes('404')) {
-              console.warn('Refresh token endpoint not available. Clearing authentication.');
-            }
+            console.error("🔐 Token refresh failed:", refreshError);
+            // Clear authentication for any refresh error
+            console.warn('🔐 Token refresh failed. Clearing authentication.');
           }
         }
         
@@ -270,11 +270,16 @@ export const useAuthStore = defineStore("auth", () => {
         }
         
         // Clear invalid authentication
+        console.log('🔐 Clearing invalid authentication data');
         AuthService.clearAuthData();
         setUser(null);
         setToken(null);
       }
+    } else {
+      console.log('🔐 No stored token found');
     }
+
+    console.log('🔐 Authentication initialization complete. Authenticated:', isAuthenticated.value);
   };
 
   /**

@@ -227,6 +227,7 @@
     <ProductTable
       :products="products"
       :is-loading="isLoading"
+      :is-deleting="isDeleting"
       :selected-ids="selectedIds"
       :sort-by="sortBy"
       :sort-order="sortOrder"
@@ -237,7 +238,7 @@
       @toggle-status="toggleProductStatus"
       @toggle-selection="toggleSelection"
       @select-all="selectAll"
-      @bulk-delete="bulkDeleteProducts"
+      @bulk-delete="handleBulkDelete"
       @manage-variants="openVariantModal"
       @sort="handleSort"
     />
@@ -346,6 +347,7 @@ const clearAllFilters = () => {
 // Modal state
 const isModalOpen = ref(false);
 const selectedProduct = ref<Product | null>(null);
+const isDeleting = ref(false);
 
 // Variant Modal state
 const isVariantModalOpen = ref(false);
@@ -362,10 +364,27 @@ const closeModal = () => {
   selectedProduct.value = null;
 };
 
-const handleProductSuccess = () => {
-  loadProducts();
-  closeModal();
-  toast.showSuccess("Thao tác thành công!");
+const handleProductSuccess = (product: Product) => {
+  // Update the products list immediately without reloading
+  if (selectedProduct.value) {
+    // Update existing product
+    const index = products.value.findIndex(p => p.id === selectedProduct.value!.id);
+    if (index !== -1) {
+      products.value[index] = product;
+      toast.showSuccess("Cập nhật sản phẩm thành công!");
+    }
+  } else {
+    // Add new product to the beginning of the list
+    products.value.unshift(product);
+    // Update total count
+    if (paginationData.value) {
+      paginationData.value.total += 1;
+    }
+    toast.showSuccess("Thêm sản phẩm mới thành công!");
+  }
+
+  // Trigger reactivity by calling loadProducts if needed
+  // The modal component will handle closing
 };
 
 const openAddModal = () => {
@@ -390,7 +409,41 @@ const handleVariantSuccess = () => {
 
 // Handle view product details
 const handleViewDetail = (id: number) => {
-  router.push(`/admin/products/${id}`);
+  try {
+    router.push(`/admin/products/${id}`);
+  } catch (error) {
+    console.error('Navigation error:', error);
+    toast.showError('Không thể điều hướng đến trang chi tiết sản phẩm');
+  }
+};
+
+// Handle bulk delete with error handling
+const handleBulkDelete = async () => {
+  if (selectedIds.value.length === 0) {
+    toast.showError("Vui lòng chọn ít nhất một sản phẩm để xóa");
+    return;
+  }
+
+  const confirmed = await toast.showConfirm(
+    "Xác nhận xóa sản phẩm",
+    `Bạn có chắc chắn muốn xóa ${selectedIds.value.length} sản phẩm đã chọn? Hành động này không thể hoàn tác.`,
+    "Xóa tất cả",
+    "Hủy"
+  );
+
+  if (!confirmed) {
+    return;
+  }
+
+  try {
+    isDeleting.value = true;
+    await bulkDeleteProducts();
+  } catch (error: any) {
+    console.error('Bulk delete error in component:', error);
+    // Error is already handled in the composable
+  } finally {
+    isDeleting.value = false;
+  }
 };
 
 // Watch for filter and sort changes
@@ -417,27 +470,51 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-/* Force dark mode styles for this component */
+/* Light and Dark mode styles for this component */
+.admin-page {
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
 .admin-page select {
-  background-color: white !important;
-  color: rgb(55 65 81) !important;
-  border-color: rgb(229 231 235) !important;
+  background-color: white;
+  color: rgb(55 65 81);
+  border-color: rgb(229 231 235);
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
 }
 
 :global(.dark) .admin-page select {
-  background-color: rgb(31 41 55) !important;
-  color: rgb(248 250 252) !important;
-  border-color: rgb(75 85 99) !important;
+  background-color: rgb(31 41 55);
+  color: rgb(248 250 252);
+  border-color: rgb(75 85 99);
 }
 
 .admin-page select option {
-  background-color: white !important;
-  color: rgb(55 65 81) !important;
+  background-color: white;
+  color: rgb(55 65 81);
 }
 
 :global(.dark) .admin-page select option {
-  background-color: rgb(31 41 55) !important;
-  color: rgb(248 250 252) !important;
+  background-color: rgb(31 41 55);
+  color: rgb(248 250 252);
+}
+
+.admin-page input {
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+:global(.dark) .admin-page input {
+  background-color: rgb(31 41 55);
+  color: rgb(248 250 252);
+  border-color: rgb(75 85 99);
+}
+
+.admin-page .card {
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+:global(.dark) .admin-page .card {
+  background-color: rgb(31 41 55);
+  border-color: rgb(75 85 99);
 }
 
 .admin-page input {

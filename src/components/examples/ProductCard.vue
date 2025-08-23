@@ -108,7 +108,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed } from "vue";
 import { NIcon } from "naive-ui";
 import { Star, Heart, HeartOutline, CartOutline } from "@vicons/ionicons5";
 import { Button } from "@/components/ui";
@@ -136,8 +136,7 @@ const { getTextClass } = useThemeClasses();
 const { addProductToCart } = useCart();
 const { animateToCart } = useCartAnimation();
 
-// Refs
-const addToCartButtonRef = ref<HTMLElement>();
+
 
 // Computed
 const categoryBadgeClasses = computed(() =>

@@ -38,6 +38,16 @@ import type {
   RegisterRequest,
   User,
 } from "../types/auth";
+import type {
+  CartResponse,
+  AddToCartRequest,
+  AddToCartResponse,
+  UpdateCartItemRequest,
+  UpdateCartItemResponse,
+  RemoveFromCartResponse,
+  CartCountResponse,
+  ClearCartResponse
+} from "../types/cart";
 import { useLoading } from "../composables/useLoading";
 import { ENV } from "@/constants";
 
@@ -191,17 +201,15 @@ apiClient.interceptors.response.use(
         // Clear retry attempts and auth data
         retryAttempts.delete(requestKey);
         
-        // Only clear auth data if it's not a 404 (endpoint not found)
-        if (!refreshError.message?.includes('404')) {
-          localStorage.removeItem(AUTH_TOKEN_KEY);
-        }
-        
+        // Clear auth data for any refresh error
+        localStorage.removeItem(AUTH_TOKEN_KEY);
+        localStorage.removeItem("user_data");
+
         // Log appropriate error message
-        if (refreshError.message?.includes('404')) {
-          console.warn("Refresh token endpoint not available (404). Skipping token refresh.");
+        if (refreshError.response?.status === 404) {
+          console.warn("Refresh token endpoint not available (404). Clearing authentication.");
         } else {
           console.error("Authentication error - token refresh failed. Please login again.");
-          localStorage.removeItem(AUTH_TOKEN_KEY);
         }
         
         throw {
@@ -594,15 +602,160 @@ export const api = {
     bulkDelete: (
       data: ProductBulkDeleteRequest
     ): Promise<{ status: boolean; message: string }> => {
-      return api.delete<{ status: boolean; message: string }>(
-        "/admin/products/bulk-delete",
-        { data }
-      );
+      // Validate data before sending
+      if (!data.ids || data.ids.length === 0) {
+        throw new Error("Không có ID sản phẩm để xóa");
+      }
+
+      return apiClient
+        .delete<{ status: boolean; message: string }>("/admin/products/bulk-delete", {
+          data,
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        })
+        .then((response: AxiosResponse) => {
+          console.log("🗑️ API: Bulk delete success response:", response.data);
+          return response.data;
+        })
+        .catch((error) => {
+          console.error("🗑️ API: Bulk delete error details:");
+          console.error("🗑️ API: Error status:", error.response?.status);
+          console.error("🗑️ API: Error data:", error.response?.data);
+          console.error("🗑️ API: Error headers:", error.response?.headers);
+          console.error("🗑️ API: Request config:", error.config);
+
+          // Enhanced error handling
+          if (error.response?.status === 404) {
+            if (error.response?.data?.message === "Product not found") {
+              throw new Error("Một hoặc nhiều sản phẩm không tồn tại trong hệ thống");
+            } else {
+              throw new Error("Endpoint xóa hàng loạt không tồn tại trên server");
+            }
+          } else if (error.response?.status === 401) {
+            throw new Error("Phiên đăng nhập đã hết hạn");
+          } else if (error.response?.status === 403) {
+            throw new Error("Không có quyền thực hiện thao tác này");
+          }
+
+          throw error;
+        });
     },
 
     // Toggle product active status
     toggleStatus: (id: number): Promise<ProductResponse> => {
       return api.put<ProductResponse>(`/admin/products/${id}/toggle-status`);
+    },
+  },
+
+  // Cart operations
+  cart: {
+    // Get cart items
+    getCart: (): Promise<CartResponse> => {
+      return api.get<CartResponse>("/cart");
+    },
+    // Add item to cart
+    addToCart: (request: AddToCartRequest): Promise<AddToCartResponse> => {
+      return api.post<AddToCartResponse>("/cart/add", request);
+    },
+    // Update cart item quantity
+    updateCartItem: (itemId: number, request: UpdateCartItemRequest): Promise<UpdateCartItemResponse> => {
+      return api.put<UpdateCartItemResponse>(`/cart/${itemId}`, request);
+    },
+    // Remove item from cart
+    removeFromCart: (itemId: number): Promise<RemoveFromCartResponse> => {
+      return api.delete<RemoveFromCartResponse>(`/cart/${itemId}`);
+    },
+    // Clear all cart items
+    clearCart: (): Promise<ClearCartResponse> => {
+      return api.delete<ClearCartResponse>("/cart");
+    },
+    // Get cart count
+    getCartCount: (): Promise<CartCountResponse> => {
+      return api.get<CartCountResponse>("/cart/count");
+    },
+  },
+
+  // Orders API
+  orders: {
+    // Create new order from cart
+    createOrder: (data: {
+      shipping_address: string;
+      shipping_city: string;
+      shipping_district: string;
+      shipping_ward: string;
+      shipping_phone: string;
+      payment_method: string;
+      notes?: string;
+      discount_amount?: number;
+    }): Promise<{
+      success: boolean;
+      message: string;
+      data: {
+        id: number;
+        user_id: number;
+        user: {
+          id: number;
+          name: string;
+          email: string;
+          role: string;
+          created_at: string;
+          updated_at: string;
+        };
+        total_price: number;
+        shipping_fee: number;
+        discount_amount: number;
+        final_total: number;
+        status: string;
+        payment_method: string;
+        payment_status: string;
+        transaction_id: string;
+        paid_at: string;
+        shipping_address: string;
+        shipping_city: string;
+        shipping_district: string;
+        shipping_ward: string;
+        shipping_phone: string;
+        notes: string;
+        sepay_reference_code: string;
+        order_details: Array<{
+          id: number;
+          order_id: number;
+          product_id: number;
+          product: {
+            id: number;
+            name: string;
+            price: number;
+            discount_price: number;
+            description: string;
+            image: string;
+            cloudinary_public_id: string;
+            stock_quantity: number;
+            is_active: boolean;
+            category_id: number;
+            brand_id: number;
+            category: {
+              id: number;
+              name: string;
+            };
+            brand: {
+              id: number;
+              name: string;
+            };
+            created_at: string;
+            updated_at: string;
+          };
+          quantity: number;
+          price: number;
+          total: number;
+          created_at: string;
+          updated_at: string;
+        }>;
+        created_at: string;
+        updated_at: string;
+      };
+    }> => {
+      return api.post("/orders", data);
     },
   },
 };

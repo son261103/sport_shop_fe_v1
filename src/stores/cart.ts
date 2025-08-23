@@ -30,16 +30,45 @@ export const useCartStore = defineStore('cart', () => {
     try {
       isLoading.value = true;
       const response = await CartService.getCart();
-      
-      items.value = response.data.items;
-      totalItems.value = response.data.total_items;
-      totalPrice.value = response.data.total_price;
-      subtotal.value = response.data.subtotal;
-      shippingFee.value = response.data.shipping_fee;
-      discountAmount.value = response.data.discount_amount;
-      
-    } catch (error) {
+
+      if (response && response.data) {
+        // Handle the API response structure with cart_items
+        const cartItems = response.data.cart_items || [];
+        
+        // Transform cart_items to match our CartItem interface
+        items.value = cartItems.map((item: any) => ({
+          id: item.id,
+          product_id: item.product_id,
+          product_name: item.product?.name || '',
+          product_image: item.product?.image || '',
+          product_price: parseFloat(item.product?.discount_price || item.product?.price || '0'),
+          quantity: item.quantity,
+          total_price: parseFloat(item.product?.discount_price || item.product?.price || '0') * item.quantity,
+          variant_id: item.variant_id,
+          variant_name: item.variant_name,
+          variant_image: item.variant_image,
+          variant_price: item.variant_price,
+          created_at: item.created_at,
+          updated_at: item.updated_at
+        }));
+        
+        // Calculate totals from cart items
+        totalItems.value = cartItems.reduce((sum: number, item: any) => sum + item.quantity, 0);
+        totalPrice.value = items.value.reduce((sum, item) => sum + item.total_price, 0);
+        subtotal.value = totalPrice.value;
+        shippingFee.value = response.data.shipping_fee || 0;
+        discountAmount.value = response.data.discount_amount || 0;
+      }
+
+    } catch (error: any) {
       console.error('Error fetching cart:', error);
+      // Reset to default values on error
+      items.value = [];
+      totalItems.value = 0;
+      totalPrice.value = 0;
+      subtotal.value = 0;
+      shippingFee.value = 0;
+      discountAmount.value = 0;
     } finally {
       isLoading.value = false;
     }
@@ -134,10 +163,14 @@ export const useCartStore = defineStore('cart', () => {
   const getCartCount = async () => {
     try {
       const response = await CartService.getCartCount();
-      totalItems.value = response.data.count;
-      return response.data.count;
-    } catch (error) {
+      if (response && response.data) {
+        totalItems.value = response.data.count || 0;
+        return response.data.count || 0;
+      }
+      return 0;
+    } catch (error: any) {
       console.error('Error getting cart count:', error);
+      totalItems.value = 0;
       return 0;
     }
   };
@@ -163,32 +196,7 @@ export const useCartStore = defineStore('cart', () => {
     ]);
   };
 
-  // Add sample data for testing - using real backend data
-  const addSampleData = () => {
-    items.value = [
-      {
-        id: 1,
-        product_id: 1,
-        product_name: 'Nike Air Max 270',
-        product_image: 'http://res.cloudinary.com/dzeiafgu0/image/upload/v1752423996/sport_shop/products/wrfqqj7dsvxeghuf6fx0.jpg',
-        product_price: 2000.00, // Using discount price from backend
-        quantity: 11,
-        total_price: 22000.00, // product_price * quantity
-        variant_id: undefined,
-        variant_name: undefined,
-        variant_price: undefined,
-        created_at: '2025-08-12T16:28:30.000000Z',
-        updated_at: '2025-08-12T17:08:10.000000Z'
-      }
-    ];
-    
-    // Update totals based on real backend data
-    totalItems.value = items.value.reduce((sum, item) => sum + item.quantity, 0);
-    totalPrice.value = items.value.reduce((sum, item) => sum + (item.product_price * item.quantity), 0);
-    subtotal.value = totalPrice.value;
-    shippingFee.value = 0; // No shipping fee in backend response
-    discountAmount.value = 0;
-  };
+
 
   return {
     // State
@@ -216,8 +224,7 @@ export const useCartStore = defineStore('cart', () => {
     toggleCart,
     openCart,
     closeCart,
-    initializeCart,
-    addSampleData
+    initializeCart
   };
 });
 

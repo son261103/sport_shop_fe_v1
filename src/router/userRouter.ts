@@ -39,6 +39,22 @@ export const userRoutes: RouteRecordRaw[] = [
           title: "Giỏ hàng - Sport Shop",
         },
       },
+      {
+        path: 'checkout',
+        name: 'Checkout',
+        component: () => import('@/views/user/Checkout.vue'),
+        meta: {
+          title: "Thanh toán - Sport Shop",
+        },
+      },
+      {
+        path: 'sepay-demo',
+        name: 'SepayDemo',
+        component: () => import('@/components/debug/SepayWebhookDemo.vue'),
+        meta: {
+          title: "SePay Webhook Demo - Sport Shop",
+        },
+      },
 
       {
         path: 'components',

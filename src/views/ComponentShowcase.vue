@@ -284,6 +284,11 @@
       </div>
     </ComponentSection>
 
+    <!-- Cart API Test Section -->
+    <ComponentSection title="🛒 Cart API Test" description="Test cart functionality with API response">
+      <CartApiTest />
+    </ComponentSection>
+
   </div>
 </template>
 
@@ -317,6 +322,9 @@ import {
   type OrderData,
   type ActivityData
 } from '@/components/examples'
+
+// Import Cart API Test Component
+import CartApiTest from '@/components/CartApiTest.vue'
 
 // Sample data for demonstrations
 const sampleCategories = ref<Category[]>([
