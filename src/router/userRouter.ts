@@ -1,4 +1,6 @@
 import type { RouteRecordRaw } from "vue-router";
+import ChatView from '@/views/chat/ChatView.vue';
+import ChatLayout from '@/layouts/ChatLayout.vue';
 import { useAuthStore } from "@/stores/auth";
 
 // Public Routes with DefaultLayout
@@ -97,7 +99,21 @@ export const userRoutes: RouteRecordRaw[] = [
         meta: {
           title: "Liên hệ - Sport Shop",
         },
-      }
+      },
+    ],
+  },
+  {
+    path: '/chat',
+    component: ChatLayout,
+    children: [
+      {
+        path: '',
+        name: 'Chat',
+        component: ChatView,
+        meta: {
+          title: "AI Chat - Sport Shop",
+        },
+      },
     ],
   },
   // Authentication Routes (no layout)
