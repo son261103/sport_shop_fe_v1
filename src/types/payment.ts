@@ -1,4 +1,4 @@
-// SePay webhook types
+// SePay webhook types (kept for backward compatibility)
 export interface SepayWebhookRequest {
   gateway: string;
   transactionDate: string;
@@ -14,6 +14,31 @@ export interface SepayWebhookResponse {
   success: boolean;
   message: string;
   data?: any;
+}
+
+// New polling-based payment types
+export interface SepayPaymentInfo {
+  account_number: string;
+  account_holder_name: string;
+  bank_name: string;
+  amount: number;
+  content: string;
+}
+
+export interface SepayOrderPaymentInfo {
+  qr_image_url: string; // Direct URL to QR code image
+  reference_code: string;
+  amount: number;
+  account_number: string;
+  account_holder_name: string;
+  bank_name: string;
+  content: string;
+}
+
+export interface PaymentStatusCheckResponse {
+  success: boolean;
+  paid: boolean;
+  order: any; // Order details
 }
 
 export interface PaymentStatus {

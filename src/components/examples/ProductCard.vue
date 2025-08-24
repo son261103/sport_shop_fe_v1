@@ -115,6 +115,7 @@ import { Button } from "@/components/ui";
 import { useThemeClasses } from "@/composables/useTheme";
 import { useCart } from "@/composables/useCart";
 import { useCartAnimation } from "@/composables/useCartAnimation";
+import { formatPrice } from "@/utils";
 import type { Product } from "./index";
 
 interface Props {
@@ -189,12 +190,6 @@ const discountPercentage = computed(() => {
 });
 
 // Methods
-const formatPrice = (price: number) => {
-  return new Intl.NumberFormat("vi-VN", {
-    style: "currency",
-    currency: "VND",
-  }).format(price * 1000); // Assuming price is in thousands
-};
 
 const handleClick = () => {
   emit("click", props.product);

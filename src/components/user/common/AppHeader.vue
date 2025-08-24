@@ -83,18 +83,8 @@
                       <span>Hồ sơ</span>
                     </div>
                   </a>
-                  <a href="#" class="dropdown-item">
-                    <div class="flex items-center">
-                      <n-icon
-                        size="16"
-                        class="mr-2.5 text-light-accent-sport dark:text-dark-accent-sport"
-                      >
-                        <HeartOutline />
-                      </n-icon>
-                      <span>Yêu thích</span>
-                    </div>
-                  </a>
-                  <a href="#" class="dropdown-item">
+                  
+                  <router-link to="/orders" class="dropdown-item" @click="isUserMenuOpen = false">
                     <div class="flex items-center">
                       <n-icon
                         size="16"
@@ -104,7 +94,7 @@
                       </n-icon>
                       <span>Đơn hàng</span>
                     </div>
-                  </a>
+                  </router-link>
                   <a href="#" class="dropdown-item">
                     <div class="flex items-center">
                       <n-icon
@@ -301,20 +291,9 @@
               </n-icon>
               Hồ sơ
             </a>
-            <a
-              href="#"
-              class="block py-2 px-3 rounded-md font-medium text-light-text-secondary dark:text-dark-text-secondary hover:text-light-accent-sport dark:hover:text-dark-accent-sport transition-colors"
-            >
-              <n-icon
-                size="16"
-                class="mr-2.5 text-light-accent-sport dark:text-dark-accent-sport"
-              >
-                <HeartOutline />
-              </n-icon>
-              Yêu thích
-            </a>
-            <a
-              href="#"
+            
+            <router-link
+              to="/orders"
               class="block py-2 px-3 rounded-md font-medium text-light-text-secondary dark:text-dark-text-secondary hover:text-light-accent-sport dark:hover:text-dark-accent-sport transition-colors"
             >
               <n-icon
@@ -324,7 +303,7 @@
                 <BagOutline />
               </n-icon>
               Đơn hàng
-            </a>
+            </router-link>
             <a
               href="#"
               class="block py-2 px-3 rounded-md font-medium text-light-text-secondary dark:text-dark-text-secondary hover:text-light-accent-sport dark:hover:text-dark-accent-sport transition-colors"

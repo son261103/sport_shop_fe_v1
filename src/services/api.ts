@@ -85,7 +85,7 @@ apiClient.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
     // Show loading for API requests (except for specific endpoints)
     const { showLoading } = useLoading();
-    if (!config.url?.includes("/auth/check")) {
+        if (!config.url?.includes("/auth/check") && !config.url?.includes("/check-payment")) {
       showLoading("Đang xử lý...");
     }
 
@@ -660,15 +660,15 @@ export const api = {
     },
     // Update cart item quantity
     updateCartItem: (itemId: number, request: UpdateCartItemRequest): Promise<UpdateCartItemResponse> => {
-      return api.put<UpdateCartItemResponse>(`/cart/${itemId}`, request);
+      return api.put<UpdateCartItemResponse>(`/cart/update/${itemId}`, request);
     },
     // Remove item from cart
     removeFromCart: (itemId: number): Promise<RemoveFromCartResponse> => {
-      return api.delete<RemoveFromCartResponse>(`/cart/${itemId}`);
+      return api.delete<RemoveFromCartResponse>(`/cart/remove/${itemId}`);
     },
     // Clear all cart items
     clearCart: (): Promise<ClearCartResponse> => {
-      return api.delete<ClearCartResponse>("/cart");
+      return api.delete<ClearCartResponse>("/cart/clear");
     },
     // Get cart count
     getCartCount: (): Promise<CartCountResponse> => {

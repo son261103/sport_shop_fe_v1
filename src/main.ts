@@ -26,16 +26,11 @@ app.use(router);
 // Initialize authentication before mounting
 const authStore = useAuthStore();
 
-// Initialize auth state
-authStore.initAuth().then(() => {
-  console.log('🔐 Auth initialization completed');
-}).catch((error) => {
-  console.error('🔐 Auth initialization failed:', error);
-});
-
+// Initialize auth state (only once!)
 authStore
   .initAuth()
   .then(() => {
+    console.log('🔐 Auth initialization completed');
     // Mount app after auth initialization
     app.mount("#app");
 
@@ -48,8 +43,8 @@ authStore
     });
   })
   .catch((error: any) => {
-    console.error("Failed to initialize authentication:", error);
-    // Mount app anyway
+    console.error("🔐 Failed to initialize authentication:", error);
+    // Mount app anyway to prevent blocking
     app.mount("#app");
 
     // Initialize AOS

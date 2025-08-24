@@ -99,5 +99,6 @@ export interface CreateOrderRequest {
 export interface CreateOrderResponse {
   success: true;
   message: string;
-  data: Order;
+  data?: Order;
+  payment_info?: import('./payment').SepayOrderPaymentInfo; // Only present when payment_method is 'sepay'
 }

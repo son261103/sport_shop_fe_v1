@@ -1,257 +1,213 @@
 <template>
-  <div class="qr-code-display bg-white rounded-lg shadow-lg p-6 max-w-md mx-auto">
-    <!-- Header -->
-    <div class="text-center mb-6">
-      <h3 class="text-xl font-bold text-gray-800 mb-2">Thanh toán đơn hàng</h3>
-      <p class="text-gray-600">Vui lòng chọn phương thức thanh toán</p>
+  <div class="qr-code-display bg-light-surface-secondary dark:bg-dark-surface-secondary rounded-xl p-6">
+    <div class="text-center mb-4">
+      <h3 class="text-xl font-bold text-light-text-primary dark:text-dark-text-primary">Thanh toán qua SePay</h3>
+      <p class="text-light-text-secondary dark:text-dark-text-secondary">Quét mã QR hoặc chuyển khoản thủ công</p>
     </div>
 
-    <!-- Payment Method Tabs -->
-    <div class="payment-tabs mb-6">
-      <div class="flex border-b">
-        <button 
-          @click="activeTab = 'qr'" 
-          :class="[activeTab === 'qr' ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-500', 'flex-1 py-2 font-medium']"
-        >
-          <i class="fas fa-qrcode mr-2"></i>Quét mã QR
-        </button>
-        <button 
-          @click="activeTab = 'bank'" 
-          :class="[activeTab === 'bank' ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-500', 'flex-1 py-2 font-medium']"
-        >
-          <i class="fas fa-university mr-2"></i>Chuyển khoản
-        </button>
-      </div>
+    <div v-if="loading" class="flex justify-center items-center h-64">
+      <i class="fas fa-spinner fa-spin text-3xl text-light-accent-sport dark:text-dark-accent-sport"></i>
+    </div>
+    <div v-else-if="error" class="text-center text-red-500 p-4 bg-red-50 dark:bg-red-900/20 rounded-lg">
+      <i class="fas fa-exclamation-circle text-3xl mb-2"></i>
+      <p class="font-semibold">{{ error }}</p>
+      <button @click="$emit('retry')" class="mt-3 btn-outline-danger">Thử lại</button>
     </div>
 
-    <!-- QR Code Section -->
-    <div v-if="activeTab === 'qr'" class="qr-code-container mb-6">
-      <div v-if="loading" class="flex justify-center items-center h-64">
-        <div class="loading-spinner"></div>
-        <span class="ml-3 text-gray-600">Đang tạo mã QR...</span>
-      </div>
-      
-      <div v-else-if="error" class="text-center text-red-600 p-4">
-        <svg class="w-12 h-12 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-        </svg>
-        <p class="font-medium mb-2">Không thể tạo mã QR</p>
-        <p class="text-sm">{{ error }}</p>
-        <button @click="$emit('retry')" class="mt-3 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">
-          Thử lại
-        </button>
-      </div>
-      
-      <div v-else-if="qrCodeUrl" class="text-center">
-        <img :src="qrCodeUrl" alt="QR Code" class="mx-auto mb-4 border rounded" @error="handleImageError" />
-        
-        <!-- Payment Info -->
-        <div v-if="paymentInfo" class="bg-gray-50 rounded-lg p-4 mb-4">
-          <div class="text-sm text-gray-600 space-y-2">
-            <div class="flex justify-between">
-              <span>Số tiền:</span>
-              <span class="font-medium text-gray-800">{{ formatCurrency(paymentInfo.amount) }}</span>
-            </div>
-            <div class="flex justify-between">
-              <span>Mã đơn hàng:</span>
-              <span class="font-medium text-gray-800">{{ paymentInfo.orderCode }}</span>
-            </div>
-          </div>
-        </div>
-        
-        <!-- Countdown Timer -->
-        <div class="text-center mb-4">
-          <p class="text-sm text-gray-600 mb-1">Thời gian còn lại:</p>
-          <p class="text-2xl font-bold text-red-600">{{ formatTime(timeLeft) }}</p>
+    <div v-else-if="paymentInfo" class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+      <div class="text-center">
+        <img :src="paymentInfo.qr_image_url" alt="QR Code Thanh toán" class="mx-auto border-4 border-white dark:border-gray-700 rounded-lg shadow-md w-48 h-48" />
+        <div v-if="timeLeft > 0" class="mt-3">
+          <p class="text-sm text-light-text-secondary dark:text-dark-text-secondary">Mã hết hạn sau:</p>
+          <p class="text-2xl font-bold text-red-500">{{ formatTime(timeLeft) }}</p>
         </div>
       </div>
-    </div>
-    
-    <!-- Bank Transfer Section -->
-    <div v-if="activeTab === 'bank'" class="bank-transfer-container mb-6">
-      <BankInfo 
-        :amount="paymentInfo?.amount || 0" 
-        :order-code="paymentInfo?.orderCode || ''"
-      />
-    </div>
 
-    <!-- Payment Status -->
-    <div class="payment-status text-center mb-6">
-      <div v-if="paymentStatus === 'checking'" class="text-blue-600">
-        <div class="loading-spinner mx-auto mb-2"></div>
-        <p class="font-medium">Đang kiểm tra thanh toán...</p>
+      <div class="bg-light-bg-primary dark:bg-dark-bg-primary p-4 rounded-lg space-y-3">
+        <div v-for="(item, index) in bankDetails" :key="index" class="flex justify-between items-center text-sm">
+          <span class="text-light-text-secondary dark:text-dark-text-secondary">{{ item.label }}:</span>
+          <span :class="['font-semibold', item.highlight ? 'text-red-500 text-base' : 'text-light-text-primary dark:text-dark-text-primary']">{{ item.value }}</span>
+        </div>
       </div>
-      
-      <div v-else-if="paymentStatus === 'success'" class="text-green-600">
-        <svg class="w-8 h-8 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-        </svg>
-        <p class="font-medium">Thanh toán thành công!</p>
-      </div>
-      
-      <div v-else-if="paymentStatus === 'failed'" class="text-red-600">
-        <svg class="w-8 h-8 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-        </svg>
-        <p class="font-medium">Thanh toán thất bại</p>
-      </div>
-    </div>
 
-    <!-- Action Buttons -->
-    <div class="action-buttons space-y-3">
-      <button 
-        v-if="paymentStatus !== 'success'"
-        @click="$emit('check-payment')"
-        :disabled="paymentStatus === 'checking'"
-        class="w-full px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
-      >
-        {{ paymentStatus === 'checking' ? 'Đang kiểm tra...' : 'Kiểm tra thanh toán' }}
-      </button>
-      
-      <button 
-        @click="$emit('cancel')"
-        class="w-full px-4 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-medium"
-      >
-        Hủy thanh toán
-      </button>
-    </div>
+      <!-- Payment Status -->
+      <div class="payment-status text-center mt-6 h-6 md:col-span-2">
+        <div v-if="paymentStatus === 'checking'" class="flex items-center justify-center text-blue-500">
+          <i class="fas fa-spinner fa-spin mr-2"></i>
+          <span class="font-medium">Đang kiểm tra thanh toán...</span>
+        </div>
+        <div v-else-if="paymentStatus === 'success'" class="flex items-center justify-center text-green-500">
+          <i class="fas fa-check-circle mr-2"></i>
+          <span class="font-medium">Thanh toán thành công!</span>
+        </div>
+        <div v-else-if="paymentStatus === 'timeout'" class="flex items-center justify-center text-orange-500">
+          <i class="fas fa-clock mr-2"></i>
+          <span class="font-medium">Thanh toán quá hạn.</span>
+        </div>
+      </div>
 
-    <!-- Instructions -->
-    <div class="instructions mt-6 text-sm text-gray-600">
-      <h4 class="font-medium mb-2">Hướng dẫn thanh toán:</h4>
-      <ol class="list-decimal list-inside space-y-1">
-        <li>Mở ứng dụng ngân hàng trên điện thoại</li>
-        <li>Chọn chức năng quét mã QR</li>
-        <li>Quét mã QR hiển thị trên màn hình</li>
-        <li>Xác nhận thông tin và thực hiện thanh toán</li>
-        <li>Chờ hệ thống xác nhận thanh toán</li>
-      </ol>
+      <!-- Action Buttons -->
+      <div class="mt-6 flex justify-between items-center md:col-span-2">
+        <button
+          @click="handleConfirmPayment"
+          :disabled="isConfirmingPayment || paymentStatus === 'success'"
+          class="btn-primary px-6 py-2 rounded-lg"
+        >
+          <span v-if="isConfirmingPayment">
+            <i class="fas fa-spinner fa-spin mr-2"></i>
+            Đang xác nhận...
+          </span>
+          <span v-else>Đã chuyển khoản</span>
+        </button>
+        <button @click="$emit('cancel')" class="btn-outline px-6 py-2 rounded-lg">Hủy</button>
+      </div>
     </div>
   </div>
 </template>
 
-<script setup>
-import { ref, onMounted, onUnmounted, watchEffect } from 'vue'
-import BankInfo from './BankInfo.vue'
+<script setup lang="ts">
+import { ref, onUnmounted, watch, computed } from 'vue';
+import { useCartStore } from '@/stores/cart';
+import type { PropType } from 'vue';
+import type { SepayOrderPaymentInfo } from '@/types/payment';
 
 const props = defineProps({
+  orderId: {
+    type: Number as PropType<number | null>,
+    required: true,
+  },
   paymentInfo: {
-    type: Object,
-    default: () => ({})
+    type: Object as PropType<SepayOrderPaymentInfo | null>,
+    required: true,
   },
-  qrCodeUrl: {
-    type: String,
-    default: ''
-  },
-  loading: {
-    type: Boolean,
-    default: false
-  },
-  error: {
-    type: String,
-    default: ''
-  },
-  paymentStatus: {
-    type: String,
-    default: 'idle'
-  },
+  loading: Boolean,
+  error: String,
   timeoutMinutes: {
     type: Number,
-    default: 15
-  }
-})
+    default: 10,
+  },
 
-const emit = defineEmits(['check-payment', 'cancel', 'retry', 'timeout'])
+});
 
-// Active tab state
-const activeTab = ref('qr')
+import OrderService from '@/services/orderService';
 
-// Countdown timer
-const timeLeft = ref(props.timeoutMinutes * 60)
-let countdownInterval = null
+const emit = defineEmits(['cancel', 'retry', 'timeout', 'payment-success']);
+const cartStore = useCartStore();
 
-const formatTime = (seconds) => {
-  const minutes = Math.floor(seconds / 60)
-  const remainingSeconds = seconds % 60
-  return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`
-}
+const timeLeft = ref(props.timeoutMinutes * 60);
+const paymentStatus = ref<'idle' | 'checking' | 'success' | 'failed' | 'timeout'>('idle');
+const isConfirmingPayment = ref(false);
+let countdownInterval: number | undefined;
+let pollingInterval: number | undefined;
 
-const formatCurrency = (amount) => {
-  return new Intl.NumberFormat('vi-VN', {
-    style: 'currency',
-    currency: 'VND'
-  }).format(amount)
-}
+const formatTime = (seconds: number) => {
+  const minutes = Math.floor(seconds / 60);
+  const remainingSeconds = seconds % 60;
+  return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+};
 
-const handleImageError = () => {
-  emit('retry')
-}
+const formatCurrency = (amount: number) => {
+  return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
+};
+
+const bankDetails = computed(() => {
+    if (!props.paymentInfo) return [];
+    const info = props.paymentInfo;
+    return [
+        { label: 'Ngân hàng', value: info.bank_name },
+        { label: 'Số tài khoản', value: info.account_number },
+        { label: 'Chủ tài khoản', value: info.account_holder_name },
+        { label: 'Tiền hàng', value: formatCurrency(cartStore.subtotal) },
+        { label: 'Phí vận chuyển', value: formatCurrency(cartStore.shippingFee) },
+        { label: 'Tổng cộng', value: formatCurrency(info.amount), highlight: true },
+        { label: 'Nội dung', value: info.content },
+    ];
+});
 
 const startCountdown = () => {
-  if (countdownInterval) {
-    clearInterval(countdownInterval)
-  }
-  
+  stopCountdown();
+  timeLeft.value = props.timeoutMinutes * 60;
   countdownInterval = setInterval(() => {
-    timeLeft.value--
-    
+    timeLeft.value--;
     if (timeLeft.value <= 0) {
-      clearInterval(countdownInterval)
-      emit('timeout')
+      stopCountdown();
+      emit('timeout');
     }
-  }, 1000)
-}
+  }, 1000) as unknown as number;
+};
 
 const stopCountdown = () => {
   if (countdownInterval) {
-    clearInterval(countdownInterval)
-    countdownInterval = null
+    clearInterval(countdownInterval);
+    countdownInterval = undefined;
   }
-}
+};
 
-onMounted(() => {
-  if (!props.loading && !props.error) {
-    startCountdown()
+const checkStatus = async () => {
+  if (!props.orderId || paymentStatus.value === 'success') return;
+
+  paymentStatus.value = 'checking';
+  try {
+    const response = await OrderService.checkPaymentStatus(props.orderId);
+    if (response.paid) {
+      paymentStatus.value = 'success';
+      stopPolling();
+      stopCountdown();
+      emit('payment-success');
+    }
+  } catch (err) {
+    console.error('Polling check failed, but will continue.');
   }
-})
+};
+
+const startPolling = () => {
+  stopPolling();
+  if (props.orderId) {
+    pollingInterval = setInterval(checkStatus, 3000) as unknown as number;
+  }
+};
+
+const stopPolling = () => {
+  if (pollingInterval) {
+    clearInterval(pollingInterval);
+    pollingInterval = undefined;
+  }
+};
+
+watch(() => props.paymentInfo, (newInfo) => {
+  if (newInfo && !props.loading && !props.error) {
+    startCountdown();
+    startPolling();
+  }
+}, { immediate: true });
+
+watch(paymentStatus, (newStatus) => {
+  if (newStatus === 'success' || newStatus === 'failed' || newStatus === 'timeout') {
+    stopCountdown();
+    stopPolling();
+  }
+});
+
+const handleConfirmPayment = async () => {
+  if (!props.orderId) return;
+
+  isConfirmingPayment.value = true;
+  try {
+    const response = await OrderService.confirmPayment(props.orderId);
+    if (response.success) {
+      // Manually trigger a status check right away
+      await checkStatus();
+    }
+  } catch (error: any) {
+    console.error('Lỗi khi xác nhận thanh toán:', error.message);
+    // Optionally, show an error message to the user
+  } finally {
+    isConfirmingPayment.value = false;
+  }
+};
 
 onUnmounted(() => {
-  stopCountdown()
-})
-
-// Watch for payment success to stop countdown
-watchEffect(() => {
-  if (props.paymentStatus === 'success') {
-    stopCountdown()
-  }
-})
+  stopCountdown();
+  stopPolling();
+});
 </script>
-
-<style scoped>
-.qr-code-display {
-  min-height: 400px;
-}
-
-.qr-code-container img {
-  max-width: 200px;
-  max-height: 200px;
-}
-
-.loading-spinner {
-  width: 24px;
-  height: 24px;
-  border: 3px solid #f3f4f6;
-  border-top: 3px solid #3b82f6;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-</style>

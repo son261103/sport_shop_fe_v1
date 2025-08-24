@@ -109,6 +109,33 @@
           </div>
         </div>
         
+                <div>
+          <label class="block text-sm font-medium text-light-text-primary dark:text-dark-text-primary mb-2">
+            Phường/Xã <span class="text-red-500">*</span>
+          </label>
+          <select
+            :value="deliveryInfo.wardCode || ''"
+            @change="handleWardChange"
+            :disabled="!deliveryInfo.districtCode || loading"
+            :class="[
+              'w-full px-4 py-3 bg-light-surface-secondary dark:bg-dark-surface-secondary border rounded-lg text-light-text-primary dark:text-dark-text-primary focus:ring-2 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed',
+              validationErrors.ward ? 'border-red-500 focus:ring-red-500' : 'border-light-border-primary dark:border-dark-border-primary focus:ring-light-accent-sport dark:focus:ring-dark-accent-sport'
+            ]"
+          >
+            <option value="">
+              {{ !deliveryInfo.districtCode ? 'Vui lòng chọn quận/huyện trước' :
+                 loading ? 'Đang tải...' :
+                 'Chọn phường/xã' }}
+            </option>
+            <option v-for="ward in wardsForSelect" :key="ward.code" :value="ward.code">
+              {{ ward.name }}
+            </option>
+          </select>
+          <div v-if="validationErrors.ward" class="text-red-500 text-sm mt-1">
+            {{ validationErrors.ward }}
+          </div>
+        </div>
+
         <div class="md:col-span-2">
           <label class="block text-sm font-medium text-light-text-primary dark:text-dark-text-primary mb-2">
             Địa chỉ chi tiết <span class="text-red-500">*</span>
@@ -159,9 +186,11 @@ interface DeliveryInfo {
   phone: string;
   province: string;
   district: string;
+  ward: string;
   address: string;
   provinceCode?: number;
   districtCode?: number;
+  wardCode?: number;
 }
 
 interface Props {
@@ -200,12 +229,15 @@ const filteredProvinces = computed(() => {
 // Use provinces composable
 const {
   districts,
+  wards,
   loading,
   error,
   provincesForSelect,
   districtsForSelect,
+  wardsForSelect,
   fetchProvinces,
   fetchDistricts,
+  fetchWards,
 } = useProvinces()
 
 // Load provinces on component mount
@@ -238,6 +270,11 @@ const validateDistrict = (value: string): string => {
   return '';
 };
 
+const validateWard = (value: string): string => {
+  if (!value.trim()) return 'Vui lòng chọn phường/xã';
+  return '';
+};
+
 const validateAddress = (value: string): string => {
   if (!value.trim()) return 'Vui lòng nhập địa chỉ chi tiết';
   if (value.trim().length < 5) return 'Địa chỉ phải có ít nhất 5 ký tự';
@@ -256,8 +293,11 @@ const validateField = (field: keyof DeliveryInfo, value: string) => {
     case 'province':
       error = validateProvince(value);
       break;
-    case 'district':
+        case 'district':
       error = validateDistrict(value);
+      break;
+    case 'ward':
+      error = validateWard(value);
       break;
     case 'address':
       error = validateAddress(value);
@@ -274,7 +314,7 @@ const validateField = (field: keyof DeliveryInfo, value: string) => {
 };
 
 const validateAllFields = (): boolean => {
-  const fields: (keyof DeliveryInfo)[] = ['fullName', 'phone', 'province', 'district', 'address'];
+    const fields: (keyof DeliveryInfo)[] = ['fullName', 'phone', 'province', 'district', 'ward', 'address'];
   let isValid = true;
   
   fields.forEach(field => {
@@ -304,28 +344,38 @@ const handleProceedToNextStep = () => {
 
 // Handle district change
 const handleDistrictChange = (event: Event) => {
-  const target = event.target as HTMLSelectElement
-  const selectedCode = parseInt(target.value)
-  
-  if (selectedCode) {
-    const selectedDistrict = districts.value.find(d => d.code === selectedCode)
-    if (selectedDistrict) {
-      const updatedInfo = { 
-        ...props.deliveryInfo, 
-        district: selectedDistrict.name,
-        districtCode: selectedCode
-      }
-      emit('update:deliveryInfo', updatedInfo)
-    }
-  } else {
-    const updatedInfo = { 
-      ...props.deliveryInfo, 
-      district: '',
-      districtCode: undefined
-    }
-    emit('update:deliveryInfo', updatedInfo)
+  const target = event.target as HTMLSelectElement;
+  const selectedCode = parseInt(target.value);
+  const selectedDistrict = districts.value.find(d => d.code === selectedCode);
+
+  const updatedInfo = {
+    ...props.deliveryInfo,
+    district: selectedDistrict ? selectedDistrict.name : '',
+    districtCode: selectedDistrict ? selectedCode : undefined,
+    ward: '', // Reset ward when district changes
+    wardCode: undefined,
+  };
+  emit('update:deliveryInfo', updatedInfo);
+
+  if (selectedDistrict) {
+    fetchWards(selectedCode);
   }
-}
+};
+
+const handleWardChange = (event: Event) => {
+  const target = event.target as HTMLSelectElement;
+  const selectedCode = parseInt(target.value);
+  const selectedWard = wards.value.find(w => w.code === selectedCode);
+
+  if (selectedWard) {
+    const updatedInfo = {
+      ...props.deliveryInfo,
+      ward: selectedWard.name,
+      wardCode: selectedCode,
+    };
+    emit('update:deliveryInfo', updatedInfo);
+  }
+};
 
 // Handle province search input
 const handleProvinceSearch = (event: Event) => {
@@ -339,12 +389,14 @@ const selectProvince = (province: { code: number; name: string }) => {
   provinceSearchText.value = province.name;
   showProvinceDropdown.value = false;
   
-  const updatedInfo = { 
-    ...props.deliveryInfo, 
+    const updatedInfo = {
+    ...props.deliveryInfo,
     province: province.name,
     provinceCode: province.code,
     district: '',
-    districtCode: undefined
+    districtCode: undefined,
+    ward: '',
+    wardCode: undefined
   };
   emit('update:deliveryInfo', updatedInfo);
   

@@ -47,15 +47,17 @@ export const userRoutes: RouteRecordRaw[] = [
           title: "Thanh toán - Sport Shop",
         },
       },
+
+
       {
-        path: 'sepay-demo',
-        name: 'SepayDemo',
-        component: () => import('@/components/debug/SepayWebhookDemo.vue'),
+        path: 'orders',
+        name: 'Orders',
+        component: () => import('@/views/user/Orders.vue'),
         meta: {
-          title: "SePay Webhook Demo - Sport Shop",
+          title: "Đơn hàng - Sport Shop",
+          requiresAuth: true,
         },
       },
-
       {
         path: 'components',
         name: 'ComponentShowcase',

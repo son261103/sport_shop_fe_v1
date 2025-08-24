@@ -9,7 +9,9 @@ import type {
   SepayQRRequest,
   SepayQRResponse,
   SepayErrorResponse,
-  BankInfoResponse
+  BankInfoResponse,
+  PaymentStatusCheckResponse,
+  SepayOrderPaymentInfo
 } from '@/types/payment';
 
 /**
@@ -180,16 +182,38 @@ export class SepayService {
   }
   
   /**
-   * Kiểm tra trạng thái thanh toán
+   * Kiểm tra trạng thái thanh toán (Polling-based approach)
    * @param orderId - ID đơn hàng
-   * @returns Promise với trạng thái thanh toán
+   * @returns Promise<PaymentStatusCheckResponse>
    */
-  static async checkPaymentStatus(orderId: string) {
+  static async checkPaymentStatus(orderId: string): Promise<PaymentStatusCheckResponse> {
     try {
-      const response = await apiClient.post(`/orders/${orderId}/check-payment`);
+      console.log(`🔍 Kiểm tra trạng thái thanh toán cho đơn hàng: ${orderId}`);
+
+      const response = await apiClient.post<PaymentStatusCheckResponse>(`/orders/${orderId}/check-payment`);
+
+      if (!response.data.success) {
+        throw new Error('Không thể kiểm tra trạng thái thanh toán');
+      }
+
+      console.log(`📊 Trạng thái thanh toán đơn hàng ${orderId}:`, {
+        paid: response.data.paid,
+        success: response.data.success
+      });
+
       return response.data;
-    } catch (error) {
-      console.error('Lỗi kiểm tra trạng thái thanh toán:', error);
+    } catch (error: any) {
+      console.error('❌ Lỗi kiểm tra trạng thái thanh toán:', error);
+
+      // Handle different error types
+      if (error.response?.status === 404) {
+        throw new Error('Không tìm thấy đơn hàng');
+      } else if (error.response?.status === 401) {
+        throw new Error('Không có quyền truy cập');
+      } else if (error.response?.status === 500) {
+        throw new Error('Lỗi server khi kiểm tra thanh toán');
+      }
+
       throw error;
     }
   }
@@ -259,7 +283,7 @@ export class SepayService {
    * @returns Promise<SepayWebhookResponse>
    */
   static async updatePaymentStatus(
-    orderId: string, 
+    orderId: string,
     paymentData: Partial<OrderPaymentUpdate>
   ): Promise<SepayWebhookResponse> {
     try {
@@ -272,6 +296,101 @@ export class SepayService {
       console.error('Lỗi cập nhật trạng thái thanh toán:', error);
       throw error;
     }
+  }
+
+  /**
+   * Bắt đầu polling kiểm tra trạng thái thanh toán
+   * @param orderId - ID đơn hàng
+   * @param options - Tùy chọn polling
+   * @returns Promise<PaymentStatusCheckResponse> - Kết quả cuối cùng
+   */
+  static async startPaymentPolling(
+    orderId: string,
+    options: {
+      intervalMs?: number; // Khoảng thời gian giữa các lần kiểm tra (mặc định: 5000ms)
+      timeoutMs?: number; // Thời gian chờ tối đa (mặc định: 600000ms = 10 phút)
+      onStatusUpdate?: (status: PaymentStatusCheckResponse) => void; // Callback khi có cập nhật
+      onTimeout?: () => void; // Callback khi hết thời gian chờ
+    } = {}
+  ): Promise<PaymentStatusCheckResponse> {
+    const {
+      intervalMs = 5000, // 5 giây
+      timeoutMs = 600000, // 10 phút
+      onStatusUpdate,
+      onTimeout
+    } = options;
+
+    console.log(`🔄 Bắt đầu polling thanh toán cho đơn hàng ${orderId}`, {
+      interval: `${intervalMs}ms`,
+      timeout: `${timeoutMs}ms`
+    });
+
+    return new Promise((resolve, reject) => {
+      const startTime = Date.now();
+      let intervalId: NodeJS.Timeout;
+
+      const checkStatus = async () => {
+        try {
+          // Kiểm tra timeout
+          if (Date.now() - startTime > timeoutMs) {
+            clearInterval(intervalId);
+            console.log(`⏰ Hết thời gian chờ thanh toán cho đơn hàng ${orderId}`);
+
+            if (onTimeout) {
+              onTimeout();
+            }
+
+            const timeoutResponse: PaymentStatusCheckResponse = {
+              success: false,
+              paid: false,
+              order: null
+            };
+
+            resolve(timeoutResponse);
+            return;
+          }
+
+          // Kiểm tra trạng thái thanh toán
+          const status = await this.checkPaymentStatus(orderId);
+
+          // Gọi callback nếu có
+          if (onStatusUpdate) {
+            onStatusUpdate(status);
+          }
+
+          // Nếu đã thanh toán thành công
+          if (status.paid) {
+            clearInterval(intervalId);
+            console.log(`✅ Thanh toán thành công cho đơn hàng ${orderId}`);
+            resolve(status);
+            return;
+          }
+
+          // Nếu chưa thanh toán, tiếp tục polling
+          console.log(`⏳ Đơn hàng ${orderId} chưa được thanh toán, tiếp tục kiểm tra...`);
+
+        } catch (error) {
+          clearInterval(intervalId);
+          console.error(`❌ Lỗi trong quá trình polling đơn hàng ${orderId}:`, error);
+          reject(error);
+        }
+      };
+
+      // Kiểm tra ngay lập tức
+      checkStatus();
+
+      // Thiết lập interval để kiểm tra định kỳ
+      intervalId = setInterval(checkStatus, intervalMs);
+    });
+  }
+
+  /**
+   * Dừng polling thanh toán (utility method để dừng từ bên ngoài nếu cần)
+   * @param intervalId - ID của interval cần dừng
+   */
+  static stopPaymentPolling(intervalId: NodeJS.Timeout): void {
+    clearInterval(intervalId);
+    console.log('🛑 Đã dừng polling thanh toán');
   }
 }
 

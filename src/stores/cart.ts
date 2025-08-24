@@ -54,10 +54,10 @@ export const useCartStore = defineStore('cart', () => {
         
         // Calculate totals from cart items
         totalItems.value = cartItems.reduce((sum: number, item: any) => sum + item.quantity, 0);
-        totalPrice.value = items.value.reduce((sum, item) => sum + item.total_price, 0);
-        subtotal.value = totalPrice.value;
-        shippingFee.value = response.data.shipping_fee || 0;
+                subtotal.value = items.value.reduce((sum, item) => sum + item.total_price, 0);
+        shippingFee.value = 30000; // Phí vận chuyển cố định
         discountAmount.value = response.data.discount_amount || 0;
+        totalPrice.value = subtotal.value + shippingFee.value - discountAmount.value;
       }
 
     } catch (error: any) {

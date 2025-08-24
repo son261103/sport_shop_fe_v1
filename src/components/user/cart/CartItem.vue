@@ -106,6 +106,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
+import { formatPrice } from '@/utils';
 import type { CartItem } from '@/types';
 
 interface Props {
@@ -125,12 +126,6 @@ const emit = defineEmits<{
 const isUpdating = ref(false);
 
 // Methods
-const formatPrice = (price: number): string => {
-  return new Intl.NumberFormat('vi-VN', {
-    style: 'currency',
-    currency: 'VND'
-  }).format(price);
-};
 
 const handleImageError = (event: Event) => {
   const target = event.target as HTMLImageElement;

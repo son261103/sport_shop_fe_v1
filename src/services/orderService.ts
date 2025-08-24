@@ -1,10 +1,10 @@
 import { apiClient } from './api';
 import { api } from './api';
-import type { 
-  SepayWebhookRequest, 
-  SepayWebhookResponse, 
+import type {
+  SepayWebhookRequest,
+  SepayWebhookResponse,
   PaymentStatus,
-  OrderPaymentUpdate 
+  OrderPaymentUpdate
 } from '../types/payment';
 import type {
   CreateOrderRequest,
@@ -93,16 +93,27 @@ export class OrderService {
   static async createOrder(orderData: CreateOrderRequest): Promise<CreateOrderResponse> {
     try {
       console.log('🛒 Đang tạo đơn hàng mới:', orderData);
-      
+
       const response = await api.orders.createOrder(orderData);
-      
+
       console.log('✅ Đã tạo đơn hàng thành công:', {
         orderId: response.data.id,
         totalAmount: response.data.final_total,
         paymentMethod: response.data.payment_method,
         status: response.data.status
       });
-      
+
+      // Check if response includes payment_info (for SePay orders)
+      const hasPaymentInfo = response.payment_info && orderData.payment_method === 'sepay';
+
+      if (hasPaymentInfo) {
+        console.log('💳 Đơn hàng SePay với thông tin thanh toán:', {
+          referenceCode: response.payment_info.reference_code,
+          amount: response.payment_info.payment_info.amount,
+          bankName: response.payment_info.payment_info.bank_name
+        });
+      }
+
       // Return the response in the expected format
       return {
         success: true,
@@ -112,11 +123,12 @@ export class OrderService {
           status: response.data.status as 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled',
           payment_method: response.data.payment_method as 'cod' | 'sepay',
           payment_status: response.data.payment_status as 'pending' | 'completed' | 'failed' | 'cancelled'
-        }
+        },
+        payment_info: hasPaymentInfo ? response.payment_info : undefined
       };
     } catch (error: any) {
       console.error('❌ Lỗi tạo đơn hàng:', error);
-      
+
       // Xử lý các loại lỗi khác nhau
       if (error.response?.status === 400) {
         throw new Error('Dữ liệu đơn hàng không hợp lệ');
@@ -147,14 +159,14 @@ export class OrderService {
     try {
       // Extract order ID from reference code
       const orderId = this.extractOrderId(webhookData.referenceCode);
-      
+
       if (!orderId) {
         throw new Error('Không thể trích xuất mã đơn hàng từ reference code');
       }
-      
+
       // Determine payment status based on transfer type and amount
       const paymentStatus = this.determinePaymentStatus(webhookData);
-      
+
       // Prepare update data
       const updateData: OrderPaymentUpdate = {
         orderId,
@@ -164,13 +176,13 @@ export class OrderService {
         amount: webhookData.transferAmount,
         transactionDate: webhookData.transactionDate
       };
-      
+
       // Call API to update order
       const response = await apiClient.patch<SepayWebhookResponse>(
         `/orders/${orderId}/payment`,
         updateData
       );
-      
+
       // Log successful update
       console.log(`✅ Đã cập nhật trạng thái thanh toán cho đơn hàng ${orderId}:`, {
         status: paymentStatus,
@@ -178,14 +190,14 @@ export class OrderService {
         gateway: webhookData.gateway,
         transactionId: webhookData.id
       });
-      
+
       return response.data;
     } catch (error: any) {
       console.error('❌ Lỗi cập nhật trạng thái thanh toán:', error);
       throw error;
     }
   }
-  
+
   /**
    * Lấy thông tin đơn hàng
    * @param orderId - ID đơn hàng
@@ -200,7 +212,7 @@ export class OrderService {
       throw error;
     }
   }
-  
+
   /**
    * Lấy trạng thái thanh toán của đơn hàng
    * @param orderId - ID đơn hàng
@@ -217,7 +229,7 @@ export class OrderService {
       throw error;
     }
   }
-  
+
   /**
    * Cập nhật trạng thái đơn hàng
    * @param orderId - ID đơn hàng
@@ -225,7 +237,7 @@ export class OrderService {
    * @returns Promise với kết quả cập nhật
    */
   static async updateOrderStatus(
-    orderId: string, 
+    orderId: string,
     status: 'pending' | 'confirmed' | 'processing' | 'shipped' | 'delivered' | 'cancelled'
   ) {
     try {
@@ -233,7 +245,7 @@ export class OrderService {
         `/orders/${orderId}/status`,
         { status }
       );
-      
+
       console.log(`✅ Đã cập nhật trạng thái đơn hàng ${orderId} thành: ${status}`);
       return response.data;
     } catch (error) {
@@ -241,7 +253,7 @@ export class OrderService {
       throw error;
     }
   }
-  
+
   /**
    * Xác định trạng thái thanh toán dựa trên dữ liệu webhook
    * @param webhookData - Dữ liệu webhook
@@ -254,16 +266,16 @@ export class OrderService {
     if (webhookData.transferType === 'in' && webhookData.transferAmount > 0) {
       return 'completed';
     }
-    
+
     // Nếu là giao dịch chuyển tiền (out) thì có thể là hoàn tiền
     if (webhookData.transferType === 'out') {
       return 'cancelled';
     }
-    
+
     // Mặc định là thất bại
     return 'failed';
   }
-  
+
   /**
    * Trích xuất order ID từ reference code
    * @param referenceCode - Reference code từ webhook
@@ -274,7 +286,7 @@ export class OrderService {
     const orderIdMatch = referenceCode.match(/ORDER\d+/);
     return orderIdMatch ? orderIdMatch[0] : null;
   }
-  
+
   /**
    * Validate số tiền thanh toán với đơn hàng
    * @param orderId - ID đơn hàng
@@ -284,13 +296,13 @@ export class OrderService {
   static async validatePaymentAmount(orderId: string, amount: number): Promise<boolean> {
     try {
       const order = await this.getOrderById(orderId);
-      
+
       // So sánh số tiền (có thể có sai lệch nhỏ do làm tròn)
       const tolerance = 1000; // Cho phép sai lệch 1000 VND
       const amountDiff = Math.abs(order.totalAmount - amount);
-      
+
       const isValid = amountDiff <= tolerance;
-      
+
       if (!isValid) {
         console.warn(`⚠️ Số tiền không khớp cho đơn hàng ${orderId}:`, {
           orderAmount: order.totalAmount,
@@ -298,21 +310,21 @@ export class OrderService {
           difference: amountDiff
         });
       }
-      
+
       return isValid;
     } catch (error) {
       console.error(`Lỗi validate số tiền đơn hàng ${orderId}:`, error);
       return false;
     }
   }
-  
+
   /**
    * Gửi email thông báo thanh toán thành công
    * @param orderId - ID đơn hàng
    * @param paymentData - Dữ liệu thanh toán
    */
   static async sendPaymentConfirmationEmail(
-    orderId: string, 
+    orderId: string,
     paymentData: OrderPaymentUpdate
   ): Promise<void> {
     try {
@@ -320,7 +332,7 @@ export class OrderService {
         orderId,
         paymentData
       });
-      
+
       console.log(`📧 Đã gửi email xác nhận thanh toán cho đơn hàng ${orderId}`);
     } catch (error) {
       console.error(`Lỗi gửi email xác nhận thanh toán cho đơn hàng ${orderId}:`, error);
@@ -334,7 +346,7 @@ export class OrderService {
   static async getOrders(): Promise<OrdersResponse> {
     try {
       const response = await apiClient.get('/orders');
-      
+
       if (response.data.success) {
         return response.data as OrdersResponse;
       } else {
@@ -342,18 +354,55 @@ export class OrderService {
       }
     } catch (error: any) {
       console.error('Error fetching orders:', error);
-      
+
       if (error.response?.status === 401) {
         throw new Error('Unauthorized - Please login again');
       }
-      
+
       if (error.response?.status === 500) {
         throw new Error('Server error - Please try again later');
       }
-      
+
       throw new Error(error.message || 'Failed to fetch orders');
     }
   }
+
+  static async retryPayment(orderId: number): Promise<CreateOrderResponse> {
+    try {
+      const response = await apiClient.post(`/orders/${orderId}/retry-payment`);
+      return response.data;
+    } catch (error: any) {
+      console.error(`Lỗi thanh toán lại đơn hàng ${orderId}:`, error);
+      throw error;
+    }
+  }
+
+  static async checkPaymentStatus(orderId: number): Promise<PaymentStatusCheckResponse> {
+    try {
+      const response = await apiClient.post(`/sepay/check-payment`, { order_id: orderId });
+      return response.data;
+    } catch (error: any) {
+      console.error(`Lỗi kiểm tra trạng thái thanh toán cho đơn hàng ${orderId}:`, error);
+      // Return a default "not paid" status on API error to prevent polling from stopping
+      return {
+        success: false,
+        paid: false,
+        message: error.response?.data?.message || 'Không thể kiểm tra trạng thái thanh toán.'
+      };
+    }
+  }
+
+  static async confirmPayment(orderId: number): Promise<{ success: boolean; message: string; data?: any }> {
+    try {
+      const response = await apiClient.post(`/orders/${orderId}/confirm-payment`);
+      return response.data;
+    } catch (error: any) {
+      console.error(`Lỗi xác nhận thanh toán cho đơn hàng ${orderId}:`, error);
+      throw error.response?.data || new Error('Không thể xác nhận thanh toán.');
+    }
+  }
+
+
 }
 
 export default OrderService;
