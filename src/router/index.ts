@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from "vue-router";
+import { watch } from "vue";
 import type { RouteRecordRaw } from "vue-router";
 import { userRoutes } from "./userRouter";
 import { adminRoutes } from "./adminRouter";
@@ -21,6 +22,18 @@ router.beforeEach(async (to, from, next) => {
 
   // Get auth store instance
   const authStore = useAuthStore();
+
+  // Wait for authentication to be ready before proceeding
+  if (!authStore.isAuthReady) {
+    await new Promise(resolve => {
+      const unwatch = watch(() => authStore.isAuthReady, (isReady) => {
+        if (isReady) {
+          unwatch();
+          resolve(true);
+        }
+      });
+    });
+  }
 
   // Check if we're navigating from login/register pages
   const isFromAuth = from.name === 'Login' || from.name === 'Register';

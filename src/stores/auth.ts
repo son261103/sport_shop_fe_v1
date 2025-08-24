@@ -16,6 +16,7 @@ export const useAuthStore = defineStore("auth", () => {
   const token = ref<string | null>(AuthService.getToken());
   const isLoading = ref(false);
   const error = ref<AuthError | null>(null);
+  const isAuthReady = ref(false); // New state to track initialization
 
   // Getters
   const isAuthenticated = computed(() => !!token.value && !!user.value);
@@ -198,88 +199,93 @@ export const useAuthStore = defineStore("auth", () => {
    * Initialize authentication state
    */
   const initAuth = async (): Promise<void> => {
-    const storedToken = AuthService.getToken();
-    const storedUser = AuthService.getStoredUser();
-    
-    if (storedToken) {
-      // Restore token and user data from localStorage
-      setToken(storedToken);
-      
-      if (storedUser) {
-        setUser(storedUser);
-      }
-      
-      try {
-        // Try to refresh user data from server to ensure it's up to date
-        await refreshUser();
-        
-        // Initialize cart after successful auth restoration
-        try {
-          const cartStore = useCartStore();
-          await cartStore.initializeCart();
-        } catch (cartError) {
-          console.error('Failed to initialize cart during auth init:', cartError);
-          // Don't fail auth if cart initialization fails
-        }
-        
-      } catch (error: any) {
-        console.error("🔐 Auth initialization error:", error);
+    try {
+      const storedToken = AuthService.getToken();
+      const storedUser = AuthService.getStoredUser();
 
-        // Only try to refresh token if we get a 401 error (unauthorized)
-        if (error.type === 'unauthorized' || error.status === 401) {
-          console.log('🔐 Attempting token refresh...');
-          try {
-            const refreshResponse = await AuthService.refreshToken();
-            if (refreshResponse.status && refreshResponse.data.token) {
-              setToken(refreshResponse.data.token);
-              console.log('🔐 Token refreshed successfully');
-              // Retry getting user data with new token
-              await refreshUser();
-              
-              // Initialize cart after successful token refresh
-              try {
-                const cartStore = useCartStore();
-                await cartStore.initializeCart();
-              } catch (cartError) {
-                console.error('Failed to initialize cart after token refresh:', cartError);
-              }
-              
-              return;
-            }
-          } catch (refreshError: any) {
-            console.error("🔐 Token refresh failed:", refreshError);
-            // Clear authentication for any refresh error
-            console.warn('🔐 Token refresh failed. Clearing authentication.');
-          }
+      if (storedToken) {
+        // Restore token and user data from localStorage
+        setToken(storedToken);
+
+        if (storedUser) {
+          setUser(storedUser);
         }
-        
-        // If we have stored user data but can't refresh from server,
-        // keep the user logged in with cached data (offline mode)
-        if (storedUser && error.type === 'network') {
-          console.warn('Network error during auth init. Using cached user data.');
-          
-          // Initialize cart even in offline mode
+
+        try {
+          // Try to refresh user data from server to ensure it's up to date
+          await refreshUser();
+
+          // Initialize cart after successful auth restoration
           try {
             const cartStore = useCartStore();
             await cartStore.initializeCart();
           } catch (cartError) {
-            console.error('Failed to initialize cart in offline mode:', cartError);
+            console.error('Failed to initialize cart during auth init:', cartError);
+            // Don't fail auth if cart initialization fails
           }
-          
-          return;
-        }
-        
-        // Clear invalid authentication
-        console.log('🔐 Clearing invalid authentication data');
-        AuthService.clearAuthData();
-        setUser(null);
-        setToken(null);
-      }
-    } else {
-      console.log('🔐 No stored token found');
-    }
 
-    console.log('🔐 Authentication initialization complete. Authenticated:', isAuthenticated.value);
+        } catch (error: any) {
+          console.error("🔐 Auth initialization error:", error);
+
+        // Only try to refresh token if we get a 40
+          if (error.type === 'unauthorized' || error.status === 401) {
+            console.log('🔐 Attempting token refresh...');
+            try {
+              const refreshResponse = await AuthService.refreshToken();
+              if (refreshResponse.status && refreshResponse.data.token) {
+                setToken(refreshResponse.data.token);
+                console.log('🔐 Token refreshed successfully');
+                // Retry getting user data with new token
+                await refreshUser();
+
+                // Initialize cart after successful token refresh
+                try {
+                  const cartStore = useCartStore();
+                  await cartStore.initializeCart();
+                } catch (cartError) {
+                  console.error('Failed to initialize cart after token refresh:', cartError);
+                }
+
+                return;
+              }
+            } catch (refreshError: any) {
+              console.error("🔐 Token refresh failed:", refreshError);
+              // Clear authentication for any refresh error
+              console.warn('🔐 Token refresh failed. Clearing authentication.');
+            }
+          }
+
+          // If we have stored user data but can't refresh from server,
+          // keep the user logged in with cached data (offline mode)
+          if (storedUser && error.type === 'network') {
+            console.warn('Network error during auth init. Using cached user data.');
+
+            // Initialize cart even in offline mode
+            try {
+              const cartStore = useCartStore();
+              await cartStore.initializeCart();
+            } catch (cartError) {
+              console.error('Failed to initialize cart in offline mode:', cartError);
+            }
+
+            return;
+          }
+
+          // Clear invalid authentication
+          console.log('🔐 Clearing invalid authentication data');
+          AuthService.clearAuthData();
+          setUser(null);
+          setToken(null);
+        }
+      } else {
+        console.log('🔐 No stored token found');
+      }
+
+      console.log('🔐 Authentication initialization complete. Authenticated:', isAuthenticated.value);
+    } finally {
+      isAuthReady.value = true;
+      console.log('🔐 Auth is ready.');
+    }
   };
 
   /**
@@ -303,6 +309,7 @@ export const useAuthStore = defineStore("auth", () => {
     token: readonly(token),
     isLoading: readonly(isLoading),
     error: readonly(error),
+    isAuthReady: readonly(isAuthReady), // Export the new state
 
     // Getters
     isAuthenticated,
