@@ -240,6 +240,25 @@ const SettingsIcon = () =>
     ]
   );
 
+const CartIcon = () =>
+  h(
+    "svg",
+    {
+      fill: "none",
+      stroke: "currentColor",
+      viewBox: "0 0 24 24",
+      class: "w-5 h-5",
+    },
+    [
+      h("path", {
+        "stroke-linecap": "round",
+        "stroke-linejoin": "round",
+        "stroke-width": "2",
+        d: "M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17M17 13v4a2 2 0 01-2 2H9a2 2 0 01-2-2v-4m8 0V9a2 2 0 00-2-2H9a2 2 0 00-2 2v4.01",
+      }),
+    ]
+  );
+
 const menuItems = [
   {
     path: "/admin",
@@ -260,6 +279,11 @@ const menuItems = [
     path: "/admin/products",
     label: "Products",
     icon: CubeIcon,
+  },
+  {
+    path: "/admin/carts",
+    label: "Carts",
+    icon: CartIcon,
   },
   {
     path: "/admin/orders",

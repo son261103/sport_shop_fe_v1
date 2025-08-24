@@ -81,6 +81,16 @@ export const adminRoutes: RouteRecordRaw[] = [
         },
       },
       {
+        path: "carts",
+        name: "AdminCarts",
+        component: () => import("@/views/admin/AdminCart.vue"),
+        meta: {
+          title: "Carts - Admin Dashboard",
+          requiresAuth: true,
+          requiresAdmin: true,
+        },
+      },
+      {
         path: "analytics",
         name: "AdminAnalytics",
         component: () => import("@/views/admin/AdminAnalytics.vue"),

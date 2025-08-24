@@ -8,6 +8,7 @@ export { default as Badge } from './Badge.vue'
 export { default as Table } from './Table.vue'
 export { default as Loading } from './Loading.vue'
 export { default as ComponentSection } from './ComponentSection.vue'
+export { default as Icon } from './Icon.vue'
 
 // Export component types for TypeScript
 export type ButtonVariant = 'primary' | 'secondary' | 'danger' | 'warning' | 'info' | 'ghost' | 'outline'
