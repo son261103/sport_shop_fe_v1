@@ -1,22 +1,70 @@
 export interface Order {
   id: number;
   user_id: number;
-  status: 'pending' | 'confirmed' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
-  payment_status: 'pending' | 'paid' | 'failed' | 'refunded';
-  payment_method: 'sepay' | 'cod';
-  total_amount: string;
-  shipping_address: string;
-  notes?: string;
-  created_at: string;
-  updated_at: string;
-  user?: {
+  user: {
     id: number;
     name: string;
     email: string;
+    role: string;
+    created_at: string;
+    updated_at: string;
   };
-  items?: OrderItem[];
+  total_price: number;
+  shipping_fee: number;
+  discount_amount: number;
+  final_total: number;
+  status: 'pending' | 'confirmed' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
+  payment_method: 'sepay' | 'cod';
+  payment_status: 'pending' | 'paid' | 'failed' | 'refunded';
+  transaction_id?: string;
+  paid_at?: string;
+  shipping_address: string;
+  shipping_city: string;
+  shipping_district: string;
+  shipping_ward: string;
+  shipping_phone: string;
+  notes?: string;
+  sepay_reference_code?: string;
+  order_details: OrderDetail[];
+  created_at: string;
+  updated_at: string;
 }
 
+export interface OrderDetail {
+  id: number;
+  order_id: number;
+  product_id: number;
+  product: {
+    id: number;
+    name: string;
+    price: number;
+    discount_price: number;
+    description: string;
+    image: string;
+    cloudinary_public_id: string;
+    stock_quantity: number;
+    is_active: boolean;
+    category_id: number;
+    brand_id: number;
+    category: {
+      id: number;
+      name: string;
+    };
+    brand: {
+      id: number;
+      name: string;
+    };
+    created_at: string;
+    updated_at: string;
+  };
+  quantity: number;
+  price: number;
+  total: number;
+  created_at: string;
+  updated_at: string;
+}
+
+// Keep OrderItem for backward compatibility
 export interface OrderItem {
   id: number;
   order_id: number;
@@ -61,14 +109,7 @@ export interface OrderPaginationData {
 
 export interface OrderListResponse {
   success: boolean;
-  message: string;
   data: Order[];
-  pagination: {
-    current_page: number;
-    per_page: number;
-    total: number;
-    last_page: number;
-  };
 }
 
 export interface OrderResponse {
