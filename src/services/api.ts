@@ -85,7 +85,7 @@ apiClient.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
     // Show loading for API requests (except for specific endpoints)
     const { showLoading } = useLoading();
-        if (!config.url?.includes("/auth/check") && !config.url?.includes("/check-payment")) {
+        if (!config.url?.includes("/auth/check") && !config.url?.includes("/check-payment") && !config.url?.includes("/chat")) {
       showLoading("Đang xử lý...");
     }
 
@@ -320,7 +320,10 @@ export const api = {
     me: (): Promise<User> => {
       return apiClient
         .get("/me")
-        .then((response: AxiosResponse) => response.data);
+        .then((response: AxiosResponse) => {
+          console.log('🔍 /me API response:', response.data);
+          return response.data.data; // Correctly extract nested data
+        });
     },
 
     // Refresh token

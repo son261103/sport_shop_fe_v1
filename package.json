@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@f3ve/vue-markdown-it": "^0.2.3",
     "@tailwindcss/vite": "^4.1.8",
     "@vicons/ionicons5": "^0.13.0",
     "aos": "^2.3.4",

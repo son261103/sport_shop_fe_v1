@@ -27,7 +27,7 @@
             <p class="text-sm text-light-text-secondary dark:text-dark-text-secondary">Sắp xếp theo</p>
           </div>
         </div>
-        <button 
+        <button
           @click="clearAllFilters"
           class="px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all duration-200 flex items-center gap-2"
         >
@@ -71,7 +71,7 @@
             class="w-full px-4 py-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-light-text-primary dark:text-dark-text-primary cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-200"
           />
         </div>
-        
+
         <!-- Date To Filter -->
         <div class="space-y-2">
           <label class="flex items-center gap-2 text-sm font-medium text-light-text-primary dark:text-dark-text-primary">
@@ -242,7 +242,7 @@
               <p class="text-sm text-light-text-secondary dark:text-dark-text-secondary">Tổng cộng {{ filteredCarts.length }} giỏ hàng</p>
             </div>
           </div>
-          <button 
+          <button
             @click="refreshData"
             class="px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-all duration-200 flex items-center gap-2"
           >
@@ -384,7 +384,7 @@
       <div class="flex items-center text-sm text-light-text-secondary dark:text-dark-text-secondary">
         <span>Hiển thị {{ startIndex + 1 }}-{{ endIndex }} trong tổng số {{ totalItems }} giỏ hàng</span>
       </div>
-      
+
       <div class="flex items-center space-x-2">
         <button
           @click="goToPage(currentPage - 1)"
@@ -396,7 +396,7 @@
           </svg>
           Trước
         </button>
-        
+
         <div class="flex items-center space-x-1">
           <button
             v-for="page in visiblePages"
@@ -412,7 +412,7 @@
             {{ page }}
           </button>
         </div>
-        
+
         <button
           @click="goToPage(currentPage + 1)"
           :disabled="currentPage === totalPages"
@@ -447,7 +447,7 @@
             </svg>
           </button>
         </div>
-        
+
         <div class="p-6 overflow-y-auto max-h-[calc(90vh-140px)]">
           <div v-if="selectedCart" class="space-y-6">
             <!-- Customer Info -->
@@ -477,7 +477,7 @@
                 </div>
               </div>
             </div>
-            
+
             <!-- Cart Items -->
             <div class="bg-gray-50 dark:bg-gray-800/50 rounded-xl p-6">
               <h4 class="text-lg font-semibold text-light-text-primary dark:text-dark-text-primary mb-4 flex items-center gap-2">
@@ -490,9 +490,9 @@
                 <div v-for="item in selectedCart.items" :key="item.id" class="flex items-center gap-4 p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
                   <div class="flex-shrink-0">
                     <div class="w-16 h-16 bg-gray-200 dark:bg-gray-600 rounded-lg overflow-hidden">
-                      <img 
-                        v-if="item.image || item.product_image" 
-                        :src="item.image || item.product_image || '/placeholder-image.jpg'" 
+                      <img
+                        v-if="item.image || item.product_image"
+                        :src="item.image || item.product_image || '/placeholder-image.jpg'"
                         :alt="item.product_name"
                         class="w-full h-full object-cover"
                         @error="($event.target as HTMLImageElement).style.display='none'"
@@ -522,7 +522,7 @@
                 <p class="text-light-text-secondary dark:text-dark-text-secondary">Giỏ hàng trống</p>
               </div>
             </div>
-            
+
             <!-- Cart Summary -->
             <div class="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-xl p-6">
               <h4 class="text-lg font-semibold text-light-text-primary dark:text-dark-text-primary mb-4 flex items-center gap-2">
@@ -544,7 +544,7 @@
             </div>
           </div>
         </div>
-        
+
         <div class="flex items-center justify-end gap-3 p-6 border-t border-gray-200 dark:border-gray-700">
           <button @click="closeCartModal" class="px-6 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition-all duration-200">
             Đóng
@@ -577,12 +577,14 @@ interface CartItem {
   product_image?: string
   variant_name: string
   price: number
+
   quantity: number
   image?: string
   stock_quantity?: number
 }
 
 // Notifications
+import { useAuthStore } from '@/stores/auth';
 const { showError } = useNotification()
 
 // Data
@@ -606,6 +608,7 @@ const showCartModal = ref(false)
 const selectedCart = ref<Cart | null>(null)
 
 // Statistics
+const authStore = useAuthStore();
 interface CartStatistics {
   total_carts: number
   active_carts: number
@@ -680,47 +683,47 @@ const hasActiveFilters = computed(() => {
 
 const filteredCarts = computed(() => {
   let filtered = [...carts.value]
-  
+
   // Search filter
   if (searchQuery.value) {
     const query = searchQuery.value.toLowerCase()
-    filtered = filtered.filter(cart => 
+    filtered = filtered.filter(cart =>
       cart.id.toString().includes(query) ||
       cart.customer_name?.toLowerCase().includes(query) ||
       cart.customer_email?.toLowerCase().includes(query)
     )
   }
-  
+
   // Date filters
   if (dateFrom.value) {
-    filtered = filtered.filter(cart => 
+    filtered = filtered.filter(cart =>
       new Date(cart.created_at) >= new Date(dateFrom.value)
     )
   }
-  
+
   if (dateTo.value) {
-    filtered = filtered.filter(cart => 
+    filtered = filtered.filter(cart =>
       new Date(cart.created_at) <= new Date(dateTo.value)
     )
   }
-  
+
   // Sort
   filtered.sort((a, b) => {
     let aValue: any = a[sortBy.value as keyof Cart]
     let bValue: any = b[sortBy.value as keyof Cart]
-    
+
     if (sortBy.value === 'created_at' || sortBy.value === 'updated_at') {
       aValue = new Date(aValue).getTime()
       bValue = new Date(bValue).getTime()
     }
-    
+
     if (sortOrder.value === 'asc') {
       return aValue > bValue ? 1 : -1
     } else {
       return aValue < bValue ? 1 : -1
     }
   })
-  
+
   return filtered
 })
 
@@ -738,7 +741,7 @@ const visiblePages = computed(() => {
   const pages = []
   const total = totalPages.value
   const current = currentPage.value
-  
+
   if (total <= 7) {
     for (let i = 1; i <= total; i++) {
       pages.push(i)
@@ -762,7 +765,7 @@ const visiblePages = computed(() => {
       pages.push('...', total)
     }
   }
-  
+
   return pages
 })
 
@@ -781,26 +784,26 @@ const totalItems = computed(() => filteredCarts.value.length)
 // Methods
 const fetchStatistics = async () => {
   try {
-    const response = await fetch('http://192.168.2.17:8000/api/admin/carts/statistics', {
+    const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/admin/carts/statistics`, {
       headers: {
         'Accept': 'application/json',
-        'Authorization': 'Bearer 132|tdYuqi9hMMT3wOsuWWazHmgEhCkHaC5KUtxEsdHRfddac653',
+        'Authorization': `Bearer ${authStore.token}`,
         'X-CSRF-TOKEN': ''
       }
     })
-    
+
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`)
     }
-    
+
     const data = await response.json()
-    
+
     if (data.success) {
       statistics.value = data.data
     } else {
       throw new Error('API returned unsuccessful response')
     }
-    
+
   } catch (err) {
     console.error('Error loading statistics:', err)
     showError('Không thể tải thống kê giỏ hàng')
@@ -811,30 +814,30 @@ const loadCarts = async () => {
   try {
     loading.value = true
     error.value = ''
-    
+
     const params = new URLSearchParams({
       page: currentPage.value.toString(),
       per_page: itemsPerPage.value.toString()
     })
-    
+
     if (searchQuery.value) {
       params.append('search', searchQuery.value)
     }
-    
-    const response = await fetch(`http://192.168.2.17:8000/api/admin/carts?${params}`, {
+
+    const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/admin/carts?${params}`, {
       headers: {
         'Accept': 'application/json',
-        'Authorization': 'Bearer 132|tdYuqi9hMMT3wOsuWWazHmgEhCkHaC5KUtxEsdHRfddac653',
+        'Authorization': `Bearer ${authStore.token}`,
         'X-CSRF-TOKEN': ''
       }
     })
-    
+
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`)
     }
-    
+
     const data: ApiResponse = await response.json()
-    
+
     if (data.success) {
       // Transform API data to match existing Cart interface
       carts.value = data.data.data.map(apiCart => ({
@@ -842,7 +845,7 @@ const loadCarts = async () => {
         customer_name: apiCart.user.name,
         customer_email: apiCart.user.email,
         total_items: apiCart.cart_items.length,
-        total_amount: apiCart.cart_items.reduce((sum: number, item: ApiCartItem) => 
+        total_amount: apiCart.cart_items.reduce((sum: number, item: ApiCartItem) =>
           sum + (parseFloat(item.product.discount_price) * item.quantity), 0
         ),
         created_at: apiCart.created_at,
@@ -858,7 +861,7 @@ const loadCarts = async () => {
     } else {
       throw new Error('API returned unsuccessful response')
     }
-    
+
   } catch (err) {
     error.value = 'Có lỗi xảy ra khi tải dữ liệu giỏ hàng'
     console.error('Error loading carts:', err)
@@ -882,27 +885,27 @@ const goToPage = (page: number | string) => {
 const viewCartDetails = async (cart: Cart) => {
   loading.value = true
   try {
-    const response = await fetch(`http://192.168.2.17:8000/api/admin/carts/${cart.id}`, {
+    const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/admin/carts/${cart.id}`, {
       headers: {
         'Accept': 'application/json',
-        'Authorization': 'Bearer 132|tdYuqi9hMMT3wOsuWWazHmgEhCkHaC5KUtxEsdHRfddac653',
+        'Authorization': `Bearer ${authStore.token}`,
         'X-CSRF-TOKEN': ''
       }
     })
-    
+
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`)
     }
-    
+
     const data = await response.json()
-    
+
     if (data.success) {
       selectedCart.value = {
         id: data.data.id,
         customer_name: data.data.user.name,
         customer_email: data.data.user.email,
         total_items: data.data.cart_items.length,
-        total_amount: data.data.cart_items.reduce((sum: number, item: any) => 
+        total_amount: data.data.cart_items.reduce((sum: number, item: any) =>
           sum + (parseFloat(item.product.discount_price) * item.quantity), 0
         ),
         created_at: data.data.created_at,

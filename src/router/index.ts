@@ -62,7 +62,10 @@ router.beforeEach(async (to, from, next) => {
     requiresAdmin,
     isAuthenticated,
     hasToken: !!authStore.token,
-    hasUser: !!authStore.user
+    hasUser: !!authStore.user,
+    userRole: authStore.user?.role,
+    isAdmin: authStore.isAdmin,
+    isAuthReady: authStore.isAuthReady
   });
 
   if (requiresAuth && !isAuthenticated) {

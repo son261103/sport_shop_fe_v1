@@ -1,5 +1,5 @@
 <template>
-  <div class="space-y-6">
+  <div class="p-6 space-y-6">
     <!-- Loading State -->
     <div v-if="isLoading" class="flex items-center justify-center py-12">
       <Loading size="lg" color="sport" text="Đang tải dữ liệu dashboard..." />
@@ -11,21 +11,27 @@
       <WelcomeSection />
 
       <!-- Stats Cards -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <StatCard v-for="stat in stats" :key="stat.title" v-bind="stat" />
-      </div>
+      <Card>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <StatCard v-for="stat in stats" :key="stat.title" v-bind="stat" />
+        </div>
+      </Card>
 
       <!-- Charts Section -->
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <!-- Sales Chart -->
-        <SalesChart />
+      <Card>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <!-- Sales Chart -->
+          <SalesChart />
 
-        <!-- Recent Orders -->
-        <RecentOrders :orders="recentOrders" />
-      </div>
+          <!-- Recent Orders -->
+          <RecentOrders :orders="recentOrders" />
+        </div>
+      </Card>
 
       <!-- Quick Actions -->
-      <QuickActions :actions="quickActions" @action-click="handleActionClick" />
+      <Card>
+        <QuickActions :actions="quickActions" @action-click="handleActionClick" />
+      </Card>
     </div>
   </div>
 </template>
@@ -43,6 +49,7 @@ import {
   type ActionData,
 } from "@/components/admin/home";
 import { Loading } from "@/components/ui";
+import { Card } from "@/components/ui";
 
 // Loading state
 const isLoading = ref(true);

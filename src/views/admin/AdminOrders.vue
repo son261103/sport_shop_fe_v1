@@ -756,7 +756,7 @@ const loadOrders = async () => {
     
     // Call API
     const response = await orderService.getOrders(params)
-    orders.value = response.data
+    orders.value = response.data.data
     
   } catch (err: any) {
     error.value = err.message || 'Có lỗi xảy ra khi tải danh sách đơn hàng'

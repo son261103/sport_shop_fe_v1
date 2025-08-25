@@ -290,25 +290,6 @@ const menuItems = [
     label: "Orders",
     icon: DocumentIcon,
   },
-  {
-    path: "/admin/customers",
-    label: "Customers",
-    icon: PeopleIcon,
-  },
-  {
-    path: "/admin/analytics",
-    label: "Analytics",
-    icon: ChartIcon,
-  },
-  {
-    path: "/admin/store",
-    label: "Store Settings",
-    icon: StoreIcon,
-  },
-  {
-    path: "/admin/settings",
-    label: "Settings",
-    icon: SettingsIcon,
-  },
+  
 ];
 </script>

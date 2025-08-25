@@ -27,6 +27,11 @@ export const useAuthStore = defineStore("auth", () => {
 
   // Actions
   const setUser = (userData: User | null) => {
+    console.log('🔐 Setting user data:', {
+      hasUser: !!userData,
+      userRole: userData?.role,
+      userName: userData?.name
+    });
     user.value = userData;
   };
 
@@ -282,6 +287,11 @@ export const useAuthStore = defineStore("auth", () => {
       }
 
       console.log('🔐 Authentication initialization complete. Authenticated:', isAuthenticated.value);
+      console.log('🔐 User data:', {
+        hasUser: !!user.value,
+        userRole: user.value?.role,
+        isAdmin: isAdmin.value
+      });
     } finally {
       isAuthReady.value = true;
       console.log('🔐 Auth is ready.');
