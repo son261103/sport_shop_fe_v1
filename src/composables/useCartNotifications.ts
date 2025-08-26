@@ -3,6 +3,7 @@ import { useCartStore } from '@/stores/cart';
 import { useNotification } from '@/composables/useNotification';
 import { useLoading } from '@/composables/useLoading';
 import type { AddToCartRequest } from '@/types/cart';
+import { getCartErrorMessage } from '@/utils/cartValidation';
 
 export function useCartNotifications() {
   const cartStore = useCartStore();
@@ -46,7 +47,11 @@ export function useCartNotifications() {
       showSuccess('Đã xóa sản phẩm khỏi giỏ hàng!');
       return result;
     } catch (error: any) {
-      const message = error.response?.data?.message || 'Không thể xóa sản phẩm khỏi giỏ hàng';
+      console.error('Remove from cart error:', error);
+
+      // Sử dụng utility function để tạo error message
+      const message = getCartErrorMessage(error);
+
       showError(message);
       throw error;
     } finally {

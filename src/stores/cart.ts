@@ -3,6 +3,7 @@ import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import CartService from '@/services/cartService';
 import type { CartItem, AddToCartRequest } from '@/types/cart';
+import { validateItemForRemoval, getCartErrorMessage } from '@/utils/cartValidation';
 
 export const useCartStore = defineStore('cart', () => {
   // State
@@ -14,6 +15,20 @@ export const useCartStore = defineStore('cart', () => {
   const discountAmount = ref(0);
   const isLoading = ref(false);
   const isCartOpen = ref(false);
+
+  // Helper function để update cart count an toàn
+  const updateCartCountSafely = async (response: any) => {
+    if (response?.data && typeof response.data.cart_count === 'number') {
+      totalItems.value = response.data.cart_count;
+    } else {
+      // Fallback: lấy cart count từ API riêng
+      try {
+        await getCartCount();
+      } catch (countError) {
+        console.warn('Failed to get cart count:', countError);
+      }
+    }
+  };
 
   // Computed
   const cartCount = computed(() => totalItems.value);
@@ -78,13 +93,13 @@ export const useCartStore = defineStore('cart', () => {
     try {
       isLoading.value = true;
       const response = await CartService.addToCart(request);
-      
-      // Update cart count
-      totalItems.value = response.data.cart_count;
-      
+
+      // Update cart count an toàn
+      await updateCartCountSafely(response);
+
       // Refresh cart data
       await fetchCart();
-      
+
       return response.data;
     } catch (error: any) {
       console.error('Error adding to cart:', error);
@@ -102,13 +117,13 @@ export const useCartStore = defineStore('cart', () => {
     try {
       isLoading.value = true;
       const response = await CartService.updateCartItem(itemId, { quantity });
-      
-      // Update cart count
-      totalItems.value = response.data.cart_count;
-      
+
+      // Update cart count an toàn
+      await updateCartCountSafely(response);
+
       // Refresh cart data
       await fetchCart();
-      
+
       return response.data;
     } catch (error: any) {
       console.error('Error updating cart item:', error);
@@ -121,18 +136,44 @@ export const useCartStore = defineStore('cart', () => {
   const removeFromCart = async (itemId: number) => {
     try {
       isLoading.value = true;
+
+      // Debug: Log trước khi gọi API
+      console.log('Attempting to remove cart item:', itemId);
+      console.log('Current cart items:', items.value);
+
+      // Validate item trước khi xóa
+      const validation = await validateItemForRemoval(itemId, items.value, fetchCart);
+      if (!validation.isValid) {
+        throw new Error(validation.message);
+      }
+
       const response = await CartService.removeFromCart(itemId);
-      
-      // Update cart count
-      totalItems.value = response.data.cart_count;
-      
-      // Refresh cart data
+
+      // Update cart count an toàn
+      await updateCartCountSafely(response);
+
+      // Refresh cart data để đồng bộ với server
       await fetchCart();
-      
+
       return response.data;
     } catch (error: any) {
       console.error('Error removing from cart:', error);
-      throw error;
+      console.error('Error response:', error.response?.data);
+
+      // Sử dụng utility function để tạo error message
+      const errorMessage = getCartErrorMessage(error);
+
+      // Refresh cart nếu gặp lỗi 404 để đồng bộ với server
+      if (error.type === 'not_found' || error.response?.status === 404) {
+        console.warn('Cart item not found on server, refreshing cart...');
+        try {
+          await fetchCart();
+        } catch (refreshError) {
+          console.error('Failed to refresh cart:', refreshError);
+        }
+      }
+
+      throw new Error(errorMessage);
     } finally {
       isLoading.value = false;
     }

@@ -231,6 +231,7 @@ apiClient.interceptors.response.use(
       throw {
         type: "unauthorized",
         message: "Authentication required",
+        response: error.response
       };
     }
 
@@ -238,6 +239,16 @@ apiClient.interceptors.response.use(
       throw {
         type: "forbidden",
         message: "Access denied",
+        response: error.response
+      };
+    }
+
+    if (error.response?.status === 404) {
+      console.error("404 Not Found error:", error.response?.data || error.message);
+      throw {
+        type: "not_found",
+        message: error.response?.data?.message || "Resource not found",
+        response: error.response
       };
     }
 
@@ -245,6 +256,7 @@ apiClient.interceptors.response.use(
       throw {
         type: "server",
         message: "Server error occurred",
+        response: error.response
       };
     }
 
@@ -252,6 +264,7 @@ apiClient.interceptors.response.use(
     throw {
       type: "network",
       message: error.message || "Network error occurred",
+      response: error.response
     };
   }
 );

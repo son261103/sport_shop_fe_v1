@@ -76,8 +76,8 @@ export interface AddToCartRequest {
 export interface AddToCartResponse {
   success: boolean;
   data: {
-    item: CartItem;
-    cart_count: number;
+    item?: CartItem;
+    cart_count?: number;
   };
   message: string;
 }
@@ -89,24 +89,24 @@ export interface UpdateCartItemRequest {
 export interface UpdateCartItemResponse {
   success: boolean;
   data: {
-    item: CartItem;
-    cart_count: number;
+    item?: CartItem;
+    cart_count?: number;
   };
   message: string;
 }
 
 export interface RemoveFromCartResponse {
   success: boolean;
-  data: {
-    cart_count: number;
+  data?: {
+    cart_count?: number;
   };
   message: string;
 }
 
 export interface ClearCartResponse {
   success: boolean;
-  data: {
-    cart_count: number;
+  data?: {
+    cart_count?: number;
   };
   message: string;
 }
